@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include "JSSocket.h"
@@ -265,7 +238,7 @@ connect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_TRUE;
         }
 
-    	JS_ReportError(cx, "Tried to call connect() on a socket that was instantiated without a socket type");
+        JS_ReportError(cx, "Tried to call connect() on a socket that was instantiated without a socket type");
         return JS_FALSE;
 
     } HANDLE_CPP_EXCEPTION;
@@ -336,8 +309,8 @@ JSSocket::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, j
             *vp = as_jsval(cx, getNative().isValid());
             return JS_TRUE;
         case PROP_isConnected:
-        	*vp = as_jsval(cx, getNative().isConnected());
-        	return JS_TRUE;
+            *vp = as_jsval(cx, getNative().isConnected());
+            return JS_TRUE;
         case PROP_sendBufferSize:
             *vp = as_jsval(cx, getNative().getSendBufferSize());
             return JS_TRUE;

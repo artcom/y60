@@ -48,7 +48,7 @@
 
 namespace y60 {
 
-	class NetAsync : 
+    class NetAsync : 
         public asl::PlugInBase, 
         public IRendererExtension, 
         public jslib::IScriptablePlugin
@@ -98,7 +98,7 @@ namespace y60 {
 
     private:
         AsioThreadPtr _myAsioThread;
-	};
+    };
 }
 
 #endif

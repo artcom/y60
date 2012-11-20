@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO  
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations: 
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include "JSHttpServer.h"
@@ -112,10 +85,10 @@ registerCallback(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     } 
     JS_ValueToObject(cx,argv[1],&myCallingObject);
 
-	if (!JS_ValueToFunction(cx, argv[2])) {
-		JS_ReportError(cx, "Argument 3 is not a function!" );
-		return JS_FALSE;
-	}
+    if (!JS_ValueToFunction(cx, argv[2])) {
+        JS_ReportError(cx, "Argument 3 is not a function!" );
+        return JS_FALSE;
+    }
     
     std::string myContentType = "text/plain";
     if (argc > 3 && !convertFrom(cx, argv[3], myContentType)) {
@@ -126,7 +99,7 @@ registerCallback(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     async::http::JSCallback myCallback;
     myCallback.context = cx;
     myCallback.object = myCallingObject;
-	myCallback.functionValue = argv[2];
+    myCallback.functionValue = argv[2];
     myCallback.contentType = myContentType;
 
     async::http::Server & myNative = JSHttpServer::getJSWrapper(cx, obj).openNative();

@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef _ac_renderer_Renderer_h_
@@ -91,8 +64,8 @@
 
 // CG support
 #ifndef _AC_NO_CG_
-	#include <Cg/cg.h>
-	#include <Cg/cgGL.h>
+    #include <Cg/cg.h>
+    #include <Cg/cgGL.h>
 #endif
 
 #include <string>
@@ -174,8 +147,8 @@ namespace y60 {
             dom::NodePtr getActiveLodChild(dom::NodePtr theNode, const y60::CameraPtr theCamera);
 
             void createRenderList(const WorldPtr & theWorld,
-								  const dom::NodePtr & theNode,
-								  BodyPartMap & theBodyParts,
+                                  const dom::NodePtr & theNode,
+                                  BodyPartMap & theBodyParts,
                                   const y60::CameraPtr theCamera,
                                   const asl::Matrix4f & theEyeSpaceTransform,
                                   ViewportPtr theViewport,

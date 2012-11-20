@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include <y60/glutil/GLUtils.h> // must be included first for <GL/glew.h>
@@ -654,67 +627,67 @@ namespace y60 {
 
             switch (curParam._myID) {
             case CAMERA_POSITION :
-				{AC_TRACE << "setting CAMERA_POSITION to " << theCamera.get<GlobalMatrixTag>().getTranslation();}
+                {AC_TRACE << "setting CAMERA_POSITION to " << theCamera.get<GlobalMatrixTag>().getTranslation();}
                 setCgVectorParameter(curParam, theCamera.get<GlobalMatrixTag>().getTranslation());
                 break;
             case POSITIONAL_LIGHTS :
-				{AC_TRACE << "setting POSITIONAL_LIGHTS to " << myPositionalLights;}
+                {AC_TRACE << "setting POSITIONAL_LIGHTS to " << myPositionalLights;}
                 setCgUnsizedArrayParameter(curParam, myPositionalLights);
                 break;
             case POSITIONAL_LIGHTS_DIFFUSE_COLOR :
-				{AC_TRACE << "setting POSITIONAL_LIGHTS_DIFFUSE_COLOR to " << myPositionalLightDiffuseColors;}
+                {AC_TRACE << "setting POSITIONAL_LIGHTS_DIFFUSE_COLOR to " << myPositionalLightDiffuseColors;}
                 setCgUnsizedArrayParameter(curParam, myPositionalLightDiffuseColors);
                 break;
             case POSITIONAL_LIGHTS_SPECULAR_COLOR :
-				{AC_TRACE << "setting POSITIONAL_LIGHTS_SPECULAR_COLOR to " << myPositionalLightSpecularColors;}
+                {AC_TRACE << "setting POSITIONAL_LIGHTS_SPECULAR_COLOR to " << myPositionalLightSpecularColors;}
                 setCgUnsizedArrayParameter(curParam, myPositionalLightSpecularColors);
                 break;
             case DIRECTIONAL_LIGHTS :
-				{AC_TRACE << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;}
+                {AC_TRACE << "setting DIRECTIONAL_LIGHTS to " << myDirectionalLights;}
                 setCgUnsizedArrayParameter(curParam, myDirectionalLights);
                 break;
             case DIRECTIONAL_LIGHTS_DIFFUSE_COLOR :
-				{AC_TRACE << "setting DIRECTIONAL_LIGHTS_DIFFUSE_COLOR to " << myDirectionalLightDiffuseColors;}
+                {AC_TRACE << "setting DIRECTIONAL_LIGHTS_DIFFUSE_COLOR to " << myDirectionalLightDiffuseColors;}
                 setCgUnsizedArrayParameter(curParam, myDirectionalLightDiffuseColors);
                 break;
             case DIRECTIONAL_LIGHTS_SPECULAR_COLOR :
-				{AC_TRACE << "setting DIRECTIONAL_LIGHTS_SPECULAR_COLOR to " << myDirectionalLightSpecularColors;}
+                {AC_TRACE << "setting DIRECTIONAL_LIGHTS_SPECULAR_COLOR to " << myDirectionalLightSpecularColors;}
                 setCgUnsizedArrayParameter(curParam, myDirectionalLightSpecularColors);
                 break;
             case SPOT_LIGHTS :
-				{AC_TRACE << "setting SPOT_LIGHTS to " << mySpotLights;}
+                {AC_TRACE << "setting SPOT_LIGHTS to " << mySpotLights;}
                 setCgUnsizedArrayParameter(curParam, mySpotLights);
                 break;
             case SPOT_LIGHTS_DIFFUSE_COLOR :
-				{AC_TRACE << "setting SPOT_LIGHTS_DIFFUSE_COLOR to " << mySpotLightDiffuseColors;}
+                {AC_TRACE << "setting SPOT_LIGHTS_DIFFUSE_COLOR to " << mySpotLightDiffuseColors;}
                 setCgUnsizedArrayParameter(curParam, mySpotLightDiffuseColors);
                 break;
             case SPOT_LIGHTS_SPECULAR_COLOR :
-				{AC_TRACE << "setting SPOT_LIGHTS_SPECULAR_COLOR to " << mySpotLightSpecularColors;}
+                {AC_TRACE << "setting SPOT_LIGHTS_SPECULAR_COLOR to " << mySpotLightSpecularColors;}
                 setCgUnsizedArrayParameter(curParam, mySpotLightSpecularColors);
                 break;
             case SPOT_LIGHTS_EXPONENT :
-				{AC_TRACE << "setting SPOT_LIGHTS_EXPONENT to " << mySpotLightExponent;}
+                {AC_TRACE << "setting SPOT_LIGHTS_EXPONENT to " << mySpotLightExponent;}
                 setCgUnsizedArrayParameter(curParam, mySpotLightExponent);
                 break;
             case SPOT_LIGHTS_CUTOFF :
-				{AC_TRACE << "setting SPOT_LIGHTS_CUTOFF to " << mySpotLightCutoff;}
+                {AC_TRACE << "setting SPOT_LIGHTS_CUTOFF to " << mySpotLightCutoff;}
                 setCgUnsizedArrayParameter(curParam, mySpotLightCutoff);
                 break;
             case SPOT_LIGHTS_DIRECTION :
-				{AC_TRACE << "setting SPOT_LIGHTS_DIRECTION to " << mySpotLightDirection;}
+                {AC_TRACE << "setting SPOT_LIGHTS_DIRECTION to " << mySpotLightDirection;}
                 setCgUnsizedArrayParameter(curParam, mySpotLightDirection);
                 break;
             case SPOT_LIGHTS_ATTENUATION :
-				{AC_TRACE << "setting SPOT_LIGHTS_ATTENUATION to " << mySpotLightAttenuation;}
+                {AC_TRACE << "setting SPOT_LIGHTS_ATTENUATION to " << mySpotLightAttenuation;}
                 setCgUnsizedArrayParameter(curParam, mySpotLightAttenuation);
                 break;
             case AMBIENT_LIGHT_COLOR :
-				{AC_TRACE << "setting AMBIENT_LIGHT_COLOR to " << myAmbientLightColor;}
+                {AC_TRACE << "setting AMBIENT_LIGHT_COLOR to " << myAmbientLightColor;}
                 setCgVectorParameter(curParam, myAmbientLightColor);
                 break;
             case CAMERA_I:
-				{AC_TRACE << "setting CAMERA_I to " << theCamera.get<InverseGlobalMatrixTag>();}
+                {AC_TRACE << "setting CAMERA_I to " << theCamera.get<InverseGlobalMatrixTag>();}
                 setCgMatrixParameter(curParam, theCamera.get<InverseGlobalMatrixTag>());
                 break;
             case CAMERA_T:
@@ -737,11 +710,11 @@ namespace y60 {
                 break;
             }
             case OBJECTWORLD:
-				{AC_TRACE << "setting OBJECTWORLD to " << theBody.get<GlobalMatrixTag>();}
+                {AC_TRACE << "setting OBJECTWORLD to " << theBody.get<GlobalMatrixTag>();}
                 setCgMatrixParameter(curParam, theBody.get<GlobalMatrixTag>());
                 break;
             case OBJECTWORLD_I:
-				{AC_TRACE << "setting OBJECTWORLD_I to " << theBody.get<InverseGlobalMatrixTag>();}
+                {AC_TRACE << "setting OBJECTWORLD_I to " << theBody.get<InverseGlobalMatrixTag>();}
                 setCgMatrixParameter(curParam, theBody.get<InverseGlobalMatrixTag>());
                 break;
             case OBJECTWORLD_T:

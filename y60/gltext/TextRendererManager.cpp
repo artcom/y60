@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 //own header
 #include "TextRendererManager.h"
@@ -230,15 +203,15 @@ const asl::Vector2i &
                                           theImageNode, theString, theFont,
                                           theTargetWidth, theTargetHeight, theCursorPos);
         return mySize;
-	}
+    }
 
-	void
-	TextRendererManager::loadTTF(const std::string & theName, const std::string & theFileName,
-	                  int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
-	                  TTFFontInfo::FONTTYPE & theFonttype, int theAscendOffset)
+    void
+    TextRendererManager::loadTTF(const std::string & theName, const std::string & theFileName,
+                      int theHeight, TTFFontInfo::FONTHINTING & theFonthint,
+                      TTFFontInfo::FONTTYPE & theFonttype, int theAscendOffset)
     {
         _myTTFRenderer->loadFont(theName, expandEnvironment(theFileName), theHeight, theFonthint, theFonttype, theAscendOffset);
-	}
+    }
 
     bool
     TextRendererManager::getFontMetrics(const std::string & theFontName,

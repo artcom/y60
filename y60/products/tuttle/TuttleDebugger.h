@@ -37,7 +37,7 @@ namespace tuttle {
         JSContext          *_myContext;
         JSObject           *_myGlobal;
 
-	std::queue<Command *> _myQueue;
+    std::queue<Command *> _myQueue;
         asl::ThreadLock       _myQueueLock;
 
         asl::ThreadSemaphore  _myRequestSemaphore;

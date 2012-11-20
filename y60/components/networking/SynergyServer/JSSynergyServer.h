@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef _ac_jslib_JSSynergyServer_h_
@@ -139,16 +112,16 @@ namespace jslib {
 namespace y60 {
     class JSSynergyServerPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
     public:
-    	JSSynergyServerPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+        JSSynergyServerPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    	virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
+        virtual void initClasses(JSContext * theContext, JSObject * theGlobalObject) {
             jslib::JSSynergyServer::initClass(theContext, theGlobalObject);
-  	}
+    }
 
-   	const char * ClassName() {
-    	    static const char * myClassName = "SynergyServerPlugIn";
-    	    return myClassName;
-    	}
+    const char * ClassName() {
+            static const char * myClassName = "SynergyServerPlugIn";
+            return myClassName;
+        }
 };
 }
 

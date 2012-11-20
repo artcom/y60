@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 use("SceneViewer.js");
@@ -341,7 +314,7 @@ PathText.prototype.Constructor = function(self, theText, theFontSize, theCharact
 
             var myCharacterPos = new Vector3f(-0.5, -0.5, 0.0);
             var myCharacterSize = new Vector3f(1.0, 1.0, 0.0);
-      	    var myUVCoordX = 0.0;
+            var myUVCoordX = 0.0;
 
             for (var i = 0; i < _myText.length; ++i) {
                 var myCharacter = _myCharacters[i];

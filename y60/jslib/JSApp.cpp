@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
@@ -679,7 +652,7 @@ PreLoad(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         } else if (myNode->nodeName() == IMAGE_NODE_NAME) {
             myNode->getFacade<y60::Image>()->preload();
         } else if (myNode->nodeName() == MOVIE_NODE_NAME) {
-        	// do nothing
+            // do nothing
         } else {
             JS_ReportError(cx, "preLoad(): argument #1 must be a texture or image node");
             return JS_FALSE;
@@ -696,12 +669,12 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     try {
         if (argc != 2) {
-			JS_ReportError(cx, "saveImage(): expects at least two arguments : image node, file name.");
+            JS_ReportError(cx, "saveImage(): expects at least two arguments : image node, file name.");
             return JS_FALSE;
         }
 
-		dom::NodePtr myImageNode;
-		if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
+        dom::NodePtr myImageNode;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
             JS_ReportError(cx, "saveImage(): argument #1 must be an image node");
             return JS_FALSE;
         }
@@ -712,8 +685,8 @@ SaveImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
 
-		ImagePtr myImage = myImageNode->getFacade<y60::Image>();
-		myImage->saveToFile(myFileName);
+        ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+        myImage->saveToFile(myFileName);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -800,27 +773,27 @@ BlitImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     try {
         if (argc != 3 && argc != 5) {
-			JS_ReportError(cx, "blitImage(): expects at least three arguments : source image node,"
+            JS_ReportError(cx, "blitImage(): expects at least three arguments : source image node,"
                                "target image node, target position [,source position, source-size]");
             return JS_FALSE;
         }
-		dom::NodePtr mySourceImageNode;
-		if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], mySourceImageNode)) {
+        dom::NodePtr mySourceImageNode;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], mySourceImageNode)) {
             JS_ReportError(cx, "blitImage(): argument #1 must be an image node");
             return JS_FALSE;
         }
-		dom::NodePtr myTargetImageNode;
-		if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myTargetImageNode)) {
+        dom::NodePtr myTargetImageNode;
+        if (JSVAL_IS_VOID(argv[1]) || !convertFrom(cx, argv[1], myTargetImageNode)) {
             JS_ReportError(cx, "blitImage(): argument #2 must be an image node");
             return JS_FALSE;
         }
         asl::Vector2i myTargetPosition;
-		if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myTargetPosition)) {
+        if (JSVAL_IS_VOID(argv[2]) || !convertFrom(cx, argv[2], myTargetPosition)) {
             JS_ReportError(cx, "blitImage(): argument #3 must be a Vector2i");
             return JS_FALSE;
         }
-		ImagePtr myTargetImage = myTargetImageNode->getFacade<y60::Image>();
-		ImagePtr mySourceImage = mySourceImageNode->getFacade<y60::Image>();
+        ImagePtr myTargetImage = myTargetImageNode->getFacade<y60::Image>();
+        ImagePtr mySourceImage = mySourceImageNode->getFacade<y60::Image>();
         if (argc == 5) {
             asl::Vector2i myMinPosition;
             if (JSVAL_IS_VOID(argv[3]) || !convertFrom(cx, argv[3], myMinPosition)) {
@@ -833,9 +806,9 @@ BlitImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
                 return JS_FALSE;
             }
             asl::Box2i mySourceArea(myMinPosition, myMaxPosition);
-		    myTargetImage->blitImage(mySourceImage, myTargetPosition, & mySourceArea);
+            myTargetImage->blitImage(mySourceImage, myTargetPosition, & mySourceArea);
         } else {
-    		myTargetImage->blitImage(mySourceImage, myTargetPosition);
+            myTargetImage->blitImage(mySourceImage, myTargetPosition);
         }
 
         return JS_TRUE;
@@ -851,12 +824,12 @@ ApplyImageFilter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
     DOC_END;
     try {
         if (argc != 3) {
-			JS_ReportError(cx, "applyImageFilter(): expects three arguments : image node,"
+            JS_ReportError(cx, "applyImageFilter(): expects three arguments : image node,"
                                "filter name, vector of filter params");
             return JS_FALSE;
         }
-		dom::NodePtr myImageNode;
-		if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
+        dom::NodePtr myImageNode;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
             JS_ReportError(cx, "applyImageFilter(): argument #1 must be an image node");
             return JS_FALSE;
         }
@@ -873,8 +846,8 @@ ApplyImageFilter(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *r
             return JS_FALSE;
         }
 
-		ImagePtr myImage = myImageNode->getFacade<y60::Image>();
-		myImage->applyFilter(myFilterName, myFilterParams);
+        ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+        myImage->applyFilter(myFilterName, myFilterParams);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -890,13 +863,13 @@ SaveImageFiltered(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     DOC_END;
     try {
         if (argc != 4) {
-			JS_ReportError(cx, "saveImageFiltered(): expects at least four arguments : image node,"
+            JS_ReportError(cx, "saveImageFiltered(): expects at least four arguments : image node,"
                                "file name, filter name, filter params");
             return JS_FALSE;
         }
 
-		dom::NodePtr myImageNode;
-		if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
+        dom::NodePtr myImageNode;
+        if (JSVAL_IS_VOID(argv[0]) || !convertFrom(cx, argv[0], myImageNode)) {
             JS_ReportError(cx, "saveImageFiltered(): argument #1 must be an image node");
             return JS_FALSE;
         }
@@ -919,9 +892,9 @@ SaveImageFiltered(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
             return JS_FALSE;
         }
 
-		ImagePtr myImage = myImageNode->getFacade<y60::Image>();
-		//myImage->saveToFileFiltered(myFileName, myFilterName, myFilterParams);
-		myImage->saveToFile(myFileName, myFilterName, myFilterParams);
+        ImagePtr myImage = myImageNode->getFacade<y60::Image>();
+        //myImage->saveToFileFiltered(myFileName, myFilterName, myFilterParams);
+        myImage->saveToFile(myFileName, myFilterName, myFilterParams);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -1277,7 +1250,7 @@ ExpandEnvironment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 
         string myExpandedString = asl::expandEnvironment(myString);
 
-		*rval = as_jsval(cx, myExpandedString);
+        *rval = as_jsval(cx, myExpandedString);
 
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -1664,12 +1637,12 @@ static JSFunctionSpec glob_functions[] = {
     {"parseArguments",    ParseArguments, 3},
     {"plug",              Plug,           2},
     {"preLoad",           PreLoad,  1},
-    {"saveImage",         SaveImage,	  2},
+    {"saveImage",         SaveImage,      2},
     {"saveImageFiltered", SaveImageFiltered, 4},
     {"saveImageToBlock",  SaveImageToBlock, 1},
     {"saveImageToBlockFiltered",  SaveImageToBlockFiltered, 3},
-    {"applyImageFilter",  ApplyImageFilter,	3},
-    {"blitImage",         BlitImage,	5},
+    {"applyImageFilter",  ApplyImageFilter, 3},
+    {"blitImage",         BlitImage,    5},
     {"exit",              Exit,           1},
     {"version",           Version,        1},
     {"build",             BuildDate,      0},
@@ -1683,8 +1656,8 @@ static JSFunctionSpec glob_functions[] = {
     {"__LINE__",          Line,           0},
     {"fileline",          FileLine,       0},
     {"dumpstack",         DumpStack,      0},
-	{"milliSecSince1970", MilliSecSince1970,0},
-	{"millisec",          MilliSec,       0},
+    {"milliSecSince1970", MilliSecSince1970,0},
+    {"millisec",          MilliSec,       0},
     {"msleep",            MSleep,         1},
     {"getProgramName",    GetProgramName, 0},
     {"hostname",          HostName,       0},

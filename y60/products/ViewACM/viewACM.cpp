@@ -505,8 +505,8 @@ void initWindow() {
     }
 
     glutPostWindowRedisplay (globalOriginalWindow);
-	// initialize glew
-	unsigned int myGlewError = glewInit();
+    // initialize glew
+    unsigned int myGlewError = glewInit();
 
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);

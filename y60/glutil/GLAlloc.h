@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef _asl_included_asl_GLAlloc_h_
@@ -102,64 +75,64 @@ namespace asl {
         operator const void*() const {
             return _myMem;
         }
-		bool claim(asl::AC_SIZE_TYPE theCapacity);
-		void release();
-		bool enableDMA();
-		void disableDMA();
-		void resize(asl::AC_SIZE_TYPE theSize) {
-			if (_myCapacity >= theSize) {
-				_mySize = theSize;
-			}
-		}
-		unsigned char * begin() {
-			return _myMem;
-		}
-		const unsigned char * begin() const {
-			return _myMem;
-		}
-		unsigned char * end() {
-			return _myMem + _mySize;
-		}
-		const unsigned char * end() const {
-			return _myMem + _mySize;
-		}
-		asl::AC_SIZE_TYPE size() const {
-			return _mySize;
-		}
+        bool claim(asl::AC_SIZE_TYPE theCapacity);
+        void release();
+        bool enableDMA();
+        void disableDMA();
+        void resize(asl::AC_SIZE_TYPE theSize) {
+            if (_myCapacity >= theSize) {
+                _mySize = theSize;
+            }
+        }
+        unsigned char * begin() {
+            return _myMem;
+        }
+        const unsigned char * begin() const {
+            return _myMem;
+        }
+        unsigned char * end() {
+            return _myMem + _mySize;
+        }
+        const unsigned char * end() const {
+            return _myMem + _mySize;
+        }
+        asl::AC_SIZE_TYPE size() const {
+            return _mySize;
+        }
         asl::AC_SIZE_TYPE capacity() const {
-			return _myCapacity;
-		}
+            return _myCapacity;
+        }
 
-		~GLMemory() {
+        ~GLMemory() {
             std::cerr << "~GLMemory()" << std::endl;
-			if (_myMem) {
-				//disableDMA();
-				release();
-			}
-		}
-		unsigned char * allocateChunk(asl::AC_SIZE_TYPE theRequiredBytes);
-		void deallocateChunk(unsigned char * theChunk);
+            if (_myMem) {
+                //disableDMA();
+                release();
+            }
+        }
+        unsigned char * allocateChunk(asl::AC_SIZE_TYPE theRequiredBytes);
+        void deallocateChunk(unsigned char * theChunk);
 
-	private:
-		unsigned char * _myMem;
+    private:
+        unsigned char * _myMem;
         asl::AC_SIZE_TYPE _mySize;
         asl::AC_SIZE_TYPE _myCapacity;
-		MemoryType _myMemoryType;
+        MemoryType _myMemoryType;
 
-		typedef std::map<unsigned char *,asl::AC_SIZE_TYPE> ChunkMap;
+        typedef std::map<unsigned char *,asl::AC_SIZE_TYPE> ChunkMap;
         ChunkMap _myFreeChunks;
         ChunkMap _myUsedChunks;
-		ChunkMap::iterator _myHint;
+        ChunkMap::iterator _myHint;
         asl::AC_SIZE_TYPE _myTotalUsedBytes;
         asl::AC_SIZE_TYPE _myFreeStoreBytes;
-	};
+    };
 
     //typedef asl::Ptr<GLMemory> GLMemoryPtr;
     typedef GLMemory * GLMemoryPtr;
 
-	extern GLMemoryPtr AGPMemory();
-	extern GLMemoryPtr GPUMemory();
-	extern GLMemoryPtr MainMemory();
+    extern GLMemoryPtr AGPMemory();
+    extern GLMemoryPtr GPUMemory();
+    extern GLMemoryPtr MainMemory();
 
     // Set Y60_AGP_VERTEX_MEMORY to default vertex memory size in MB
     // If Y60_AGP_VERTEX_MEMORY is "0", AGP-Memory will be disabled
@@ -216,7 +189,7 @@ namespace asl {
 
         GLAlloc(GLMemory::MemoryType theMem = GLMemory::AGPMemoryType, //GLAlloc(GLMemory::MemoryType theMem = GLMemory::GPUMemoryType, GLAlloc(GLMemory::MemoryType theMem = GLMemory::MainMemoryType,
                 asl::AC_SIZE_TYPE theCapacity = AGPVertexArray::getDefaultCapacity())
-			: _myType(theMem),
+            : _myType(theMem),
             _myMem(VertexMemory(_myType,theCapacity)),
             _myGfxMemAllocatedBytes(0)
         {}
@@ -231,7 +204,7 @@ namespace asl {
         template <typename U>
             GLAlloc(const GLAlloc<U> & theOther) throw()
             : _myGfxMemAllocatedBytes(theOther._myGfxMemAllocatedBytes),
-			_myType(theOther._myType),
+            _myType(theOther._myType),
              _myMem(theOther._myMem)
        {}
 #endif
@@ -281,12 +254,12 @@ namespace asl {
         // Allocate a piece of raw memory from the block; if the block is exhausted,
         // no  resize attempt will be made and an exception will be thrown
         pointer allocate( size_type n, const void* = NULL ) {
-			DB2(std::cerr << "GLAlloc::allocate: allocate object count = " << n << std::endl);
+            DB2(std::cerr << "GLAlloc::allocate: allocate object count = " << n << std::endl);
             asl::AC_SIZE_TYPE myRequiredBytes = n * sizeof(T);
-			DB2(std::cerr << "GLAlloc::allocate: allocate byte size = " << myRequiredBytes << std::endl);
+            DB2(std::cerr << "GLAlloc::allocate: allocate byte size = " << myRequiredBytes << std::endl);
 
             pointer myResult = reinterpret_cast<pointer>(
-				_myMem->allocateChunk(myRequiredBytes));
+                _myMem->allocateChunk(myRequiredBytes));
 
             return myResult;
 
@@ -306,11 +279,11 @@ namespace asl {
             return reinterpret_cast<char*>(allocate(n, NULL));
         }
 
-		GLMemory::MemoryType getMemoryType() const {
-			return _myType;
-		}
+        GLMemory::MemoryType getMemoryType() const {
+            return _myType;
+        }
     private:
-		GLMemory::MemoryType _myType;
+        GLMemory::MemoryType _myType;
         GLMemoryPtr _myMem;
         asl::AC_SIZE_TYPE _myGfxMemAllocatedBytes;
     }; // end of GLAlloc

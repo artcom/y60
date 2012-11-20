@@ -17,7 +17,7 @@ namespace tuttle {
     static bool tuttle_clish_builtin_##symbol(Shell *theShell,                             \
                                                 const clish_shell_t *theClish,             \
                                                 const lub_argv_t    *theArguments,         \
-						JSTrapStatus *theTrapStatus) {             \
+                        JSTrapStatus *theTrapStatus) {             \
         return theShell->command##symbol(theShell, theClish, theArguments, theTrapStatus); \
     }                                                                                      \
     static bool_t tuttle_clish_bouncer_##symbol(const clish_shell_t *theClish,             \

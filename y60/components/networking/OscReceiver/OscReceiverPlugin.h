@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef OSC_RECEIVER_PLUGIN_INCLUDED
@@ -64,21 +37,21 @@
 #include "JSOscReceiver.h"
 
 namespace y60 {
-	class OscReceiverPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
-    		OscReceiverPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    class OscReceiverPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
+            OscReceiverPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    		virtual void initClasses(JSContext * theContext,
-    			JSObject *theGlobalObject)
+            virtual void initClasses(JSContext * theContext,
+                JSObject *theGlobalObject)
             {
                 jslib::JSOscReceiver::initClass(theContext, theGlobalObject);
-    		}
+            }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "OscReceiver";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "OscReceiver";
+                return myClassName;
+            }
+    };
 }
 
 #endif

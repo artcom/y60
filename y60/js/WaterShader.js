@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 //
 //   $RCSfile: WaterShader.js,v $
@@ -158,12 +131,12 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
         _myTimer.add("waves");
     }
 /*
-	function newFromOldMatrix(m) {
-		return new Matrix4f(m.getElement(0),m.getElement(1),m.getElement(2),m.getElement(3),
-							m.getElement(4),m.getElement(5),m.getElement(6),m.getElement(7),
-							m.getElement(8),m.getElement(9),m.getElement(10),m.getElement(11),
-							m.getElement(12),m.getElement(13),m.getElement(14),m.getElement(15));
-	}
+    function newFromOldMatrix(m) {
+        return new Matrix4f(m.getElement(0),m.getElement(1),m.getElement(2),m.getElement(3),
+                            m.getElement(4),m.getElement(5),m.getElement(6),m.getElement(7),
+                            m.getElement(8),m.getElement(9),m.getElement(10),m.getElement(11),
+                            m.getElement(12),m.getElement(13),m.getElement(14),m.getElement(15));
+    }
 */
     obj.transformWater = function() {
         if (_myCgFlag && _myBodyNode) {
@@ -186,13 +159,13 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
             var myViewVector = normalized(new Vector3f(myVecTemp[0], myVecTemp[1], -myVecTemp[2]));
             var myPitch = Math.asin(-dot(myViewVector, new Vector3f(0,1,0)));
 
-			/*
+            /*
             print("Roll=" + degFromRad(myRoll));
             print("Pitch=" + degFromRad(myPitch));
             print("VFOV=" + renderer.verticalfov + ", HFOV=" + renderer.horizontalfov);
             print("renderer.width=" +renderer.width);
             print("renderer.height=" +renderer.height);
-			*/
+            */
 
             var myAspect = renderer.width / renderer.height;
             var myVerticalFOV = renderer.horizontalfov/myAspect;
@@ -279,38 +252,38 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
         // create geometry
         var myElementString=[];
 
-		//var myPrimitiveType = "triangles";
-		var myPrimitiveType = "trianglestrip";
-		//var myPrimitiveType = "quadstrip";
-		var myElementCount = 0;
-		myElementString[0] = "";
-		if (myPrimitiveType == "triangles") {
-			myElementCount = 1;
-			for (var x=0; x < theXSize-1; ++x) {
-				for (var y=0; y < theYSize-1; ++y) {
-					var myTLIndex = theYSize * x + y;
-					var myTRIndex = myTLIndex + 1;
-					var myBLIndex = myTLIndex + theYSize;
-					var myBRIndex = myBLIndex + 1;
-					myElementString[0] += myTLIndex + "," + myTRIndex + "," + myBLIndex + "," +
-										myTRIndex + "," + myBRIndex + "," + myBLIndex + ",";
-				}
-			}
-			myElementString[0] = myElementString[0].substr(0,myElementString[0].length-1); // discard trailing comma
-		}
-		if (myPrimitiveType != "triangles") {
-			myElementCount = theXSize-1;
-			for (var x=0; x < theXSize-1; ++x) {
-				myElementString[x] = "";
-				for (var y=0; y < theYSize-1; ++y) {
-					var myTLIndex = theYSize * x + y;
-					var myTRIndex = myTLIndex + theYSize;
-					myElementString[x] += myTRIndex + "," + myTLIndex + ",";
-				}
-				var myBLIndex = myTLIndex + 1;
-				var myBRIndex = myBLIndex + theYSize;
-				myElementString[x] += myBRIndex + "," + myBLIndex;
-			}
+        //var myPrimitiveType = "triangles";
+        var myPrimitiveType = "trianglestrip";
+        //var myPrimitiveType = "quadstrip";
+        var myElementCount = 0;
+        myElementString[0] = "";
+        if (myPrimitiveType == "triangles") {
+            myElementCount = 1;
+            for (var x=0; x < theXSize-1; ++x) {
+                for (var y=0; y < theYSize-1; ++y) {
+                    var myTLIndex = theYSize * x + y;
+                    var myTRIndex = myTLIndex + 1;
+                    var myBLIndex = myTLIndex + theYSize;
+                    var myBRIndex = myBLIndex + 1;
+                    myElementString[0] += myTLIndex + "," + myTRIndex + "," + myBLIndex + "," +
+                                        myTRIndex + "," + myBRIndex + "," + myBLIndex + ",";
+                }
+            }
+            myElementString[0] = myElementString[0].substr(0,myElementString[0].length-1); // discard trailing comma
+        }
+        if (myPrimitiveType != "triangles") {
+            myElementCount = theXSize-1;
+            for (var x=0; x < theXSize-1; ++x) {
+                myElementString[x] = "";
+                for (var y=0; y < theYSize-1; ++y) {
+                    var myTLIndex = theYSize * x + y;
+                    var myTRIndex = myTLIndex + theYSize;
+                    myElementString[x] += myTRIndex + "," + myTLIndex + ",";
+                }
+                var myBLIndex = myTLIndex + 1;
+                var myBRIndex = myBLIndex + theYSize;
+                myElementString[x] += myBRIndex + "," + myBLIndex;
+            }
         }
 
         var myShapeString =
@@ -320,7 +293,7 @@ WaterShader.prototype.Constructor = function(obj, theWaterMaterialNode, theWaves
             '</vertexdata>'+
             '<primitives>';
         for (var e = 0; e < myElementCount; ++e) {
-			myShapeString+=
+            myShapeString+=
                 '<elements type="'+myPrimitiveType+'" material="'+_myMaterialNode.id+'">' +
                     '<indices vertexdata="position" role="position">['+myElementString[e]+']</indices>' +
                 '</elements>';

@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 //
 //    $RCSfile: SDLText.cpp,v $
@@ -110,10 +83,10 @@ namespace y60 {
             : Text(theRenderer, thePos, theTextColor, theString, theFontName),
                    _glTexture(0)
     {
-       	glGenTextures(1, &_glTexture);
-    	glBindTexture(GL_TEXTURE_2D, _glTexture);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glGenTextures(1, &_glTexture);
+        glBindTexture(GL_TEXTURE_2D, _glTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
     SDLText::~SDLText() {
@@ -128,14 +101,14 @@ namespace y60 {
     {
         glBindTexture(GL_TEXTURE_2D, _glTexture);
         glTexImage2D(GL_TEXTURE_2D,
-    	        0,
-    	        GL_RGBA,
-    	        theTextureSurface->w,
-    	        theTextureSurface->h,
-    	        0,
-    	        GL_RGBA,
-    	        GL_UNSIGNED_BYTE,
-    	        theTextureSurface->pixels);
+                0,
+                GL_RGBA,
+                theTextureSurface->w,
+                theTextureSurface->h,
+                0,
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                theTextureSurface->pixels);
 #ifdef CREATE_PNG_FROM_TEXT
         PLAnyPicDecoder myDecoder;
         PLAnyBmp myBmp;

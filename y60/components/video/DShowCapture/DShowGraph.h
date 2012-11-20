@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef _ac_DShowCapture_DShowGraph_h_
@@ -128,18 +101,18 @@ protected:
     // release the resource related to the extra filters
     virtual void    releaseExtraFilters();
     // initialization the extra filters after the graph is finished
-    virtual void	initExtraFilters();
+    virtual void    initExtraFilters();
 
     // Get the input or output pin to connect filters
     IPin* get_pin( IBaseFilter* pFilter, PIN_DIRECTION dir );
 
     // DirectShow interface pointers
-    IGraphBuilder *			m_pGraphBuilder; // build render graph
+    IGraphBuilder *         m_pGraphBuilder; // build render graph
     ICaptureGraphBuilder2 * m_pCaptureGraphBuilder2; // for capture
-    IMediaControl*			m_pMediaControl; // MediaControl
-    IFilterGraph*			m_pFilterGraph;  // Filter Graph
-	// The interface to set callback function
-	// ColorConverter is needed to convert other color to RGB24
+    IMediaControl*          m_pMediaControl; // MediaControl
+    IFilterGraph*           m_pFilterGraph;  // Filter Graph
+    // The interface to set callback function
+    // ColorConverter is needed to convert other color to RGB24
     IBaseFilter *           m_pColorConv;
     // Grab filter which get image data for each frame
     IBaseFilter *           m_pGrabFilter;

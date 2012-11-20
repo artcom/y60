@@ -28,29 +28,29 @@ HttpLogger.prototype.Constructor = function(Public, theHttpServer) {
                 "        <title> y60 logfile | " + window.title + "</title>" +
                 "             <style type=\"text/css\">\n"+ 
                 "                 *, BODY, TD, P, HR, LI { \n"+  
-                "                     line-height:	125%; \n"+ 
-                "                     font-family:	sans-serif; \n"+ 
-                "                     font-size:	12px; \n"+ 
+                "                     line-height:  125%; \n"+ 
+                "                     font-family:  sans-serif; \n"+ 
+                "                     font-size:    12px; \n"+ 
                 "                 } \n"+ 
                 "                 PRE, TT, CODE, PRE * { \n"+ 
-                "                     line-height:	110%; \n"+ 
-                "                     font-family:	monospace; \n"+ 
-                "                     font-size:	14pt; \n"+ 
+                "                     line-height:  110%; \n"+ 
+                "                     font-family:  monospace; \n"+ 
+                "                     font-size:    14pt; \n"+ 
                 "                 } \n"+ 
                 "                 B, H1, H2, H3 { \n"+ 
-                "                     color:		#f0e58a; \n"+ 
+                "                     color:        #f0e58a; \n"+ 
                 "                 } \n"+ 
                 "                 p.error { \n"+ 
-                "                     color:		#ce8887; \n"+ 
+                "                     color:        #ce8887; \n"+ 
                 "                 } \n"+ 
                 "                 p.warning { \n"+ 
-                "                     color:		#f0e58a; \n"+ 
+                "                     color:        #f0e58a; \n"+ 
                 "                 } \n"+ 
                 "                 p.debug { \n"+ 
-                "                     color:		#83cceb; \n"+ 
+                "                     color:        #83cceb; \n"+ 
                 "                 } \n"+ 
                 "                 p.trace { \n"+ 
-                "                     color:		#83cceb; \n"+ 
+                "                     color:        #83cceb; \n"+ 
                 "                 } \n"+ 
                 "             </style> \n"+  
                 "         </head> \n"+ 

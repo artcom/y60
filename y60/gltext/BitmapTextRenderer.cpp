@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
@@ -96,13 +69,13 @@ namespace y60 {
 
     void
     BitmapTextRenderer::renderText(TextPtr & theText) {
-	    glColor4fv(theText->_myTextStyle._myTextColor.begin());
+        glColor4fv(theText->_myTextStyle._myTextColor.begin());
         glDisable(GL_LIGHTING);
 
         unsigned int myXPos = (unsigned int) (theText->_myPos[0] * getWindowWidth() + 0.5);
         unsigned int myYPos = (unsigned int) (theText->_myPos[1] * getWindowHeight() + 0.5);
 
-	    glRasterPos2i(myXPos, myYPos);
+        glRasterPos2i(myXPos, myYPos);
 
         BITMAPFONT myFontEnum = BITMAPFONT(asl::getEnumFromString(theText->_myFont, myBitmapFontStr));
         switch(myFontEnum) {

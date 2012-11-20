@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 //
 //   $Id: property_functions.h,v 1.1 2005/03/24 23:35:56 christian Exp $
@@ -87,7 +60,7 @@ namespace y60 {
     template <class T>
     void
     setPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName, const T & theValue,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         dom::NodePtr myPropertyListNode = theParentNode->childNode(theListName);
 
         if (myPropertyListNode) {
@@ -111,14 +84,14 @@ namespace y60 {
     template <class T>
     T
     getPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         return getPropertyValue<T>(*theParentNode, theType, thePropertyName, theListName);
     }
 
     template <class T>
     T
     getPropertyValue(const dom::Node & theParentNode, const char * theType, const char * thePropertyName,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         dom::NodePtr myPropertyListNode = theParentNode.childNode(theListName);
         if (!myPropertyListNode) {
             throw SOM_PROPERTYLIST_MISSING(std::string("Propertylist in node ")+theParentNode.nodeName()+" not found",PLUS_FILE_LINE);
@@ -133,7 +106,7 @@ namespace y60 {
     template <class T>
     bool
     hasPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         dom::NodePtr myPropertyListNode = theParentNode->childNode(theListName);
         if (!myPropertyListNode) {
             return false;
@@ -147,7 +120,7 @@ namespace y60 {
     template <class T>
     T
     getPropertyValue(dom::NodePtr theParentNode, const char * theType, const char * thePropertyName, const T & theDefault,
-	                 const char * theListName = PROPERTY_LIST_NAME) {
+                     const char * theListName = PROPERTY_LIST_NAME) {
         if (hasPropertyValue<T>(theParentNode, theType, thePropertyName,theListName) ) {
             try {
                 return getPropertyValue<T>(theParentNode, theType, thePropertyName, theListName);

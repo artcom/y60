@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 //
 //   $RCSfile: MaterialExporter.h,v $
@@ -147,7 +120,7 @@ class MaterialExporter {
         void setBaseDirectory(const std::string & theDirectory);
 
     private:
-		std::string getTextureMappingType(const MObject & theTextureNode);
+        std::string getTextureMappingType(const MObject & theTextureNode);
         std::string createMaterial(const MFnMesh * theMesh, const MObject & theShaderNode, y60::SceneBuilder & theSceneBuilder,
             const SpecialFeatures & theSpecialFeatures);
         MPlug getPlug(const MObject & theShaderNode,const char * theName);
@@ -161,10 +134,10 @@ class MaterialExporter {
 #if 0
         void exportVertexParameters(y60::MaterialBuilder & theBuilder);
 #endif
-		void exportShader(const MFnMesh * theMesh, const MObject & theShaderNode,
-							   y60::MaterialBuilder & theMaterialBuilder,
+        void exportShader(const MFnMesh * theMesh, const MObject & theShaderNode,
+                               y60::MaterialBuilder & theMaterialBuilder,
                                y60::SceneBuilder & theSceneBuilder,
-							   y60::VectorOfRankedFeature & theLightingFeature);
+                               y60::VectorOfRankedFeature & theLightingFeature);
         bool exportTextures(const MFnMesh * theMesh, const MObject & theShaderNode,
                             y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder,
                             const std::string & thePlugName,
@@ -208,7 +181,7 @@ class MaterialExporter {
         void exportBlinnFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
         void exportUnlitFeatures(const MFnMesh * theMesh, const MObject & theShaderNode, y60::MaterialBuilder & theBuilder, y60::SceneBuilder & theSceneBuilder);
 
-		std::string getStrippedTextureFilename(const MPlug & theTexturePlug);
+        std::string getStrippedTextureFilename(const MPlug & theTexturePlug);
         std::string findRelativeFilePath(const std::string & theFileName);
 
         bool checkTransparency(const MObject & theShaderNode);

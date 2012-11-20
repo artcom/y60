@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
@@ -77,18 +50,18 @@ static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN
     try {
         const char * myFilename;
         int myLineNo;
-		if (! getFileLine(cx, obj, argc, argv, myFilename, myLineNo)) {
-			myLineNo = 0;
-			myFilename = "unknown";
-		}
-		std::string myModuleName(myFilename);
-		std::string myMessage;
-		ensureParamCount(argc, 1);
-		convertFrom(cx, argv[0], myMessage);
-		if (argc > 1 ) {
-    		convertFrom(cx, argv[1], myModuleName);		    
-		}
-		AC_LOG_CHECK(theSeverity, myModuleName.c_str(), myLineNo) << myMessage;
+        if (! getFileLine(cx, obj, argc, argv, myFilename, myLineNo)) {
+            myLineNo = 0;
+            myFilename = "unknown";
+        }
+        std::string myModuleName(myFilename);
+        std::string myMessage;
+        ensureParamCount(argc, 1);
+        convertFrom(cx, argv[0], myMessage);
+        if (argc > 1 ) {
+            convertFrom(cx, argv[1], myModuleName);         
+        }
+        AC_LOG_CHECK(theSeverity, myModuleName.c_str(), myLineNo) << myMessage;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

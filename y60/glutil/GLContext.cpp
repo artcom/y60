@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
@@ -81,7 +54,7 @@ namespace y60 {
         : _myDisplay(0), _myDrawable(0), _myGLXContext(0)
 #endif
 #ifdef AC_USE_OSX_CGL
-		: _myCGLContext(0)
+        : _myCGLContext(0)
 #endif
     {
         _myStateCache = RenderStatePtr(new RenderState());
@@ -103,7 +76,7 @@ namespace y60 {
         _myGLXContext = glXGetCurrentContext();
 #endif
 #ifdef AC_USE_OSX_CGL
-		_myCGLContext = CGLGetCurrentContext();
+        _myCGLContext = CGLGetCurrentContext();
 #endif
         return true;
     }
@@ -147,7 +120,7 @@ namespace y60 {
         return (_myDisplay && _myDrawable && _myGLXContext);
 #endif
 #ifdef AC_USE_OSX_CGL
-		return (_myCGLContext);
+        return (_myCGLContext);
 #endif
     }
 

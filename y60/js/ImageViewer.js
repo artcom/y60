@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 if (__main__ == undefined) var __main__ = "ImageViewer";
 
@@ -93,7 +66,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     var _myFrameRateLimiter = new FrameRateLimiter(FRAME_RATE);
 
     var _myCurrentMediaType = -1;
-    var _mySoundId	        = -1;
+    var _mySoundId          = -1;
     var _myMasterVolume     = 1.0;
     var _myVideoCapturePlugged= false;
     var _myMissedFrameCounter = 0;
@@ -286,7 +259,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             window.scene.loadCaptureFrame(_myCaptureNode);
         }
         if (_mySoundId != -1 && !isPlaying(_mySoundId)) {
-			nextFile();
+            nextFile();
         }
     }
 
@@ -464,7 +437,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
     function stepFrame(theForwardFlag) {
         if (_myMovieNode && _myMovieOverlay.visible) {
             var myStepSize = Math.abs(_myMovieNode.playspeed);
-			_myMovieNode.playmode = "pause";
+            _myMovieNode.playmode = "pause";
             if (theForwardFlag) {
                 _myMovieNode.currentframe += myStepSize;
             } else {
@@ -683,7 +656,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.audio_stream = 0;
             //_myMovieNode.maxcachesize = 32;
-            _myMovieNode.targetpixelformat = "RGB";//"YUV444";//"YUV444";//"YUVA420";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA";//"RGBA8";
+            _myMovieNode.targetpixelformat = "YUV420";//"YUV444";//"YUV444";//"YUVA420";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA";//"RGBA8";
         }
 
         if (_myFullSizeMode) {

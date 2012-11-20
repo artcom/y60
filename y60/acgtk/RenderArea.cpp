@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 //own header
@@ -133,10 +106,10 @@ RenderArea::RenderArea(RenderAreaPtr theContext) : AbstractRenderWindow(jslib::J
     /* Set OpenGL-capability to the widget. */
     DB(cerr << "RenderArea::RenderArea() sharing with " << myGdkGLContext << endl);
     if (!gtk_widget_set_gl_capability (GTK_WIDGET(gobj()),
-				myGLConfig,
-				myGdkGLContext,
-				true,
-				GDK_GL_RGBA_TYPE))
+                myGLConfig,
+                myGdkGLContext,
+                true,
+                GDK_GL_RGBA_TYPE))
     {
         throw asl::Exception("RenderArea: could not create GL context!", PLUS_FILE_LINE);
     }

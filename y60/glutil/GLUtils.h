@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef _ac_render_GLUtils_h_
@@ -100,23 +73,23 @@ struct GLExceptionHelper {
 
 namespace y60 {
     class Y60_GLUTIL_DECL GLScopeTimer {
-	public:
-		GLScopeTimer(asl::TimerPtr theTimer) : _myTimer(theTimer) {
+    public:
+        GLScopeTimer(asl::TimerPtr theTimer) : _myTimer(theTimer) {
            if (_flushGL_before_stop) {
                 glFlush();
             }
-			_myTimer->start();
-		}
-		~GLScopeTimer() {
+            _myTimer->start();
+        }
+        ~GLScopeTimer() {
             if (_flushGL_before_stop) {
                 glFlush();
             }
-			_myTimer->stop();
-		}
+            _myTimer->stop();
+        }
         static bool _flushGL_before_stop;
-	private:
-		asl::TimerPtr _myTimer;
-	};
+    private:
+        asl::TimerPtr _myTimer;
+    };
     #define MAKE_GL_SCOPE_TIMER(NAME) \
     static asl::TimerPtr myScopeTimer ## NAME = asl::getDashboard().getTimer(#NAME);\
         y60::GLScopeTimer myScopeTimerWrapper ## NAME ( myScopeTimer ## NAME);

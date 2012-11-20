@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
@@ -1548,19 +1521,19 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                         *vp = as_jsval(cx, myAttrNode->nodeValueWrapperPtr());
                         return JS_TRUE;
                     }
-		            // 2.5: Check for children
+                    // 2.5: Check for children
                     dom::NodePtr myChildNode = myFacade->getChildNode(myProperty);
                     if (myChildNode) {
                         AC_TRACE << "JSNode::getProperty: myChildNode-Facade = " <<*myChildNode;
                         *vp = as_jsval(cx, myChildNode);
                         return JS_TRUE;
                     }
-					// ask the facades propertylist (features, properties, etc)
+                    // ask the facades propertylist (features, properties, etc)
                     dom::NodePtr myPropertyNode = myFacade->getProperty(myProperty);
                     if (myPropertyNode) {
                         *vp = as_jsval(cx, myPropertyNode->nodeValueWrapperPtr());
                         return JS_TRUE;
-					}
+                    }
 
                     // Finally we check for the raster property in images, because there
                     // is just no way to stick the polymophic raster values in one of the
@@ -1694,13 +1667,13 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                             return JS_TRUE;
 #endif
                         }
-						// ask the facades propertylist (features, properties, etc)
+                        // ask the facades propertylist (features, properties, etc)
                         dom::NodePtr myPropertyNode = myFacade->getProperty(myProperty);
                         if (myPropertyNode) {
                             AC_TRACE << "JSNode::setProperty: myPropertyNode = " <<*myPropertyNode << endl;
                             myPropertyNode->nodeValue(myResult);
                             return JS_TRUE;
-						}
+                        }
                     }
                 }
 

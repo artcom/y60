@@ -51,7 +51,7 @@ WMTouchPlugin::WMTouchPlugin(DLHandle myDLHandle)
           _isRegistered(false),
           IRendererExtension("WMTouch")
 {
-    HMODULE	hMod = LoadLibrary(_T("User32.dll"));
+    HMODULE hMod = LoadLibrary(_T("User32.dll"));
     RegisterTouchWindow = (RegisterTouchWindow_M) GetProcAddress(hMod, "RegisterTouchWindow");
     if (RegisterTouchWindow == 0) {
         AC_ERROR << "can't find Win7 RegisterTouchWindow - Windows 7 Touch Events not supported!";
@@ -128,12 +128,12 @@ WMTouchPlugin::getWMTouchSettings(dom::NodePtr theSettings) {
 
 LRESULT WINAPI 
 WMTouchPlugin::GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	if (nCode < 0) {
-		return CallNextHookEx(0, nCode, wParam, lParam);
-	}
+    if (nCode < 0) {
+        return CallNextHookEx(0, nCode, wParam, lParam);
+    }
     AC_TRACE << "GetMsgProc called nCode=" << nCode << ", wParam:" << wParam << ", lParam:" << lParam;
-	switch (nCode) { 
-	    case HC_ACTION:
+    switch (nCode) { 
+        case HC_ACTION:
             if (wParam == PM_REMOVE) {
                 LPMSG msg = (LPMSG)lParam;
                 switch (msg->message) {

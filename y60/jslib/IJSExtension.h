@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef _IJEXTENSION_INCLUDED
@@ -71,20 +44,20 @@ namespace jslib {
 
 struct IScriptablePlugin {
     virtual ~IScriptablePlugin() {}
-	virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) = 0;
+    virtual void initClasses(JSContext * theContext, JSObject *theGlobalObject) = 0;
 
     // Function will be called if a property is read in js
-	virtual void onGetProperty(const std::string & thePropertyName,
-		y60::PropertyValue & theReturnValue) const
+    virtual void onGetProperty(const std::string & thePropertyName,
+        y60::PropertyValue & theReturnValue) const
     {}
 
-	// Function will be called if a property is set in js
+    // Function will be called if a property is set in js
     virtual void onSetProperty(const std::string & thePropertyName,
-		const y60::PropertyValue & thePropertyValue)
+        const y60::PropertyValue & thePropertyValue)
     {}
 
-	// Function will be called if a setting is changed (s. BaseConfigurator.js)
-	virtual void onUpdateSettings(dom::NodePtr theConfiguration) {};
+    // Function will be called if a setting is changed (s. BaseConfigurator.js)
+    virtual void onUpdateSettings(dom::NodePtr theConfiguration) {};
 };
 
 typedef asl::Ptr<IScriptablePlugin> IScriptablePluginPtr;

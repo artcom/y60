@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef AC_Y60_GLCONTEXT_INCLUDED
@@ -67,9 +40,9 @@
 #include "RenderState.h"
 
 #ifdef AC_USE_OSX_CGL
-//	#include <OpenGL/gliContext.h>
-	#include <OpenGL/OpenGL.h>
-	#include <OpenGL/CGLTypes.h>
+//  #include <OpenGL/gliContext.h>
+    #include <OpenGL/OpenGL.h>
+    #include <OpenGL/CGLTypes.h>
 #endif
 
 #include <vector>
@@ -88,7 +61,7 @@ namespace y60 {
             virtual bool activate() const;
             virtual bool saveCurrent();
 
-    	    static void checkLastError(const std::string & theScope);
+            static void checkLastError(const std::string & theScope);
 
             RenderStatePtr getStateCache() const {
                 return _myStateCache;
@@ -106,10 +79,10 @@ namespace y60 {
             GLXDrawable _myDrawable;
             GLXContext  _myGLXContext;
     #endif
-	#ifdef AC_USE_OSX_CGL
-			//GLIContext           _myGLIContext;
-			CGLContextObj       _myCGLContext;
-	#endif
+    #ifdef AC_USE_OSX_CGL
+            //GLIContext           _myGLIContext;
+            CGLContextObj       _myCGLContext;
+    #endif
             mutable RenderStatePtr _myStateCache;
             mutable bool           _myStateCacheInitialized;
     };

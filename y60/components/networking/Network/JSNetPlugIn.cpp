@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include "JSSocket.h"
@@ -64,25 +37,25 @@
 #include <y60/jsbase/IScriptablePlugin.h>
 
 namespace y60 {
-	class JSNetPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
-    		JSNetPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+    class JSNetPlugIn : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
+            JSNetPlugIn(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
-    		virtual void initClasses(JSContext * theContext,
-    			JSObject *theGlobalObject) {
-    			JSSocket::initClass(theContext, theGlobalObject);
-    			JSTCPServer::initClass(theContext, theGlobalObject);
-    			JSFrameSocket::initClass(theContext, theGlobalObject);
-    		}
+            virtual void initClasses(JSContext * theContext,
+                JSObject *theGlobalObject) {
+                JSSocket::initClass(theContext, theGlobalObject);
+                JSTCPServer::initClass(theContext, theGlobalObject);
+                JSFrameSocket::initClass(theContext, theGlobalObject);
+            }
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "Socket";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "Socket";
+                return myClassName;
+            }
+    };
 }
 
 extern "C"
 EXPORT asl::PlugInBase * Network_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::JSNetPlugIn(myDLHandle);
+    return new y60::JSNetPlugIn(myDLHandle);
 }

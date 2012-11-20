@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO  
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations: 
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include "NetAsync.h"
@@ -75,7 +48,7 @@ static JSClass Package = {
     JS_EnumerateStub, JS_ResolveStub,
     JS_ConvertStub, JS_FinalizeStub
 };
-    	
+        
 NetAsync::NetAsync(asl::DLHandle theDLHandle) : 
                 asl::PlugInBase(theDLHandle),
                 IRendererExtension(ClassName()),
@@ -176,5 +149,5 @@ const char * y60::NetAsync::PluginName = "NetAsync";
 
 extern "C"
 EXPORT asl::PlugInBase * NetAsync_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new y60::NetAsync(myDLHandle);
+    return new y60::NetAsync(myDLHandle);
 }

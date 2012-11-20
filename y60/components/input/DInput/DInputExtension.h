@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #ifndef _Y60_INPUT_DINPUTEXTENSION_INCLUDED_
@@ -82,7 +55,7 @@ namespace y60 {
     {
         public:
             DInputExtension(asl::DLHandle theDLHandle);
-    		~DInputExtension();
+            ~DInputExtension();
             virtual void init();
             virtual y60::EventPtrList poll();
 
@@ -115,7 +88,7 @@ namespace y60 {
         private:
             void initJoysticks(DWORD theFlags, DWORD theCoopLevel);
 
-    		static int CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
+            static int CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance,
                     void* This);
 
             void createForceEffect(LPDIRECTINPUTDEVICE8 & theJoystick, LPDIRECTINPUTEFFECT & theEffect);

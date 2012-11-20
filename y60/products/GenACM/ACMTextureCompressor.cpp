@@ -71,17 +71,17 @@ TextureCompressor::fillOGLTHeader(int width, int height,
         int theOrientation,
         float theFramesPerSecond)
 {
-	strcpy (myHeader.MagicNumber, "a+c");
-	myHeader.Version = 3060;
-	myHeader.Width = width;
-	myHeader.Height = height;
-	myHeader.HeaderSize = sizeof(OGLT_Header);
-  	myHeader.Components = 4;
+    strcpy (myHeader.MagicNumber, "a+c");
+    myHeader.Version = 3060;
+    myHeader.Width = width;
+    myHeader.Height = height;
+    myHeader.HeaderSize = sizeof(OGLT_Header);
+    myHeader.Components = 4;
     myHeader.OpenGLCompression = theCompressionFormat;
-	myHeader.WidthAspect = theWidthAspect;
-	myHeader.HeightAspect = theHeightAspect;
-	myHeader.Orientation = theOrientation;
-	myHeader.FramesPerSecond = theFramesPerSecond;
+    myHeader.WidthAspect = theWidthAspect;
+    myHeader.HeightAspect = theHeightAspect;
+    myHeader.Orientation = theOrientation;
+    myHeader.FramesPerSecond = theFramesPerSecond;
     myHeader.FrameDataSize = compressedDataSize;
 }
 

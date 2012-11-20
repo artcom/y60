@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
@@ -224,7 +197,7 @@ OffscreenRenderArea::renderToCanvas(bool theCopyToImageFlag, unsigned theCubemap
 
 void
 OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theTextureNode) {
-	AC_DEBUG << "OffscreenRenderArea::downloadFromViewport";
+    AC_DEBUG << "OffscreenRenderArea::downloadFromViewport";
 
     if (!theTextureNode) {
         throw OffscreenRendererException("No Texture.", PLUS_FILE_LINE);
@@ -249,16 +222,16 @@ OffscreenRenderArea::downloadFromViewport(const dom::NodePtr & theTextureNode) {
 
 void
 OffscreenRenderArea::setRenderingCaps(unsigned int theRenderingCaps) {
-	AC_DEBUG << "OffscreenRenderArea::setRenderingCaps";
+    AC_DEBUG << "OffscreenRenderArea::setRenderingCaps";
 
     AbstractRenderWindow::setRenderingCaps(theRenderingCaps);
 
     bool myFBOFlag = ((theRenderingCaps & y60::FRAMEBUFFER_SUPPORT) != 0);
 
     if(myFBOFlag) {
-    	AC_DEBUG << "Will use GL FBO for rendering";
+        AC_DEBUG << "Will use GL FBO for rendering";
     } else {
-    	AC_DEBUG << "Will use GL backbuffer for rendering";
+        AC_DEBUG << "Will use GL backbuffer for rendering";
     }
 
     _myOffscreenBuffer->setUseFBO(myFBOFlag);
@@ -280,9 +253,9 @@ OffscreenRenderArea::setHeight(unsigned theHeight) {
 
 bool
 OffscreenRenderArea::setCanvas(const NodePtr & theCanvas) {
-	AC_DEBUG << "OffscreenRenderArea::setCanvas";
+    AC_DEBUG << "OffscreenRenderArea::setCanvas";
     if (AbstractRenderWindow::setCanvas(theCanvas)) {
-    	CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
+        CanvasPtr myCanvas = theCanvas->getFacade<Canvas>();
         std::vector<TexturePtr> myTextures = myCanvas->getTargets(getCurrentScene());
         if (!myTextures.empty()) {
             ensureRenderTargets(myTextures);

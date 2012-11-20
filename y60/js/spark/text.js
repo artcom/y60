@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: Text rendering utilities
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 /*jslint white: true, plusplus: false*/
@@ -62,14 +35,14 @@
 
 /**
  * Text rendering utilities for SPARK
- * 
+ *
  * This bunch of code is used to coerce Y60 font rendering
  * into something vaguely useful. Y60 centralizes font rendering
  * state on the Window. This code manages this state.
- * 
+ *
  * The main purpose of this code is recollecting all style-related
  * state into DOM nodes representing font styles.
- * 
+ *
  * Apart from that, this code provides the function renderText,
  * which is a wart representing the overall interface that has been
  * found to be required for text rendering in SPARK.
@@ -122,10 +95,10 @@ spark.loadFont = function (theName, theSize, theFontScale, theFontStyle, theHint
         }
 
         // blurry aber gutes spacing -> No Hinting (Renderer.NOHINTING)
-        // crispy aber rottenschlechtes spacing -> Natives Fonthinting (Renderer.NATIVEHINTING) // if compiled into freetype!! 
+        // crispy aber rottenschlechtes spacing -> Natives Fonthinting (Renderer.NATIVEHINTING) // if compiled into freetype!!
         // wenig crispy aber okes spacing -> Autohinting (Renderer.AUTOHINTING)
 
-        var myHinting = spark.hintingFromString(theHinting);    
+        var myHinting = spark.hintingFromString(theHinting);
         // enforce loadttf of a normal font, otherwise we get an exception
         window.loadTTF(myName, searchFile(myFontPath), theSize * theFontScale, myHinting, spark.styleFromString("normal"), theAscendOffset);
         if (theFontStyle != "normal") {
@@ -145,7 +118,7 @@ spark.loadFont = function (theName, theSize, theFontScale, theFontStyle, theHint
                 Logger.debug("loading bold font for " + myName + "," + myFontPath + "," + theSize + "," + "bold");
                 window.loadTTF(myName, searchFile(myFontPath), theSize * theFontScale, myHinting, Renderer.BOLD);
             }
-        } 
+        }
     }
     return myName;
 };
@@ -171,27 +144,27 @@ spark.applyStyleDefaults = function(theStyle) {
 
     !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "000000" : null;
 };
-			 
+
 spark.isFontStyleNode = function(theNode) {
     return (theNode.getAttribute("font") ||
-            theNode.getAttribute("fontSize") || 
-            theNode.getAttribute("fontScale") || 
-            theNode.getAttribute("fontStyle") || 
-            theNode.getAttribute("topPad") || 
-            theNode.getAttribute("bottomPad") || 
-            theNode.getAttribute("leftPad") || 
-            theNode.getAttribute("rightPad") || 
-            theNode.getAttribute("tracking") || 
-            theNode.getAttribute("lineHeight") || 
-            theNode.getAttribute("hAlign") || 
-            theNode.getAttribute("vAlign") || 
-            theNode.getAttribute("hinting") || 
-            theNode.getAttribute("textColor")); 
+            theNode.getAttribute("fontSize") ||
+            theNode.getAttribute("fontScale") ||
+            theNode.getAttribute("fontStyle") ||
+            theNode.getAttribute("topPad") ||
+            theNode.getAttribute("bottomPad") ||
+            theNode.getAttribute("leftPad") ||
+            theNode.getAttribute("rightPad") ||
+            theNode.getAttribute("tracking") ||
+            theNode.getAttribute("lineHeight") ||
+            theNode.getAttribute("hAlign") ||
+            theNode.getAttribute("vAlign") ||
+            theNode.getAttribute("hinting") ||
+            theNode.getAttribute("textColor"));
 }
 
 spark.mergeFontStyles = function(theOldStyle, theNewStyle) {
     if(!spark.isFontStyleNode(theOldStyle) || !spark.isFontStyleNode(theNewStyle)) {
-        throw new Error("either old fontstyle or new fontstyle is no font style not!"); 
+        throw new Error("either old fontstyle or new fontstyle is no font style not!");
     }
     var myMergedStyle = new Node("<style/>");
     myMergedStyle = myMergedStyle.childNode(0);
@@ -226,23 +199,23 @@ spark.mergeFontStyles = function(theOldStyle, theNewStyle) {
     mergeAttributeIfPresent("hAlign");
     mergeAttributeIfPresent("vAlign");
     mergeAttributeIfPresent("hinting");
-    
+
     mergeAttributeIfPresent("textColor");
-    
-   return myMergedStyle; 
-    
+
+   return myMergedStyle;
+
 }
 
 
 /**
  * Produce a font style node from the given DOM node.
- * 
+ *
  * This CAN be applied to any DOM node, but is usually
  * used on a SPARK xml node to collect text style properties.
- * 
+ *
  * Returns a font style node that can be used with renderText.
  */
-spark.fontStyleFromNode = function(theNode) {    
+spark.fontStyleFromNode = function(theNode) {
     var myStyle = new Node("<style/>");
     myStyle = myStyle.childNode(0);
 
@@ -347,20 +320,20 @@ spark.createTextImage = function(theSize) {
 
 /**
  * Render the given TEXT into the given IMAGE using the given STYLE with the given SIZE.
- * 
+ *
  * Returns the size of the text within the image as a Point2f.
- * 
+ *
  * MAXTEXTWIDTH and LINEWIDTHS are output parameters,
  * allowing the client some layout trickery.
  */
 spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidth, theLineWidths) {
-    
+
     var myFont = spark.fontForStyle(theStyle);
     var mySize = new Vector2f(theImage.width, theImage.height);
     if(theSize != undefined) {
         mySize = theSize;
     }
-    
+
     if ("lineHeight" in theStyle && theStyle.fontScale != 1.0) {
         theStyle.lineHeight *= theStyle.fontScale;
     }
@@ -370,7 +343,7 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
                                  myFont,
                                  theStyle,
                                  mySize.x*theStyle.fontScale, mySize.y*theStyle.fontScale);
-    var myGlyphPosition = window.getTextGlyphPositions();  
+    var myGlyphPosition = window.getTextGlyphPositions();
     if (theStyle.fontScale != 1.0) {
         if ("lineHeight" in theStyle) {
             theStyle.lineHeight /= theStyle.fontScale;
@@ -380,11 +353,11 @@ spark.renderText = function(theImage, theText, theStyle, theSize, theMaxTextWidt
         applyImageFilter(theImage, "resizehamming", [myTextSize.x, myTextSize.y, 1]);
         if (theImage.width > 0 && theImage.height > 0) {
             var myMatrix = new Matrix4f();
-            myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width, 
+            myMatrix.makeScaling(new Vector3f(myTextSize.x / theImage.width,
                                               myTextSize.y / theImage.height, 1));
             theImage.matrix = myMatrix;
         }
-    }    
+    }
     if (theMaxTextWidth) {
         theMaxTextWidth.width = window.getTextMaxWidth();
     }

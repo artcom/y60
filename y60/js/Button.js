@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +90,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     }
 
     Public.setPressed = function(theFlag) {
-	Logger.trace(Public.id + ": setPressed("+theFlag+")");
+    Logger.trace(Public.id + ": setPressed("+theFlag+")");
         if (theFlag) {
             Public.color = Public.style.selectedColor;
         } else {
@@ -129,15 +102,15 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
     Public.onMouseButton = function(theState, theX, theY, theRadius) {
         if (Public.enabled && Protected.isVisible(Public.node)) {
             if (theState == MOUSE_UP && Protected.isPressed) {
-    	        Logger.trace("Unpressing button " + Public.id);
+                Logger.trace("Unpressing button " + Public.id);
                 Public.setPressed(false);
-        		if (Public.touches(theX, theY, theRadius)) {
+                if (Public.touches(theX, theY, theRadius)) {
                     Public.onClick(Public);
-        			return true;
-        		}
+                    return true;
+                }
             } else if (theState == MOUSE_DOWN && !Protected.isPressed && Public.touches(theX, theY, theRadius)) {
-    	        Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
-                    Public.setPressed(true);
+                Logger.trace(Public.id + ": registered mouse press at coords("+theX+","+theY+").");
+                Public.setPressed(true);
             } else {
             }
         }
@@ -203,7 +176,7 @@ ButtonBase.prototype.Constructor = function(Public, Protected, theScene, theId,
         if (!theNode || theNode.nodeName != "overlay") {
             return true;
         } else {
-	    // check visibility of parent chain recursively
+            // check visibility of parent chain recursively
             return (theNode.visible ? Protected.isVisible(theNode.parentNode) : false);
         }
     }
@@ -265,7 +238,7 @@ function DualImageButton(theScene, theId, theSources,
 }
 
 DualImageButton.prototype.Constructor = function(Public, Protected, theScene, theId, theSources,
-			                         thePosition, theStyle, theParent) {
+                                     thePosition, theStyle, theParent) {
     var Base      = [];
     ButtonBase.prototype.Constructor(Public, Protected, theScene, theId,
                [1,1], thePosition, theStyle, theParent);
@@ -312,7 +285,7 @@ function ColorButton(theScene, theId, theSize, thePosition, theStyle, theParent)
 };
 
 ColorButton.prototype.Constructor = function(Public, Protected, theScene, theId,
-						theSize, thePosition, theStyle, theParent) {
+                        theSize, thePosition, theStyle, theParent) {
 
     ButtonBase.prototype.Constructor(Public, Protected, theScene, theId, theSize,
                thePosition, theStyle, theParent);

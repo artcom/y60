@@ -4,7 +4,7 @@
 #include <asl/base/settings.h>
 
 #ifdef _WINSOCKAPI_
-#	undef _WINSOCKAPI_
+#   undef _WINSOCKAPI_
 #endif
 
 #include <boost/version.hpp>

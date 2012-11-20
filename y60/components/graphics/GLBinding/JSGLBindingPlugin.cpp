@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 
@@ -68,22 +41,22 @@ using namespace y60;
 namespace jslib {
     typedef bool DummyT;
 
-	class GLBinding : public asl::PlugInBase, public jslib::IScriptablePlugin {
-    	public:
+    class GLBinding : public asl::PlugInBase, public jslib::IScriptablePlugin {
+        public:
             typedef DummyT NATIVE;
             typedef asl::Ptr<DummyT> OWNERPTR;
             typedef JSWrapper<NATIVE,OWNERPTR,StaticAccessProtocol> Base;
 
-    		GLBinding(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
+            GLBinding(asl::DLHandle theDLHandle) : asl::PlugInBase(theDLHandle) {}
 
             virtual JSFunctionSpec * StaticFunctions();
             virtual JSConstIntPropertySpec * ConstIntProperties();
 
-    		const char * ClassName() {
-    		    static const char * myClassName = "gl";
-    		    return myClassName;
-    		}
-	};
+            const char * ClassName() {
+                static const char * myClassName = "gl";
+                return myClassName;
+            }
+    };
 
     JS_STATIC_DLL_CALLBACK(JSBool)
     Enable(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
@@ -193,5 +166,5 @@ namespace jslib {
 
 extern "C"
 EXPORT asl::PlugInBase * GLBinding_instantiatePlugIn(asl::DLHandle myDLHandle) {
-	return new jslib::GLBinding(myDLHandle);
+    return new jslib::GLBinding(myDLHandle);
 }

@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 //own header
@@ -78,12 +51,12 @@ namespace y60 {
 
     void
     SkinAndBonesShader::setup(MaterialBase & theMaterial) {
-		dom::NodePtr myProperties = theMaterial.getNode().childNode(PROPERTY_LIST_NAME);
+        dom::NodePtr myProperties = theMaterial.getNode().childNode(PROPERTY_LIST_NAME);
         unsigned myChildCount = myProperties->childNodesLength();
         for (unsigned i = 0; i < myChildCount; ++i) {
             if (myProperties->childNode(i)->getAttributeString("name") == "BoneMatrix") {
-	            _myBoneMatrixPropertyNode = myProperties->childNode(i)->childNode(0);
-				break;
+                _myBoneMatrixPropertyNode = myProperties->childNode(i)->childNode(0);
+                break;
             }
         }
         if (!_myBoneMatrixPropertyNode) {

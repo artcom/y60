@@ -201,7 +201,6 @@ namespace y60 {
                 }
             }
         }
-
         return myEvents;
     }
 }

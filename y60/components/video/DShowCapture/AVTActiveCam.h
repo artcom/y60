@@ -31,13 +31,13 @@ extern "C"{
 #ifndef __IAVTActiveCam_FWD_DEFINED__
 #define __IAVTActiveCam_FWD_DEFINED__
 typedef interface IAVTActiveCam IAVTActiveCam;
-#endif 	/* __IAVTActiveCam_FWD_DEFINED__ */
+#endif  /* __IAVTActiveCam_FWD_DEFINED__ */
 
 
 #ifndef ___IAVTActiveCamEvents_FWD_DEFINED__
 #define ___IAVTActiveCamEvents_FWD_DEFINED__
 typedef interface _IAVTActiveCamEvents _IAVTActiveCamEvents;
-#endif 	/* ___IAVTActiveCamEvents_FWD_DEFINED__ */
+#endif  /* ___IAVTActiveCamEvents_FWD_DEFINED__ */
 
 
 #ifndef __AVTActiveCam_FWD_DEFINED__
@@ -49,7 +49,7 @@ typedef class AVTActiveCam AVTActiveCam;
 typedef struct AVTActiveCam AVTActiveCam;
 #endif /* __cplusplus */
 
-#endif 	/* __AVTActiveCam_FWD_DEFINED__ */
+#endif  /* __AVTActiveCam_FWD_DEFINED__ */
 
 
 #ifndef __VideoSource_FWD_DEFINED__
@@ -61,7 +61,7 @@ typedef class VideoSource VideoSource;
 typedef struct VideoSource VideoSource;
 #endif /* __cplusplus */
 
-#endif 	/* __VideoSource_FWD_DEFINED__ */
+#endif  /* __VideoSource_FWD_DEFINED__ */
 
 
 #ifndef __VideoFormat_FWD_DEFINED__
@@ -73,7 +73,7 @@ typedef class VideoFormat VideoFormat;
 typedef struct VideoFormat VideoFormat;
 #endif /* __cplusplus */
 
-#endif 	/* __VideoFormat_FWD_DEFINED__ */
+#endif  /* __VideoFormat_FWD_DEFINED__ */
 
 
 #ifndef __VideoExposure_FWD_DEFINED__
@@ -85,7 +85,7 @@ typedef class VideoExposure VideoExposure;
 typedef struct VideoExposure VideoExposure;
 #endif /* __cplusplus */
 
-#endif 	/* __VideoExposure_FWD_DEFINED__ */
+#endif  /* __VideoExposure_FWD_DEFINED__ */
 
 
 #ifndef __VideoColor_FWD_DEFINED__
@@ -97,7 +97,7 @@ typedef class VideoColor VideoColor;
 typedef struct VideoColor VideoColor;
 #endif /* __cplusplus */
 
-#endif 	/* __VideoColor_FWD_DEFINED__ */
+#endif  /* __VideoColor_FWD_DEFINED__ */
 
 
 #ifndef __VideoDisplay_FWD_DEFINED__
@@ -109,7 +109,7 @@ typedef class VideoDisplay VideoDisplay;
 typedef struct VideoDisplay VideoDisplay;
 #endif /* __cplusplus */
 
-#endif 	/* __VideoDisplay_FWD_DEFINED__ */
+#endif  /* __VideoDisplay_FWD_DEFINED__ */
 
 
 #ifndef __VideoAdvanced_FWD_DEFINED__
@@ -121,7 +121,7 @@ typedef class VideoAdvanced VideoAdvanced;
 typedef struct VideoAdvanced VideoAdvanced;
 #endif /* __cplusplus */
 
-#endif 	/* __VideoAdvanced_FWD_DEFINED__ */
+#endif  /* __VideoAdvanced_FWD_DEFINED__ */
 
 
 /* header files for imported files */
@@ -148,225 +148,225 @@ EXTERN_C const IID LIBID_AVTACTIVECAMLib;
 /* interface IAVTActiveCam */
 /* [unique][helpstring][dual][uuid][object] */ 
 
-#define	DISPID_GRAB	( 1 )
+#define DISPID_GRAB ( 1 )
 
-#define	DISPID_CAMERA	( 2 )
+#define DISPID_CAMERA   ( 2 )
 
-#define	DISPID_MODE	( 3 )
+#define DISPID_MODE ( 3 )
 
-#define	DISPID_RATE	( 4 )
+#define DISPID_RATE ( 4 )
 
-#define	DISPID_SIZEX	( 5 )
+#define DISPID_SIZEX    ( 5 )
 
-#define	DISPID_SIZEY	( 6 )
+#define DISPID_SIZEY    ( 6 )
 
-#define	DISPID_STARTX	( 7 )
+#define DISPID_STARTX   ( 7 )
 
-#define	DISPID_STARTY	( 8 )
+#define DISPID_STARTY   ( 8 )
 
-#define	DISPID_TRIGGER	( 9 )
+#define DISPID_TRIGGER  ( 9 )
 
-#define	DISPID_TRIGGER_MODE	( 10 )
+#define DISPID_TRIGGER_MODE ( 10 )
 
-#define	DISPID_TRIGGER_COUNTER	( 11 )
+#define DISPID_TRIGGER_COUNTER  ( 11 )
 
-#define	DISPID_TRIGGER_POLARITY	( 12 )
+#define DISPID_TRIGGER_POLARITY ( 12 )
 
-#define	DISPID_TIMEOUT	( 13 )
+#define DISPID_TIMEOUT  ( 13 )
 
-#define	DISPID_ASYNCH	( 14 )
+#define DISPID_ASYNCH   ( 14 )
 
-#define	DISPID_PACKET	( 15 )
+#define DISPID_PACKET   ( 15 )
 
-#define	DISPID_SWAP	( 16 )
+#define DISPID_SWAP ( 16 )
 
-#define	DISPID_BAYER	( 17 )
+#define DISPID_BAYER    ( 17 )
 
-#define	DISPID_BAYER_ORDER	( 18 )
+#define DISPID_BAYER_ORDER  ( 18 )
 
-#define	DISPID_DISPLAY	( 19 )
+#define DISPID_DISPLAY  ( 19 )
 
-#define	DISPID_BRIGHTNESS	( 20 )
+#define DISPID_BRIGHTNESS   ( 20 )
 
-#define	DISPID_EXPOSURE	( 21 )
+#define DISPID_EXPOSURE ( 21 )
 
-#define	DISPID_SHARPNESS	( 22 )
+#define DISPID_SHARPNESS    ( 22 )
 
-#define	DISPID_WHITEBALANCE_UB	( 23 )
+#define DISPID_WHITEBALANCE_UB  ( 23 )
 
-#define	DISPID_WHITEBALANCE_VR	( 123 )
+#define DISPID_WHITEBALANCE_VR  ( 123 )
 
-#define	DISPID_HUE	( 24 )
+#define DISPID_HUE  ( 24 )
 
-#define	DISPID_SATURATION	( 25 )
+#define DISPID_SATURATION   ( 25 )
 
-#define	DISPID_GAMMA	( 26 )
+#define DISPID_GAMMA    ( 26 )
 
-#define	DISPID_SHUTTER	( 27 )
+#define DISPID_SHUTTER  ( 27 )
 
-#define	DISPID_GAIN	( 28 )
+#define DISPID_GAIN ( 28 )
 
-#define	DISPID_IRIS	( 29 )
+#define DISPID_IRIS ( 29 )
 
-#define	DISPID_FOCUS	( 30 )
+#define DISPID_FOCUS    ( 30 )
 
-#define	DISPID_FILTER	( 31 )
+#define DISPID_FILTER   ( 31 )
 
-#define	DISPID_ZOOM	( 32 )
+#define DISPID_ZOOM ( 32 )
 
-#define	DISPID_PAN	( 33 )
+#define DISPID_PAN  ( 33 )
 
-#define	DISPID_TILT	( 34 )
+#define DISPID_TILT ( 34 )
 
-#define	DISPID_TEMPERATURE	( 135 )
+#define DISPID_TEMPERATURE  ( 135 )
 
-#define	DISPID_DELAY	( 136 )
+#define DISPID_DELAY    ( 136 )
 
-#define	DISPID_SHADING	( 137 )
+#define DISPID_SHADING  ( 137 )
 
-#define	DISPID_TRIGGER_SOURCE	( 35 )
+#define DISPID_TRIGGER_SOURCE   ( 35 )
 
-#define	DISPID_BITSHIFT	( 36 )
+#define DISPID_BITSHIFT ( 36 )
 
-#define	DISPID_OVERLAY	( 37 )
+#define DISPID_OVERLAY  ( 37 )
 
-#define	DISPID_OVERLAY_COLOR	( 38 )
+#define DISPID_OVERLAY_COLOR    ( 38 )
 
-#define	DISPID_OVERLAY_FONT	( 39 )
+#define DISPID_OVERLAY_FONT ( 39 )
 
-#define	DISPID_BRIGHTNESS_CONTROL	( 40 )
+#define DISPID_BRIGHTNESS_CONTROL   ( 40 )
 
-#define	DISPID_EXPOSURE_CONTROL	( 41 )
+#define DISPID_EXPOSURE_CONTROL ( 41 )
 
-#define	DISPID_SHARPNESS_CONTROL	( 42 )
+#define DISPID_SHARPNESS_CONTROL    ( 42 )
 
-#define	DISPID_WHITEBALANCE_CONTROL	( 43 )
+#define DISPID_WHITEBALANCE_CONTROL ( 43 )
 
-#define	DISPID_HUE_CONTROL	( 44 )
+#define DISPID_HUE_CONTROL  ( 44 )
 
-#define	DISPID_SATURATION_CONTROL	( 45 )
+#define DISPID_SATURATION_CONTROL   ( 45 )
 
-#define	DISPID_GAMMA_CONTROL	( 46 )
+#define DISPID_GAMMA_CONTROL    ( 46 )
 
-#define	DISPID_SHUTTER_CONTROL	( 47 )
+#define DISPID_SHUTTER_CONTROL  ( 47 )
 
-#define	DISPID_GAIN_CONTROL	( 48 )
+#define DISPID_GAIN_CONTROL ( 48 )
 
-#define	DISPID_IRIS_CONTROL	( 49 )
+#define DISPID_IRIS_CONTROL ( 49 )
 
-#define	DISPID_FOCUS_CONTROL	( 50 )
+#define DISPID_FOCUS_CONTROL    ( 50 )
 
-#define	DISPID_FILTER_CONTROL	( 51 )
+#define DISPID_FILTER_CONTROL   ( 51 )
 
-#define	DISPID_ZOOM_CONTROL	( 52 )
+#define DISPID_ZOOM_CONTROL ( 52 )
 
-#define	DISPID_PAN_CONTROL	( 53 )
+#define DISPID_PAN_CONTROL  ( 53 )
 
-#define	DISPID_TILT_CONTROL	( 54 )
+#define DISPID_TILT_CONTROL ( 54 )
 
-#define	DISPID_TEMPERATURE_CONTROL	( 55 )
+#define DISPID_TEMPERATURE_CONTROL  ( 55 )
 
-#define	DISPID_DELAY_CONTROL	( 56 )
+#define DISPID_DELAY_CONTROL    ( 56 )
 
-#define	DISPID_SHADING_CONTROL	( 57 )
+#define DISPID_SHADING_CONTROL  ( 57 )
 
-#define	DISPID_BRIGHTNESS_MIN	( 60 )
+#define DISPID_BRIGHTNESS_MIN   ( 60 )
 
-#define	DISPID_BRIGHTNESS_MAX	( 61 )
+#define DISPID_BRIGHTNESS_MAX   ( 61 )
 
-#define	DISPID_EXPOSURE_MIN	( 62 )
+#define DISPID_EXPOSURE_MIN ( 62 )
 
-#define	DISPID_EXPOSURE_MAX	( 63 )
+#define DISPID_EXPOSURE_MAX ( 63 )
 
-#define	DISPID_SHARPNESS_MIN	( 64 )
+#define DISPID_SHARPNESS_MIN    ( 64 )
 
-#define	DISPID_SHARPNESS_MAX	( 65 )
+#define DISPID_SHARPNESS_MAX    ( 65 )
 
-#define	DISPID_WHITEBALANCE_MIN	( 66 )
+#define DISPID_WHITEBALANCE_MIN ( 66 )
 
-#define	DISPID_WHITEBALANCE_MAX	( 67 )
+#define DISPID_WHITEBALANCE_MAX ( 67 )
 
-#define	DISPID_HUE_MIN	( 68 )
+#define DISPID_HUE_MIN  ( 68 )
 
-#define	DISPID_HUE_MAX	( 69 )
+#define DISPID_HUE_MAX  ( 69 )
 
-#define	DISPID_SATURATION_MIN	( 70 )
+#define DISPID_SATURATION_MIN   ( 70 )
 
-#define	DISPID_SATURATION_MAX	( 71 )
+#define DISPID_SATURATION_MAX   ( 71 )
 
-#define	DISPID_GAMMA_MIN	( 72 )
+#define DISPID_GAMMA_MIN    ( 72 )
 
-#define	DISPID_GAMMA_MAX	( 73 )
+#define DISPID_GAMMA_MAX    ( 73 )
 
-#define	DISPID_SHUTTER_MIN	( 74 )
+#define DISPID_SHUTTER_MIN  ( 74 )
 
-#define	DISPID_SHUTTER_MAX	( 75 )
+#define DISPID_SHUTTER_MAX  ( 75 )
 
-#define	DISPID_GAIN_MIN	( 76 )
+#define DISPID_GAIN_MIN ( 76 )
 
-#define	DISPID_GAIN_MAX	( 77 )
+#define DISPID_GAIN_MAX ( 77 )
 
-#define	DISPID_IRIS_MIN	( 78 )
+#define DISPID_IRIS_MIN ( 78 )
 
-#define	DISPID_IRIS_MAX	( 79 )
+#define DISPID_IRIS_MAX ( 79 )
 
-#define	DISPID_FOCUS_MIN	( 80 )
+#define DISPID_FOCUS_MIN    ( 80 )
 
-#define	DISPID_FOCUS_MAX	( 81 )
+#define DISPID_FOCUS_MAX    ( 81 )
 
-#define	DISPID_FILTER_MIN	( 82 )
+#define DISPID_FILTER_MIN   ( 82 )
 
-#define	DISPID_FILTER_MAX	( 83 )
+#define DISPID_FILTER_MAX   ( 83 )
 
-#define	DISPID_ZOOM_MIN	( 84 )
+#define DISPID_ZOOM_MIN ( 84 )
 
-#define	DISPID_ZOOM_MAX	( 85 )
+#define DISPID_ZOOM_MAX ( 85 )
 
-#define	DISPID_PAN_MIN	( 86 )
+#define DISPID_PAN_MIN  ( 86 )
 
-#define	DISPID_PAN_MAX	( 87 )
+#define DISPID_PAN_MAX  ( 87 )
 
-#define	DISPID_TILT_MIN	( 88 )
+#define DISPID_TILT_MIN ( 88 )
 
-#define	DISPID_TILT_MAX	( 89 )
+#define DISPID_TILT_MAX ( 89 )
 
-#define	DISPID_FLIP	( 90 )
+#define DISPID_FLIP ( 90 )
 
-#define	DISPID_TEMPERATURE_MIN	( 91 )
+#define DISPID_TEMPERATURE_MIN  ( 91 )
 
-#define	DISPID_TEMPERATURE_MAX	( 92 )
+#define DISPID_TEMPERATURE_MAX  ( 92 )
 
-#define	DISPID_DELAY_MIN	( 93 )
+#define DISPID_DELAY_MIN    ( 93 )
 
-#define	DISPID_DELAY_MAX	( 94 )
+#define DISPID_DELAY_MAX    ( 94 )
 
-#define	DISPID_SHADING_MIN	( 95 )
+#define DISPID_SHADING_MIN  ( 95 )
 
-#define	DISPID_SHADING_MAX	( 96 )
+#define DISPID_SHADING_MAX  ( 96 )
 
-#define	DISPID_ACQUIRE	( 100 )
+#define DISPID_ACQUIRE  ( 100 )
 
-#define	DISPID_MAG	( 101 )
+#define DISPID_MAG  ( 101 )
 
-#define	DISPID_SCROLLBAR	( 102 )
+#define DISPID_SCROLLBAR    ( 102 )
 
-#define	DISPID_SCROLLX	( 103 )
+#define DISPID_SCROLLX  ( 103 )
 
-#define	DISPID_SCROLLY	( 104 )
+#define DISPID_SCROLLY  ( 104 )
 
-#define	DISPID_PALETTE	( 105 )
+#define DISPID_PALETTE  ( 105 )
 
-#define	DISPID_3D	( 106 )
+#define DISPID_3D   ( 106 )
 
-#define	DISPID_ANTITEARING	( 107 )
+#define DISPID_ANTITEARING  ( 107 )
 
-#define	DISPID_ROTATE	( 108 )
+#define DISPID_ROTATE   ( 108 )
 
-#define	DISPID_BKGCORRECT	( 109 )
+#define DISPID_BKGCORRECT   ( 109 )
 
-#define	DISPID_BKGNAME	( 110 )
+#define DISPID_BKGNAME  ( 110 )
 
-#define	DISPID_AVRG	( 150 )
+#define DISPID_AVRG ( 150 )
 
 
 EXTERN_C const IID IID_IAVTActiveCam;
@@ -1213,7 +1213,7 @@ EXTERN_C const IID IID_IAVTActiveCam;
         
     };
     
-#else 	/* C style interface */
+#else   /* C style interface */
 
     typedef struct IAVTActiveCamVtbl
     {
@@ -2354,777 +2354,777 @@ EXTERN_C const IID IID_IAVTActiveCam;
 #ifdef COBJMACROS
 
 
-#define IAVTActiveCam_QueryInterface(This,riid,ppvObject)	\
+#define IAVTActiveCam_QueryInterface(This,riid,ppvObject)   \
     (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
 
-#define IAVTActiveCam_AddRef(This)	\
+#define IAVTActiveCam_AddRef(This)  \
     (This)->lpVtbl -> AddRef(This)
 
-#define IAVTActiveCam_Release(This)	\
+#define IAVTActiveCam_Release(This) \
     (This)->lpVtbl -> Release(This)
 
 
-#define IAVTActiveCam_GetTypeInfoCount(This,pctinfo)	\
+#define IAVTActiveCam_GetTypeInfoCount(This,pctinfo)    \
     (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo)
 
-#define IAVTActiveCam_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+#define IAVTActiveCam_GetTypeInfo(This,iTInfo,lcid,ppTInfo) \
     (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo)
 
-#define IAVTActiveCam_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
+#define IAVTActiveCam_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)   \
     (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)
 
-#define IAVTActiveCam_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
+#define IAVTActiveCam_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr) \
     (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
 
 
-#define IAVTActiveCam_put_BackColor(This,clr)	\
+#define IAVTActiveCam_put_BackColor(This,clr)   \
     (This)->lpVtbl -> put_BackColor(This,clr)
 
-#define IAVTActiveCam_get_BackColor(This,pclr)	\
+#define IAVTActiveCam_get_BackColor(This,pclr)  \
     (This)->lpVtbl -> get_BackColor(This,pclr)
 
-#define IAVTActiveCam_put_Enabled(This,vbool)	\
+#define IAVTActiveCam_put_Enabled(This,vbool)   \
     (This)->lpVtbl -> put_Enabled(This,vbool)
 
-#define IAVTActiveCam_get_Enabled(This,pbool)	\
+#define IAVTActiveCam_get_Enabled(This,pbool)   \
     (This)->lpVtbl -> get_Enabled(This,pbool)
 
-#define IAVTActiveCam_putref_Font(This,Font)	\
+#define IAVTActiveCam_putref_Font(This,Font)    \
     (This)->lpVtbl -> putref_Font(This,Font)
 
-#define IAVTActiveCam_put_Font(This,Font)	\
+#define IAVTActiveCam_put_Font(This,Font)   \
     (This)->lpVtbl -> put_Font(This,Font)
 
-#define IAVTActiveCam_get_Font(This,pFont)	\
+#define IAVTActiveCam_get_Font(This,pFont)  \
     (This)->lpVtbl -> get_Font(This,pFont)
 
-#define IAVTActiveCam_Grab(This,value)	\
+#define IAVTActiveCam_Grab(This,value)  \
     (This)->lpVtbl -> Grab(This,value)
 
-#define IAVTActiveCam_get_SizeX(This,pVal)	\
+#define IAVTActiveCam_get_SizeX(This,pVal)  \
     (This)->lpVtbl -> get_SizeX(This,pVal)
 
-#define IAVTActiveCam_put_SizeX(This,newVal)	\
+#define IAVTActiveCam_put_SizeX(This,newVal)    \
     (This)->lpVtbl -> put_SizeX(This,newVal)
 
-#define IAVTActiveCam_get_SizeY(This,pVal)	\
+#define IAVTActiveCam_get_SizeY(This,pVal)  \
     (This)->lpVtbl -> get_SizeY(This,pVal)
 
-#define IAVTActiveCam_put_SizeY(This,newVal)	\
+#define IAVTActiveCam_put_SizeY(This,newVal)    \
     (This)->lpVtbl -> put_SizeY(This,newVal)
 
-#define IAVTActiveCam_get_StartX(This,pVal)	\
+#define IAVTActiveCam_get_StartX(This,pVal) \
     (This)->lpVtbl -> get_StartX(This,pVal)
 
-#define IAVTActiveCam_put_StartX(This,newVal)	\
+#define IAVTActiveCam_put_StartX(This,newVal)   \
     (This)->lpVtbl -> put_StartX(This,newVal)
 
-#define IAVTActiveCam_get_StartY(This,pVal)	\
+#define IAVTActiveCam_get_StartY(This,pVal) \
     (This)->lpVtbl -> get_StartY(This,pVal)
 
-#define IAVTActiveCam_put_StartY(This,newVal)	\
+#define IAVTActiveCam_put_StartY(This,newVal)   \
     (This)->lpVtbl -> put_StartY(This,newVal)
 
-#define IAVTActiveCam_get_Acquire(This,pVal)	\
+#define IAVTActiveCam_get_Acquire(This,pVal)    \
     (This)->lpVtbl -> get_Acquire(This,pVal)
 
-#define IAVTActiveCam_put_Acquire(This,newVal)	\
+#define IAVTActiveCam_put_Acquire(This,newVal)  \
     (This)->lpVtbl -> put_Acquire(This,newVal)
 
-#define IAVTActiveCam_get_Magnification(This,pVal)	\
+#define IAVTActiveCam_get_Magnification(This,pVal)  \
     (This)->lpVtbl -> get_Magnification(This,pVal)
 
-#define IAVTActiveCam_put_Magnification(This,newVal)	\
+#define IAVTActiveCam_put_Magnification(This,newVal)    \
     (This)->lpVtbl -> put_Magnification(This,newVal)
 
-#define IAVTActiveCam_get_ScrollBars(This,pVal)	\
+#define IAVTActiveCam_get_ScrollBars(This,pVal) \
     (This)->lpVtbl -> get_ScrollBars(This,pVal)
 
-#define IAVTActiveCam_put_ScrollBars(This,newVal)	\
+#define IAVTActiveCam_put_ScrollBars(This,newVal)   \
     (This)->lpVtbl -> put_ScrollBars(This,newVal)
 
-#define IAVTActiveCam_get_ScrollX(This,pVal)	\
+#define IAVTActiveCam_get_ScrollX(This,pVal)    \
     (This)->lpVtbl -> get_ScrollX(This,pVal)
 
-#define IAVTActiveCam_put_ScrollX(This,newVal)	\
+#define IAVTActiveCam_put_ScrollX(This,newVal)  \
     (This)->lpVtbl -> put_ScrollX(This,newVal)
 
-#define IAVTActiveCam_get_ScrollY(This,pVal)	\
+#define IAVTActiveCam_get_ScrollY(This,pVal)    \
     (This)->lpVtbl -> get_ScrollY(This,pVal)
 
-#define IAVTActiveCam_put_ScrollY(This,newVal)	\
+#define IAVTActiveCam_put_ScrollY(This,newVal)  \
     (This)->lpVtbl -> put_ScrollY(This,newVal)
 
-#define IAVTActiveCam_get_Palette(This,pVal)	\
+#define IAVTActiveCam_get_Palette(This,pVal)    \
     (This)->lpVtbl -> get_Palette(This,pVal)
 
-#define IAVTActiveCam_put_Palette(This,newVal)	\
+#define IAVTActiveCam_put_Palette(This,newVal)  \
     (This)->lpVtbl -> put_Palette(This,newVal)
 
-#define IAVTActiveCam_get_Edge(This,pVal)	\
+#define IAVTActiveCam_get_Edge(This,pVal)   \
     (This)->lpVtbl -> get_Edge(This,pVal)
 
-#define IAVTActiveCam_put_Edge(This,newVal)	\
+#define IAVTActiveCam_put_Edge(This,newVal) \
     (This)->lpVtbl -> put_Edge(This,newVal)
 
-#define IAVTActiveCam_get_Camera(This,pVal)	\
+#define IAVTActiveCam_get_Camera(This,pVal) \
     (This)->lpVtbl -> get_Camera(This,pVal)
 
-#define IAVTActiveCam_put_Camera(This,newVal)	\
+#define IAVTActiveCam_put_Camera(This,newVal)   \
     (This)->lpVtbl -> put_Camera(This,newVal)
 
-#define IAVTActiveCam_get_Mode(This,pVal)	\
+#define IAVTActiveCam_get_Mode(This,pVal)   \
     (This)->lpVtbl -> get_Mode(This,pVal)
 
-#define IAVTActiveCam_put_Mode(This,newVal)	\
+#define IAVTActiveCam_put_Mode(This,newVal) \
     (This)->lpVtbl -> put_Mode(This,newVal)
 
-#define IAVTActiveCam_get_Rate(This,pVal)	\
+#define IAVTActiveCam_get_Rate(This,pVal)   \
     (This)->lpVtbl -> get_Rate(This,pVal)
 
-#define IAVTActiveCam_put_Rate(This,newVal)	\
+#define IAVTActiveCam_put_Rate(This,newVal) \
     (This)->lpVtbl -> put_Rate(This,newVal)
 
-#define IAVTActiveCam_get_Trigger(This,pVal)	\
+#define IAVTActiveCam_get_Trigger(This,pVal)    \
     (This)->lpVtbl -> get_Trigger(This,pVal)
 
-#define IAVTActiveCam_put_Trigger(This,newVal)	\
+#define IAVTActiveCam_put_Trigger(This,newVal)  \
     (This)->lpVtbl -> put_Trigger(This,newVal)
 
-#define IAVTActiveCam_get_TriggerMode(This,pVal)	\
+#define IAVTActiveCam_get_TriggerMode(This,pVal)    \
     (This)->lpVtbl -> get_TriggerMode(This,pVal)
 
-#define IAVTActiveCam_put_TriggerMode(This,newVal)	\
+#define IAVTActiveCam_put_TriggerMode(This,newVal)  \
     (This)->lpVtbl -> put_TriggerMode(This,newVal)
 
-#define IAVTActiveCam_get_TriggerCounter(This,pVal)	\
+#define IAVTActiveCam_get_TriggerCounter(This,pVal) \
     (This)->lpVtbl -> get_TriggerCounter(This,pVal)
 
-#define IAVTActiveCam_put_TriggerCounter(This,newVal)	\
+#define IAVTActiveCam_put_TriggerCounter(This,newVal)   \
     (This)->lpVtbl -> put_TriggerCounter(This,newVal)
 
-#define IAVTActiveCam_get_TriggerPolarity(This,pVal)	\
+#define IAVTActiveCam_get_TriggerPolarity(This,pVal)    \
     (This)->lpVtbl -> get_TriggerPolarity(This,pVal)
 
-#define IAVTActiveCam_put_TriggerPolarity(This,newVal)	\
+#define IAVTActiveCam_put_TriggerPolarity(This,newVal)  \
     (This)->lpVtbl -> put_TriggerPolarity(This,newVal)
 
-#define IAVTActiveCam_get_Asynch(This,pVal)	\
+#define IAVTActiveCam_get_Asynch(This,pVal) \
     (This)->lpVtbl -> get_Asynch(This,pVal)
 
-#define IAVTActiveCam_put_Asynch(This,newVal)	\
+#define IAVTActiveCam_put_Asynch(This,newVal)   \
     (This)->lpVtbl -> put_Asynch(This,newVal)
 
-#define IAVTActiveCam_get_PacketSize(This,pVal)	\
+#define IAVTActiveCam_get_PacketSize(This,pVal) \
     (This)->lpVtbl -> get_PacketSize(This,pVal)
 
-#define IAVTActiveCam_put_PacketSize(This,newVal)	\
+#define IAVTActiveCam_put_PacketSize(This,newVal)   \
     (This)->lpVtbl -> put_PacketSize(This,newVal)
 
-#define IAVTActiveCam_get_SwapBytes(This,pVal)	\
+#define IAVTActiveCam_get_SwapBytes(This,pVal)  \
     (This)->lpVtbl -> get_SwapBytes(This,pVal)
 
-#define IAVTActiveCam_put_SwapBytes(This,newVal)	\
+#define IAVTActiveCam_put_SwapBytes(This,newVal)    \
     (This)->lpVtbl -> put_SwapBytes(This,newVal)
 
-#define IAVTActiveCam_get_Bayer(This,pVal)	\
+#define IAVTActiveCam_get_Bayer(This,pVal)  \
     (This)->lpVtbl -> get_Bayer(This,pVal)
 
-#define IAVTActiveCam_put_Bayer(This,newVal)	\
+#define IAVTActiveCam_put_Bayer(This,newVal)    \
     (This)->lpVtbl -> put_Bayer(This,newVal)
 
-#define IAVTActiveCam_get_BayerLayout(This,pVal)	\
+#define IAVTActiveCam_get_BayerLayout(This,pVal)    \
     (This)->lpVtbl -> get_BayerLayout(This,pVal)
 
-#define IAVTActiveCam_put_BayerLayout(This,newVal)	\
+#define IAVTActiveCam_put_BayerLayout(This,newVal)  \
     (This)->lpVtbl -> put_BayerLayout(This,newVal)
 
-#define IAVTActiveCam_get_Display(This,pVal)	\
+#define IAVTActiveCam_get_Display(This,pVal)    \
     (This)->lpVtbl -> get_Display(This,pVal)
 
-#define IAVTActiveCam_put_Display(This,newVal)	\
+#define IAVTActiveCam_put_Display(This,newVal)  \
     (This)->lpVtbl -> put_Display(This,newVal)
 
-#define IAVTActiveCam_get_Flip(This,pVal)	\
+#define IAVTActiveCam_get_Flip(This,pVal)   \
     (This)->lpVtbl -> get_Flip(This,pVal)
 
-#define IAVTActiveCam_put_Flip(This,newVal)	\
+#define IAVTActiveCam_put_Flip(This,newVal) \
     (This)->lpVtbl -> put_Flip(This,newVal)
 
-#define IAVTActiveCam_get_Brightness(This,pVal)	\
+#define IAVTActiveCam_get_Brightness(This,pVal) \
     (This)->lpVtbl -> get_Brightness(This,pVal)
 
-#define IAVTActiveCam_put_Brightness(This,newVal)	\
+#define IAVTActiveCam_put_Brightness(This,newVal)   \
     (This)->lpVtbl -> put_Brightness(This,newVal)
 
-#define IAVTActiveCam_get_BrightnessControl(This,pVal)	\
+#define IAVTActiveCam_get_BrightnessControl(This,pVal)  \
     (This)->lpVtbl -> get_BrightnessControl(This,pVal)
 
-#define IAVTActiveCam_put_BrightnessControl(This,newVal)	\
+#define IAVTActiveCam_put_BrightnessControl(This,newVal)    \
     (This)->lpVtbl -> put_BrightnessControl(This,newVal)
 
-#define IAVTActiveCam_get_AutoExposureRef(This,pVal)	\
+#define IAVTActiveCam_get_AutoExposureRef(This,pVal)    \
     (This)->lpVtbl -> get_AutoExposureRef(This,pVal)
 
-#define IAVTActiveCam_put_AutoExposureRef(This,newVal)	\
+#define IAVTActiveCam_put_AutoExposureRef(This,newVal)  \
     (This)->lpVtbl -> put_AutoExposureRef(This,newVal)
 
-#define IAVTActiveCam_get_AutoExposure(This,pVal)	\
+#define IAVTActiveCam_get_AutoExposure(This,pVal)   \
     (This)->lpVtbl -> get_AutoExposure(This,pVal)
 
-#define IAVTActiveCam_put_AutoExposure(This,newVal)	\
+#define IAVTActiveCam_put_AutoExposure(This,newVal) \
     (This)->lpVtbl -> put_AutoExposure(This,newVal)
 
-#define IAVTActiveCam_get_Sharpness(This,pVal)	\
+#define IAVTActiveCam_get_Sharpness(This,pVal)  \
     (This)->lpVtbl -> get_Sharpness(This,pVal)
 
-#define IAVTActiveCam_put_Sharpness(This,newVal)	\
+#define IAVTActiveCam_put_Sharpness(This,newVal)    \
     (This)->lpVtbl -> put_Sharpness(This,newVal)
 
-#define IAVTActiveCam_get_SharpnessControl(This,pVal)	\
+#define IAVTActiveCam_get_SharpnessControl(This,pVal)   \
     (This)->lpVtbl -> get_SharpnessControl(This,pVal)
 
-#define IAVTActiveCam_put_SharpnessControl(This,newVal)	\
+#define IAVTActiveCam_put_SharpnessControl(This,newVal) \
     (This)->lpVtbl -> put_SharpnessControl(This,newVal)
 
-#define IAVTActiveCam_get_Gamma(This,pVal)	\
+#define IAVTActiveCam_get_Gamma(This,pVal)  \
     (This)->lpVtbl -> get_Gamma(This,pVal)
 
-#define IAVTActiveCam_put_Gamma(This,newVal)	\
+#define IAVTActiveCam_put_Gamma(This,newVal)    \
     (This)->lpVtbl -> put_Gamma(This,newVal)
 
-#define IAVTActiveCam_get_GammaControl(This,pVal)	\
+#define IAVTActiveCam_get_GammaControl(This,pVal)   \
     (This)->lpVtbl -> get_GammaControl(This,pVal)
 
-#define IAVTActiveCam_put_GammaControl(This,newVal)	\
+#define IAVTActiveCam_put_GammaControl(This,newVal) \
     (This)->lpVtbl -> put_GammaControl(This,newVal)
 
-#define IAVTActiveCam_get_Shutter(This,pVal)	\
+#define IAVTActiveCam_get_Shutter(This,pVal)    \
     (This)->lpVtbl -> get_Shutter(This,pVal)
 
-#define IAVTActiveCam_put_Shutter(This,newVal)	\
+#define IAVTActiveCam_put_Shutter(This,newVal)  \
     (This)->lpVtbl -> put_Shutter(This,newVal)
 
-#define IAVTActiveCam_get_ShutterControl(This,pVal)	\
+#define IAVTActiveCam_get_ShutterControl(This,pVal) \
     (This)->lpVtbl -> get_ShutterControl(This,pVal)
 
-#define IAVTActiveCam_put_ShutterControl(This,newVal)	\
+#define IAVTActiveCam_put_ShutterControl(This,newVal)   \
     (This)->lpVtbl -> put_ShutterControl(This,newVal)
 
-#define IAVTActiveCam_get_Gain(This,pVal)	\
+#define IAVTActiveCam_get_Gain(This,pVal)   \
     (This)->lpVtbl -> get_Gain(This,pVal)
 
-#define IAVTActiveCam_put_Gain(This,newVal)	\
+#define IAVTActiveCam_put_Gain(This,newVal) \
     (This)->lpVtbl -> put_Gain(This,newVal)
 
-#define IAVTActiveCam_get_GainControl(This,pVal)	\
+#define IAVTActiveCam_get_GainControl(This,pVal)    \
     (This)->lpVtbl -> get_GainControl(This,pVal)
 
-#define IAVTActiveCam_put_GainControl(This,newVal)	\
+#define IAVTActiveCam_put_GainControl(This,newVal)  \
     (This)->lpVtbl -> put_GainControl(This,newVal)
 
-#define IAVTActiveCam_get_Iris(This,pVal)	\
+#define IAVTActiveCam_get_Iris(This,pVal)   \
     (This)->lpVtbl -> get_Iris(This,pVal)
 
-#define IAVTActiveCam_put_Iris(This,newVal)	\
+#define IAVTActiveCam_put_Iris(This,newVal) \
     (This)->lpVtbl -> put_Iris(This,newVal)
 
-#define IAVTActiveCam_get_IrisControl(This,pVal)	\
+#define IAVTActiveCam_get_IrisControl(This,pVal)    \
     (This)->lpVtbl -> get_IrisControl(This,pVal)
 
-#define IAVTActiveCam_put_IrisControl(This,newVal)	\
+#define IAVTActiveCam_put_IrisControl(This,newVal)  \
     (This)->lpVtbl -> put_IrisControl(This,newVal)
 
-#define IAVTActiveCam_get_WhiteBalanceUB(This,pVal)	\
+#define IAVTActiveCam_get_WhiteBalanceUB(This,pVal) \
     (This)->lpVtbl -> get_WhiteBalanceUB(This,pVal)
 
-#define IAVTActiveCam_put_WhiteBalanceUB(This,newVal)	\
+#define IAVTActiveCam_put_WhiteBalanceUB(This,newVal)   \
     (This)->lpVtbl -> put_WhiteBalanceUB(This,newVal)
 
-#define IAVTActiveCam_get_WhiteBalanceVR(This,pVal)	\
+#define IAVTActiveCam_get_WhiteBalanceVR(This,pVal) \
     (This)->lpVtbl -> get_WhiteBalanceVR(This,pVal)
 
-#define IAVTActiveCam_put_WhiteBalanceVR(This,newVal)	\
+#define IAVTActiveCam_put_WhiteBalanceVR(This,newVal)   \
     (This)->lpVtbl -> put_WhiteBalanceVR(This,newVal)
 
-#define IAVTActiveCam_get_WhiteBalanceControl(This,pVal)	\
+#define IAVTActiveCam_get_WhiteBalanceControl(This,pVal)    \
     (This)->lpVtbl -> get_WhiteBalanceControl(This,pVal)
 
-#define IAVTActiveCam_put_WhiteBalanceControl(This,newVal)	\
+#define IAVTActiveCam_put_WhiteBalanceControl(This,newVal)  \
     (This)->lpVtbl -> put_WhiteBalanceControl(This,newVal)
 
-#define IAVTActiveCam_get_Hue(This,pVal)	\
+#define IAVTActiveCam_get_Hue(This,pVal)    \
     (This)->lpVtbl -> get_Hue(This,pVal)
 
-#define IAVTActiveCam_put_Hue(This,newVal)	\
+#define IAVTActiveCam_put_Hue(This,newVal)  \
     (This)->lpVtbl -> put_Hue(This,newVal)
 
-#define IAVTActiveCam_get_HueControl(This,pVal)	\
+#define IAVTActiveCam_get_HueControl(This,pVal) \
     (This)->lpVtbl -> get_HueControl(This,pVal)
 
-#define IAVTActiveCam_put_HueControl(This,newVal)	\
+#define IAVTActiveCam_put_HueControl(This,newVal)   \
     (This)->lpVtbl -> put_HueControl(This,newVal)
 
-#define IAVTActiveCam_get_Saturation(This,pVal)	\
+#define IAVTActiveCam_get_Saturation(This,pVal) \
     (This)->lpVtbl -> get_Saturation(This,pVal)
 
-#define IAVTActiveCam_put_Saturation(This,newVal)	\
+#define IAVTActiveCam_put_Saturation(This,newVal)   \
     (This)->lpVtbl -> put_Saturation(This,newVal)
 
-#define IAVTActiveCam_get_SaturationControl(This,pVal)	\
+#define IAVTActiveCam_get_SaturationControl(This,pVal)  \
     (This)->lpVtbl -> get_SaturationControl(This,pVal)
 
-#define IAVTActiveCam_put_SaturationControl(This,newVal)	\
+#define IAVTActiveCam_put_SaturationControl(This,newVal)    \
     (This)->lpVtbl -> put_SaturationControl(This,newVal)
 
-#define IAVTActiveCam_get_Focus(This,pVal)	\
+#define IAVTActiveCam_get_Focus(This,pVal)  \
     (This)->lpVtbl -> get_Focus(This,pVal)
 
-#define IAVTActiveCam_put_Focus(This,newVal)	\
+#define IAVTActiveCam_put_Focus(This,newVal)    \
     (This)->lpVtbl -> put_Focus(This,newVal)
 
-#define IAVTActiveCam_get_FocusControl(This,pVal)	\
+#define IAVTActiveCam_get_FocusControl(This,pVal)   \
     (This)->lpVtbl -> get_FocusControl(This,pVal)
 
-#define IAVTActiveCam_put_FocusControl(This,newVal)	\
+#define IAVTActiveCam_put_FocusControl(This,newVal) \
     (This)->lpVtbl -> put_FocusControl(This,newVal)
 
-#define IAVTActiveCam_get_Zoom(This,pVal)	\
+#define IAVTActiveCam_get_Zoom(This,pVal)   \
     (This)->lpVtbl -> get_Zoom(This,pVal)
 
-#define IAVTActiveCam_put_Zoom(This,newVal)	\
+#define IAVTActiveCam_put_Zoom(This,newVal) \
     (This)->lpVtbl -> put_Zoom(This,newVal)
 
-#define IAVTActiveCam_get_ZoomControl(This,pVal)	\
+#define IAVTActiveCam_get_ZoomControl(This,pVal)    \
     (This)->lpVtbl -> get_ZoomControl(This,pVal)
 
-#define IAVTActiveCam_put_ZoomControl(This,newVal)	\
+#define IAVTActiveCam_put_ZoomControl(This,newVal)  \
     (This)->lpVtbl -> put_ZoomControl(This,newVal)
 
-#define IAVTActiveCam_get_Pan(This,pVal)	\
+#define IAVTActiveCam_get_Pan(This,pVal)    \
     (This)->lpVtbl -> get_Pan(This,pVal)
 
-#define IAVTActiveCam_put_Pan(This,newVal)	\
+#define IAVTActiveCam_put_Pan(This,newVal)  \
     (This)->lpVtbl -> put_Pan(This,newVal)
 
-#define IAVTActiveCam_get_PanControl(This,pVal)	\
+#define IAVTActiveCam_get_PanControl(This,pVal) \
     (This)->lpVtbl -> get_PanControl(This,pVal)
 
-#define IAVTActiveCam_put_PanControl(This,newVal)	\
+#define IAVTActiveCam_put_PanControl(This,newVal)   \
     (This)->lpVtbl -> put_PanControl(This,newVal)
 
-#define IAVTActiveCam_get_Tilt(This,pVal)	\
+#define IAVTActiveCam_get_Tilt(This,pVal)   \
     (This)->lpVtbl -> get_Tilt(This,pVal)
 
-#define IAVTActiveCam_put_Tilt(This,newVal)	\
+#define IAVTActiveCam_put_Tilt(This,newVal) \
     (This)->lpVtbl -> put_Tilt(This,newVal)
 
-#define IAVTActiveCam_get_TiltControl(This,pVal)	\
+#define IAVTActiveCam_get_TiltControl(This,pVal)    \
     (This)->lpVtbl -> get_TiltControl(This,pVal)
 
-#define IAVTActiveCam_put_TiltControl(This,newVal)	\
+#define IAVTActiveCam_put_TiltControl(This,newVal)  \
     (This)->lpVtbl -> put_TiltControl(This,newVal)
 
-#define IAVTActiveCam_get_Temperature(This,pVal)	\
+#define IAVTActiveCam_get_Temperature(This,pVal)    \
     (This)->lpVtbl -> get_Temperature(This,pVal)
 
-#define IAVTActiveCam_put_Temperature(This,newVal)	\
+#define IAVTActiveCam_put_Temperature(This,newVal)  \
     (This)->lpVtbl -> put_Temperature(This,newVal)
 
-#define IAVTActiveCam_get_TemperatureControl(This,pVal)	\
+#define IAVTActiveCam_get_TemperatureControl(This,pVal) \
     (This)->lpVtbl -> get_TemperatureControl(This,pVal)
 
-#define IAVTActiveCam_put_TemperatureControl(This,newVal)	\
+#define IAVTActiveCam_put_TemperatureControl(This,newVal)   \
     (This)->lpVtbl -> put_TemperatureControl(This,newVal)
 
-#define IAVTActiveCam_get_OpticalFilter(This,pVal)	\
+#define IAVTActiveCam_get_OpticalFilter(This,pVal)  \
     (This)->lpVtbl -> get_OpticalFilter(This,pVal)
 
-#define IAVTActiveCam_put_OpticalFilter(This,newVal)	\
+#define IAVTActiveCam_put_OpticalFilter(This,newVal)    \
     (This)->lpVtbl -> put_OpticalFilter(This,newVal)
 
-#define IAVTActiveCam_get_OpticalFilterControl(This,pVal)	\
+#define IAVTActiveCam_get_OpticalFilterControl(This,pVal)   \
     (This)->lpVtbl -> get_OpticalFilterControl(This,pVal)
 
-#define IAVTActiveCam_put_OpticalFilterControl(This,newVal)	\
+#define IAVTActiveCam_put_OpticalFilterControl(This,newVal) \
     (This)->lpVtbl -> put_OpticalFilterControl(This,newVal)
 
-#define IAVTActiveCam_get_TriggerDelay(This,pVal)	\
+#define IAVTActiveCam_get_TriggerDelay(This,pVal)   \
     (This)->lpVtbl -> get_TriggerDelay(This,pVal)
 
-#define IAVTActiveCam_put_TriggerDelay(This,newVal)	\
+#define IAVTActiveCam_put_TriggerDelay(This,newVal) \
     (This)->lpVtbl -> put_TriggerDelay(This,newVal)
 
-#define IAVTActiveCam_put_WhiteShading(This,clr)	\
+#define IAVTActiveCam_put_WhiteShading(This,clr)    \
     (This)->lpVtbl -> put_WhiteShading(This,clr)
 
-#define IAVTActiveCam_get_WhiteShading(This,pclr)	\
+#define IAVTActiveCam_get_WhiteShading(This,pclr)   \
     (This)->lpVtbl -> get_WhiteShading(This,pclr)
 
-#define IAVTActiveCam_get_WhiteShadingControl(This,pVal)	\
+#define IAVTActiveCam_get_WhiteShadingControl(This,pVal)    \
     (This)->lpVtbl -> get_WhiteShadingControl(This,pVal)
 
-#define IAVTActiveCam_put_WhiteShadingControl(This,newVal)	\
+#define IAVTActiveCam_put_WhiteShadingControl(This,newVal)  \
     (This)->lpVtbl -> put_WhiteShadingControl(This,newVal)
 
-#define IAVTActiveCam_AboutBox(This)	\
+#define IAVTActiveCam_AboutBox(This)    \
     (This)->lpVtbl -> AboutBox(This)
 
-#define IAVTActiveCam_put_OverlayColor(This,clr)	\
+#define IAVTActiveCam_put_OverlayColor(This,clr)    \
     (This)->lpVtbl -> put_OverlayColor(This,clr)
 
-#define IAVTActiveCam_get_OverlayColor(This,pclr)	\
+#define IAVTActiveCam_get_OverlayColor(This,pclr)   \
     (This)->lpVtbl -> get_OverlayColor(This,pclr)
 
-#define IAVTActiveCam_get_Overlay(This,pVal)	\
+#define IAVTActiveCam_get_Overlay(This,pVal)    \
     (This)->lpVtbl -> get_Overlay(This,pVal)
 
-#define IAVTActiveCam_put_Overlay(This,newVal)	\
+#define IAVTActiveCam_put_Overlay(This,newVal)  \
     (This)->lpVtbl -> put_Overlay(This,newVal)
 
-#define IAVTActiveCam_putref_OverlayFont(This,Font)	\
+#define IAVTActiveCam_putref_OverlayFont(This,Font) \
     (This)->lpVtbl -> putref_OverlayFont(This,Font)
 
-#define IAVTActiveCam_put_OverlayFont(This,Font)	\
+#define IAVTActiveCam_put_OverlayFont(This,Font)    \
     (This)->lpVtbl -> put_OverlayFont(This,Font)
 
-#define IAVTActiveCam_get_OverlayFont(This,pFont)	\
+#define IAVTActiveCam_get_OverlayFont(This,pFont)   \
     (This)->lpVtbl -> get_OverlayFont(This,pFont)
 
-#define IAVTActiveCam_get_BkgCorrect(This,pVal)	\
+#define IAVTActiveCam_get_BkgCorrect(This,pVal) \
     (This)->lpVtbl -> get_BkgCorrect(This,pVal)
 
-#define IAVTActiveCam_put_BkgCorrect(This,newVal)	\
+#define IAVTActiveCam_put_BkgCorrect(This,newVal)   \
     (This)->lpVtbl -> put_BkgCorrect(This,newVal)
 
-#define IAVTActiveCam_get_BkgName(This,pVal)	\
+#define IAVTActiveCam_get_BkgName(This,pVal)    \
     (This)->lpVtbl -> get_BkgName(This,pVal)
 
-#define IAVTActiveCam_put_BkgName(This,newVal)	\
+#define IAVTActiveCam_put_BkgName(This,newVal)  \
     (This)->lpVtbl -> put_BkgName(This,newVal)
 
-#define IAVTActiveCam_GetBrightnessMin(This,pVal)	\
+#define IAVTActiveCam_GetBrightnessMin(This,pVal)   \
     (This)->lpVtbl -> GetBrightnessMin(This,pVal)
 
-#define IAVTActiveCam_GetBrightnessMax(This,pVal)	\
+#define IAVTActiveCam_GetBrightnessMax(This,pVal)   \
     (This)->lpVtbl -> GetBrightnessMax(This,pVal)
 
-#define IAVTActiveCam_GetExposureMin(This,pVal)	\
+#define IAVTActiveCam_GetExposureMin(This,pVal) \
     (This)->lpVtbl -> GetExposureMin(This,pVal)
 
-#define IAVTActiveCam_GetExposureMax(This,pVal)	\
+#define IAVTActiveCam_GetExposureMax(This,pVal) \
     (This)->lpVtbl -> GetExposureMax(This,pVal)
 
-#define IAVTActiveCam_GetSharpnessMin(This,pVal)	\
+#define IAVTActiveCam_GetSharpnessMin(This,pVal)    \
     (This)->lpVtbl -> GetSharpnessMin(This,pVal)
 
-#define IAVTActiveCam_GetSharpnessMax(This,pVal)	\
+#define IAVTActiveCam_GetSharpnessMax(This,pVal)    \
     (This)->lpVtbl -> GetSharpnessMax(This,pVal)
 
-#define IAVTActiveCam_GetWhiteBalanceMin(This,pVal)	\
+#define IAVTActiveCam_GetWhiteBalanceMin(This,pVal) \
     (This)->lpVtbl -> GetWhiteBalanceMin(This,pVal)
 
-#define IAVTActiveCam_GetWhiteBalanceMax(This,pVal)	\
+#define IAVTActiveCam_GetWhiteBalanceMax(This,pVal) \
     (This)->lpVtbl -> GetWhiteBalanceMax(This,pVal)
 
-#define IAVTActiveCam_GetHueMin(This,pVal)	\
+#define IAVTActiveCam_GetHueMin(This,pVal)  \
     (This)->lpVtbl -> GetHueMin(This,pVal)
 
-#define IAVTActiveCam_GetHueMax(This,pVal)	\
+#define IAVTActiveCam_GetHueMax(This,pVal)  \
     (This)->lpVtbl -> GetHueMax(This,pVal)
 
-#define IAVTActiveCam_GetSaturationMin(This,pVal)	\
+#define IAVTActiveCam_GetSaturationMin(This,pVal)   \
     (This)->lpVtbl -> GetSaturationMin(This,pVal)
 
-#define IAVTActiveCam_GetSaturationMax(This,pVal)	\
+#define IAVTActiveCam_GetSaturationMax(This,pVal)   \
     (This)->lpVtbl -> GetSaturationMax(This,pVal)
 
-#define IAVTActiveCam_GetGammaMin(This,pVal)	\
+#define IAVTActiveCam_GetGammaMin(This,pVal)    \
     (This)->lpVtbl -> GetGammaMin(This,pVal)
 
-#define IAVTActiveCam_GetGammaMax(This,pVal)	\
+#define IAVTActiveCam_GetGammaMax(This,pVal)    \
     (This)->lpVtbl -> GetGammaMax(This,pVal)
 
-#define IAVTActiveCam_GetShutterMin(This,pVal)	\
+#define IAVTActiveCam_GetShutterMin(This,pVal)  \
     (This)->lpVtbl -> GetShutterMin(This,pVal)
 
-#define IAVTActiveCam_GetShutterMax(This,pVal)	\
+#define IAVTActiveCam_GetShutterMax(This,pVal)  \
     (This)->lpVtbl -> GetShutterMax(This,pVal)
 
-#define IAVTActiveCam_GetGainMin(This,pVal)	\
+#define IAVTActiveCam_GetGainMin(This,pVal) \
     (This)->lpVtbl -> GetGainMin(This,pVal)
 
-#define IAVTActiveCam_GetGainMax(This,pVal)	\
+#define IAVTActiveCam_GetGainMax(This,pVal) \
     (This)->lpVtbl -> GetGainMax(This,pVal)
 
-#define IAVTActiveCam_GetIrisMin(This,pVal)	\
+#define IAVTActiveCam_GetIrisMin(This,pVal) \
     (This)->lpVtbl -> GetIrisMin(This,pVal)
 
-#define IAVTActiveCam_GetIrisMax(This,pVal)	\
+#define IAVTActiveCam_GetIrisMax(This,pVal) \
     (This)->lpVtbl -> GetIrisMax(This,pVal)
 
-#define IAVTActiveCam_GetFocusMin(This,pVal)	\
+#define IAVTActiveCam_GetFocusMin(This,pVal)    \
     (This)->lpVtbl -> GetFocusMin(This,pVal)
 
-#define IAVTActiveCam_GetFocusMax(This,pVal)	\
+#define IAVTActiveCam_GetFocusMax(This,pVal)    \
     (This)->lpVtbl -> GetFocusMax(This,pVal)
 
-#define IAVTActiveCam_GetZoomMin(This,pVal)	\
+#define IAVTActiveCam_GetZoomMin(This,pVal) \
     (This)->lpVtbl -> GetZoomMin(This,pVal)
 
-#define IAVTActiveCam_GetZoomMax(This,pVal)	\
+#define IAVTActiveCam_GetZoomMax(This,pVal) \
     (This)->lpVtbl -> GetZoomMax(This,pVal)
 
-#define IAVTActiveCam_GetPanMin(This,pVal)	\
+#define IAVTActiveCam_GetPanMin(This,pVal)  \
     (This)->lpVtbl -> GetPanMin(This,pVal)
 
-#define IAVTActiveCam_GetPanMax(This,pVal)	\
+#define IAVTActiveCam_GetPanMax(This,pVal)  \
     (This)->lpVtbl -> GetPanMax(This,pVal)
 
-#define IAVTActiveCam_GetTiltMin(This,pVal)	\
+#define IAVTActiveCam_GetTiltMin(This,pVal) \
     (This)->lpVtbl -> GetTiltMin(This,pVal)
 
-#define IAVTActiveCam_GetTiltMax(This,pVal)	\
+#define IAVTActiveCam_GetTiltMax(This,pVal) \
     (This)->lpVtbl -> GetTiltMax(This,pVal)
 
-#define IAVTActiveCam_GetOpticalFilterMin(This,pVal)	\
+#define IAVTActiveCam_GetOpticalFilterMin(This,pVal)    \
     (This)->lpVtbl -> GetOpticalFilterMin(This,pVal)
 
-#define IAVTActiveCam_GetOpticalFilterMax(This,pVal)	\
+#define IAVTActiveCam_GetOpticalFilterMax(This,pVal)    \
     (This)->lpVtbl -> GetOpticalFilterMax(This,pVal)
 
-#define IAVTActiveCam_GetTriggerDelayMin(This,pVal)	\
+#define IAVTActiveCam_GetTriggerDelayMin(This,pVal) \
     (This)->lpVtbl -> GetTriggerDelayMin(This,pVal)
 
-#define IAVTActiveCam_GetTriggerDelayMax(This,pVal)	\
+#define IAVTActiveCam_GetTriggerDelayMax(This,pVal) \
     (This)->lpVtbl -> GetTriggerDelayMax(This,pVal)
 
-#define IAVTActiveCam_GetWhiteShadingMin(This,pVal)	\
+#define IAVTActiveCam_GetWhiteShadingMin(This,pVal) \
     (This)->lpVtbl -> GetWhiteShadingMin(This,pVal)
 
-#define IAVTActiveCam_GetWhiteShadingMax(This,pVal)	\
+#define IAVTActiveCam_GetWhiteShadingMax(This,pVal) \
     (This)->lpVtbl -> GetWhiteShadingMax(This,pVal)
 
-#define IAVTActiveCam_get_TriggerSource(This,pVal)	\
+#define IAVTActiveCam_get_TriggerSource(This,pVal)  \
     (This)->lpVtbl -> get_TriggerSource(This,pVal)
 
-#define IAVTActiveCam_put_TriggerSource(This,newVal)	\
+#define IAVTActiveCam_put_TriggerSource(This,newVal)    \
     (This)->lpVtbl -> put_TriggerSource(This,newVal)
 
-#define IAVTActiveCam_get_BitShift(This,pVal)	\
+#define IAVTActiveCam_get_BitShift(This,pVal)   \
     (This)->lpVtbl -> get_BitShift(This,pVal)
 
-#define IAVTActiveCam_put_BitShift(This,newVal)	\
+#define IAVTActiveCam_put_BitShift(This,newVal) \
     (This)->lpVtbl -> put_BitShift(This,newVal)
 
-#define IAVTActiveCam_get_Timeout(This,pVal)	\
+#define IAVTActiveCam_get_Timeout(This,pVal)    \
     (This)->lpVtbl -> get_Timeout(This,pVal)
 
-#define IAVTActiveCam_put_Timeout(This,newVal)	\
+#define IAVTActiveCam_put_Timeout(This,newVal)  \
     (This)->lpVtbl -> put_Timeout(This,newVal)
 
-#define IAVTActiveCam_get_AntiTearing(This,pVal)	\
+#define IAVTActiveCam_get_AntiTearing(This,pVal)    \
     (This)->lpVtbl -> get_AntiTearing(This,pVal)
 
-#define IAVTActiveCam_put_AntiTearing(This,newVal)	\
+#define IAVTActiveCam_put_AntiTearing(This,newVal)  \
     (This)->lpVtbl -> put_AntiTearing(This,newVal)
 
-#define IAVTActiveCam_get_Rotate(This,pVal)	\
+#define IAVTActiveCam_get_Rotate(This,pVal) \
     (This)->lpVtbl -> get_Rotate(This,pVal)
 
-#define IAVTActiveCam_put_Rotate(This,newVal)	\
+#define IAVTActiveCam_put_Rotate(This,newVal)   \
     (This)->lpVtbl -> put_Rotate(This,newVal)
 
-#define IAVTActiveCam_ReadBlock(This,offset,pData,nBytes)	\
+#define IAVTActiveCam_ReadBlock(This,offset,pData,nBytes)   \
     (This)->lpVtbl -> ReadBlock(This,offset,pData,nBytes)
 
-#define IAVTActiveCam_WriteBlock(This,offset,pData,nBytes)	\
+#define IAVTActiveCam_WriteBlock(This,offset,pData,nBytes)  \
     (This)->lpVtbl -> WriteBlock(This,offset,pData,nBytes)
 
-#define IAVTActiveCam_GetRawData(This,isPointer,value)	\
+#define IAVTActiveCam_GetRawData(This,isPointer,value)  \
     (This)->lpVtbl -> GetRawData(This,isPointer,value)
 
-#define IAVTActiveCam_GetImageWindow(This,x,y,sx,sy,value)	\
+#define IAVTActiveCam_GetImageWindow(This,x,y,sx,sy,value)  \
     (This)->lpVtbl -> GetImageWindow(This,x,y,sx,sy,value)
 
-#define IAVTActiveCam_GetPixel(This,x,y,value)	\
+#define IAVTActiveCam_GetPixel(This,x,y,value)  \
     (This)->lpVtbl -> GetPixel(This,x,y,value)
 
-#define IAVTActiveCam_GetRGBPixel(This,x,y,value)	\
+#define IAVTActiveCam_GetRGBPixel(This,x,y,value)   \
     (This)->lpVtbl -> GetRGBPixel(This,x,y,value)
 
-#define IAVTActiveCam_GetImageLine(This,y,value)	\
+#define IAVTActiveCam_GetImageLine(This,y,value)    \
     (This)->lpVtbl -> GetImageLine(This,y,value)
 
-#define IAVTActiveCam_GetComponentLine(This,y,component,value)	\
+#define IAVTActiveCam_GetComponentLine(This,y,component,value)  \
     (This)->lpVtbl -> GetComponentLine(This,y,component,value)
 
-#define IAVTActiveCam_GetImageData(This,value)	\
+#define IAVTActiveCam_GetImageData(This,value)  \
     (This)->lpVtbl -> GetImageData(This,value)
 
-#define IAVTActiveCam_GetComponentData(This,component,value)	\
+#define IAVTActiveCam_GetComponentData(This,component,value)    \
     (This)->lpVtbl -> GetComponentData(This,component,value)
 
-#define IAVTActiveCam_GetImagePointer(This,x,y,value)	\
+#define IAVTActiveCam_GetImagePointer(This,x,y,value)   \
     (This)->lpVtbl -> GetImagePointer(This,x,y,value)
 
-#define IAVTActiveCam_SaveImage(This,filepath,compression)	\
+#define IAVTActiveCam_SaveImage(This,filepath,compression)  \
     (This)->lpVtbl -> SaveImage(This,filepath,compression)
 
-#define IAVTActiveCam_SoftTrigger(This,newVal)	\
+#define IAVTActiveCam_SoftTrigger(This,newVal)  \
     (This)->lpVtbl -> SoftTrigger(This,newVal)
 
-#define IAVTActiveCam_GetWidth(This,pVal)	\
+#define IAVTActiveCam_GetWidth(This,pVal)   \
     (This)->lpVtbl -> GetWidth(This,pVal)
 
-#define IAVTActiveCam_GetHeight(This,pVal)	\
+#define IAVTActiveCam_GetHeight(This,pVal)  \
     (This)->lpVtbl -> GetHeight(This,pVal)
 
-#define IAVTActiveCam_GetBytesPerPixel(This,pVal)	\
+#define IAVTActiveCam_GetBytesPerPixel(This,pVal)   \
     (This)->lpVtbl -> GetBytesPerPixel(This,pVal)
 
-#define IAVTActiveCam_ReadRegister(This,address,pVal)	\
+#define IAVTActiveCam_ReadRegister(This,address,pVal)   \
     (This)->lpVtbl -> ReadRegister(This,address,pVal)
 
-#define IAVTActiveCam_WriteRegister(This,address,Val)	\
+#define IAVTActiveCam_WriteRegister(This,address,Val)   \
     (This)->lpVtbl -> WriteRegister(This,address,Val)
 
-#define IAVTActiveCam_GetCameraList(This,value)	\
+#define IAVTActiveCam_GetCameraList(This,value) \
     (This)->lpVtbl -> GetCameraList(This,value)
 
-#define IAVTActiveCam_GetModeList(This,value)	\
+#define IAVTActiveCam_GetModeList(This,value)   \
     (This)->lpVtbl -> GetModeList(This,value)
 
-#define IAVTActiveCam_GetRateList(This,value)	\
+#define IAVTActiveCam_GetRateList(This,value)   \
     (This)->lpVtbl -> GetRateList(This,value)
 
-#define IAVTActiveCam_GetTriggerList(This,value)	\
+#define IAVTActiveCam_GetTriggerList(This,value)    \
     (This)->lpVtbl -> GetTriggerList(This,value)
 
-#define IAVTActiveCam_StartCapture(This,filepath,delay)	\
+#define IAVTActiveCam_StartCapture(This,filepath,delay) \
     (This)->lpVtbl -> StartCapture(This,filepath,delay)
 
-#define IAVTActiveCam_StopCapture(This)	\
+#define IAVTActiveCam_StopCapture(This) \
     (This)->lpVtbl -> StopCapture(This)
 
-#define IAVTActiveCam_LoadChannel(This,channel)	\
+#define IAVTActiveCam_LoadChannel(This,channel) \
     (This)->lpVtbl -> LoadChannel(This,channel)
 
-#define IAVTActiveCam_SaveChannel(This,channel)	\
+#define IAVTActiveCam_SaveChannel(This,channel) \
     (This)->lpVtbl -> SaveChannel(This,channel)
 
-#define IAVTActiveCam_GetMaxChannel(This,pChannel)	\
+#define IAVTActiveCam_GetMaxChannel(This,pChannel)  \
     (This)->lpVtbl -> GetMaxChannel(This,pChannel)
 
-#define IAVTActiveCam_GetIsoSpeed(This,pSpeed)	\
+#define IAVTActiveCam_GetIsoSpeed(This,pSpeed)  \
     (This)->lpVtbl -> GetIsoSpeed(This,pSpeed)
 
-#define IAVTActiveCam_SetIsoSpeed(This,value)	\
+#define IAVTActiveCam_SetIsoSpeed(This,value)   \
     (This)->lpVtbl -> SetIsoSpeed(This,value)
 
-#define IAVTActiveCam_ShowProperties(This,CameraList)	\
+#define IAVTActiveCam_ShowProperties(This,CameraList)   \
     (This)->lpVtbl -> ShowProperties(This,CameraList)
 
-#define IAVTActiveCam_GetDIB(This,hDIB)	\
+#define IAVTActiveCam_GetDIB(This,hDIB) \
     (This)->lpVtbl -> GetDIB(This,hDIB)
 
-#define IAVTActiveCam_SetImageWindow(This,x,y,value)	\
+#define IAVTActiveCam_SetImageWindow(This,x,y,value)    \
     (This)->lpVtbl -> SetImageWindow(This,x,y,value)
 
-#define IAVTActiveCam_GetTriggerInfo(This,value)	\
+#define IAVTActiveCam_GetTriggerInfo(This,value)    \
     (This)->lpVtbl -> GetTriggerInfo(This,value)
 
-#define IAVTActiveCam_GetF7Info(This,value)	\
+#define IAVTActiveCam_GetF7Info(This,value) \
     (This)->lpVtbl -> GetF7Info(This,value)
 
-#define IAVTActiveCam_GetPicture(This,pVal)	\
+#define IAVTActiveCam_GetPicture(This,pVal) \
     (This)->lpVtbl -> GetPicture(This,pVal)
 
-#define IAVTActiveCam_Draw(This)	\
+#define IAVTActiveCam_Draw(This)    \
     (This)->lpVtbl -> Draw(This)
 
-#define IAVTActiveCam_OverlayRectangle(This,StartX,StartY,EndX,EndY,Width)	\
+#define IAVTActiveCam_OverlayRectangle(This,StartX,StartY,EndX,EndY,Width)  \
     (This)->lpVtbl -> OverlayRectangle(This,StartX,StartY,EndX,EndY,Width)
 
-#define IAVTActiveCam_OverlayEllipse(This,StartX,StartY,EndX,EndY,Width)	\
+#define IAVTActiveCam_OverlayEllipse(This,StartX,StartY,EndX,EndY,Width)    \
     (This)->lpVtbl -> OverlayEllipse(This,StartX,StartY,EndX,EndY,Width)
 
-#define IAVTActiveCam_OverlayLine(This,StartX,StartY,EndX,EndY,Width)	\
+#define IAVTActiveCam_OverlayLine(This,StartX,StartY,EndX,EndY,Width)   \
     (This)->lpVtbl -> OverlayLine(This,StartX,StartY,EndX,EndY,Width)
 
-#define IAVTActiveCam_OverlayText(This,X,Y,str)	\
+#define IAVTActiveCam_OverlayText(This,X,Y,str) \
     (This)->lpVtbl -> OverlayText(This,X,Y,str)
 
-#define IAVTActiveCam_OverlayClear(This)	\
+#define IAVTActiveCam_OverlayClear(This)    \
     (This)->lpVtbl -> OverlayClear(This)
 
-#define IAVTActiveCam_OverlayPixel(This,X,Y)	\
+#define IAVTActiveCam_OverlayPixel(This,X,Y)    \
     (This)->lpVtbl -> OverlayPixel(This,X,Y)
 
-#define IAVTActiveCam_GetItemList(This,item,count,list)	\
+#define IAVTActiveCam_GetItemList(This,item,count,list) \
     (This)->lpVtbl -> GetItemList(This,item,count,list)
 
-#define IAVTActiveCam_IsControls(This,list)	\
+#define IAVTActiveCam_IsControls(This,list) \
     (This)->lpVtbl -> IsControls(This,list)
 
-#define IAVTActiveCam_ReadPIO(This,value)	\
+#define IAVTActiveCam_ReadPIO(This,value)   \
     (This)->lpVtbl -> ReadPIO(This,value)
 
-#define IAVTActiveCam_WritePIO(This,value)	\
+#define IAVTActiveCam_WritePIO(This,value)  \
     (This)->lpVtbl -> WritePIO(This,value)
 
-#define IAVTActiveCam_SetSIO(This,settings)	\
+#define IAVTActiveCam_SetSIO(This,settings) \
     (This)->lpVtbl -> SetSIO(This,settings)
 
-#define IAVTActiveCam_ReadSIO(This,count,timeout,str)	\
+#define IAVTActiveCam_ReadSIO(This,count,timeout,str)   \
     (This)->lpVtbl -> ReadSIO(This,count,timeout,str)
 
-#define IAVTActiveCam_WriteSIO(This,str,timeout)	\
+#define IAVTActiveCam_WriteSIO(This,str,timeout)    \
     (This)->lpVtbl -> WriteSIO(This,str,timeout)
 
-#define IAVTActiveCam_SetStrobe(This,index,duration,delay,polarity)	\
+#define IAVTActiveCam_SetStrobe(This,index,duration,delay,polarity) \
     (This)->lpVtbl -> SetStrobe(This,index,duration,delay,polarity)
 
-#define IAVTActiveCam_LoadSettings(This,profile)	\
+#define IAVTActiveCam_LoadSettings(This,profile)    \
     (This)->lpVtbl -> LoadSettings(This,profile)
 
-#define IAVTActiveCam_SaveSettings(This,profile)	\
+#define IAVTActiveCam_SaveSettings(This,profile)    \
     (This)->lpVtbl -> SaveSettings(This,profile)
 
-#define IAVTActiveCam_DrawText(This,X,Y,str,red,green,blue,opacity)	\
+#define IAVTActiveCam_DrawText(This,X,Y,str,red,green,blue,opacity) \
     (This)->lpVtbl -> DrawText(This,X,Y,str,red,green,blue,opacity)
 
-#define IAVTActiveCam_DrawLine(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)	\
+#define IAVTActiveCam_DrawLine(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)   \
     (This)->lpVtbl -> DrawLine(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)
 
-#define IAVTActiveCam_DrawRectangle(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)	\
+#define IAVTActiveCam_DrawRectangle(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)  \
     (This)->lpVtbl -> DrawRectangle(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)
 
-#define IAVTActiveCam_DrawEllipse(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)	\
+#define IAVTActiveCam_DrawEllipse(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)    \
     (This)->lpVtbl -> DrawEllipse(This,X1,Y1,X2,Y2,width,red,green,blue,opacity)
 
-#define IAVTActiveCam_DrawPixel(This,X,Y,red,green,blue,opacity)	\
+#define IAVTActiveCam_DrawPixel(This,X,Y,red,green,blue,opacity)    \
     (This)->lpVtbl -> DrawPixel(This,X,Y,red,green,blue,opacity)
 
-#define IAVTActiveCam_GetHistogram(This,component,bins,step,value)	\
+#define IAVTActiveCam_GetHistogram(This,component,bins,step,value)  \
     (This)->lpVtbl -> GetHistogram(This,component,bins,step,value)
 
-#define IAVTActiveCam_GetImageStat(This,component,step,value)	\
+#define IAVTActiveCam_GetImageStat(This,component,step,value)   \
     (This)->lpVtbl -> GetImageStat(This,component,step,value)
 
-#define IAVTActiveCam_SetROI(This,X1,Y1,X2,Y2,l1,l2)	\
+#define IAVTActiveCam_SetROI(This,X1,Y1,X2,Y2,l1,l2)    \
     (This)->lpVtbl -> SetROI(This,X1,Y1,X2,Y2,l1,l2)
 
-#define IAVTActiveCam_GetROI(This,value)	\
+#define IAVTActiveCam_GetROI(This,value)    \
     (This)->lpVtbl -> GetROI(This,value)
 
-#define IAVTActiveCam_SaveBkg(This,mode,frames)	\
+#define IAVTActiveCam_SaveBkg(This,mode,frames) \
     (This)->lpVtbl -> SaveBkg(This,mode,frames)
 
 #endif /* COBJMACROS */
 
 
-#endif 	/* C style interface */
+#endif  /* C style interface */
 
 
 
@@ -6195,7 +6195,7 @@ void __RPC_STUB IAVTActiveCam_SaveBkg_Stub(
 
 
 
-#endif 	/* __IAVTActiveCam_INTERFACE_DEFINED__ */
+#endif  /* __IAVTActiveCam_INTERFACE_DEFINED__ */
 
 
 #ifndef ___IAVTActiveCamEvents_DISPINTERFACE_DEFINED__
@@ -6214,7 +6214,7 @@ EXTERN_C const IID DIID__IAVTActiveCamEvents;
     {
     };
     
-#else 	/* C style interface */
+#else   /* C style interface */
 
     typedef struct _IAVTActiveCamEventsVtbl
     {
@@ -6273,35 +6273,35 @@ EXTERN_C const IID DIID__IAVTActiveCamEvents;
 #ifdef COBJMACROS
 
 
-#define _IAVTActiveCamEvents_QueryInterface(This,riid,ppvObject)	\
+#define _IAVTActiveCamEvents_QueryInterface(This,riid,ppvObject)    \
     (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
 
-#define _IAVTActiveCamEvents_AddRef(This)	\
+#define _IAVTActiveCamEvents_AddRef(This)   \
     (This)->lpVtbl -> AddRef(This)
 
-#define _IAVTActiveCamEvents_Release(This)	\
+#define _IAVTActiveCamEvents_Release(This)  \
     (This)->lpVtbl -> Release(This)
 
 
-#define _IAVTActiveCamEvents_GetTypeInfoCount(This,pctinfo)	\
+#define _IAVTActiveCamEvents_GetTypeInfoCount(This,pctinfo) \
     (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo)
 
-#define _IAVTActiveCamEvents_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+#define _IAVTActiveCamEvents_GetTypeInfo(This,iTInfo,lcid,ppTInfo)  \
     (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo)
 
-#define _IAVTActiveCamEvents_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
+#define _IAVTActiveCamEvents_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)    \
     (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)
 
-#define _IAVTActiveCamEvents_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
+#define _IAVTActiveCamEvents_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)  \
     (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
 
 #endif /* COBJMACROS */
 
 
-#endif 	/* C style interface */
+#endif  /* C style interface */
 
 
-#endif 	/* ___IAVTActiveCamEvents_DISPINTERFACE_DEFINED__ */
+#endif  /* ___IAVTActiveCamEvents_DISPINTERFACE_DEFINED__ */
 
 
 EXTERN_C const CLSID CLSID_AVTActiveCam;

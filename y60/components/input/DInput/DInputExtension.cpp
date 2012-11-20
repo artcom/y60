@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 #include "DInputExtension.h"
@@ -353,28 +326,28 @@ namespace y60 {
         AC_ERROR << theCall << " failed, reason (" << hr << "):";
         switch (hr) {
             case DIERR_INPUTLOST:
-    			{AC_ERROR << "Access to the input device has been lost. It must be reacquired.";}
+                {AC_ERROR << "Access to the input device has been lost. It must be reacquired.";}
                 break;
             case DIERR_INVALIDPARAM:
-    			{AC_ERROR << "An invalid parameter was passed to the returning function, ";}
-    			{AC_ERROR << "or the object was not in a state that permitted the function to be called. ";}
-    			{AC_ERROR << "This value is equal to the E_INVALIDARG standard Component Object Model (COM) return value.";}
+                {AC_ERROR << "An invalid parameter was passed to the returning function, ";}
+                {AC_ERROR << "or the object was not in a state that permitted the function to be called. ";}
+                {AC_ERROR << "This value is equal to the E_INVALIDARG standard Component Object Model (COM) return value.";}
                 break;
             case DIERR_NOTACQUIRED:
-    			{AC_ERROR << "The operation cannot be performed unless the device is acquired.";}
+                {AC_ERROR << "The operation cannot be performed unless the device is acquired.";}
                 break;
             case DIERR_NOTBUFFERED:
-    			{AC_ERROR << "The device is not buffered. Set the DIPROP_BUFFERSIZE property to enable buffering.";}
+                {AC_ERROR << "The device is not buffered. Set the DIPROP_BUFFERSIZE property to enable buffering.";}
                 break;
             case DIERR_NOTINITIALIZED:
-    			{AC_ERROR << "The object has not been initialized.";}
+                {AC_ERROR << "The object has not been initialized.";}
                 break;
             case DIERR_OBJECTNOTFOUND:
-    			{AC_ERROR << "The requested object does not exist.";}
+                {AC_ERROR << "The requested object does not exist.";}
                 break;
             case DIERR_UNSUPPORTED:
-    			{AC_ERROR << "The function called is not supported at this time.";}
-    			{AC_ERROR << "This value is equal to the E_NOTIMPL standard COM return value.";}
+                {AC_ERROR << "The function called is not supported at this time.";}
+                {AC_ERROR << "This value is equal to the E_NOTIMPL standard COM return value.";}
                 break;
         }
     }

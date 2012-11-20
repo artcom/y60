@@ -112,7 +112,7 @@ int main( int argc, char *argv[] )
     glutCreateWindow("Compressor");
 
     // initialize glew
-	glewInit();
+    glewInit();
 
     TextureCompression::COMPRESSION_FORMAT theCompressionEnum;
     std::string theCompressionFormat = "S3TC_DXT5";

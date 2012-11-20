@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 //
 //   $RCSfile: intersection_functions.js,v $
@@ -189,35 +162,35 @@ function drawIntersection(theIntersectionInfo, theIntersection) {
     var myCulling = renderer.backfaceCulling;
     renderer.backfaceCulling = false;
 /*
-	// Draw intersected triangles
-	var myScale         = new Vector3f(1.01, 1.01, 1.01);
-	var myPolygonOffset = new Vector3f(0.1,0.1,0.1);
-	var myA = product(theIntersection.primitive[0], myScale);
-	    myA = sum(myA, myPolygonOffset);
-	var myB = product(theIntersection.primitive[1], myScale);
-	    myB = sum(myB, myPolygonOffset);
-	var myC = product(theIntersection.primitive[2], myScale);
-	    myC = sum(myC, myPolygonOffset);
-	var myTriangle = new Triangle(myA, myB, myC);
-	window.draw(myTriangle, [0.5,0,1,1], myMatrix);
+    // Draw intersected triangles
+    var myScale         = new Vector3f(1.01, 1.01, 1.01);
+    var myPolygonOffset = new Vector3f(0.1,0.1,0.1);
+    var myA = product(theIntersection.primitive[0], myScale);
+        myA = sum(myA, myPolygonOffset);
+    var myB = product(theIntersection.primitive[1], myScale);
+        myB = sum(myB, myPolygonOffset);
+    var myC = product(theIntersection.primitive[2], myScale);
+        myC = sum(myC, myPolygonOffset);
+    var myTriangle = new Triangle(myA, myB, myC);
+    window.draw(myTriangle, [0.5,0,1,1], myMatrix);
 
-	if (theIntersection.primitive.length == 4) {
-	    var myD = product(theIntersection.primitive[3], myScale);
+    if (theIntersection.primitive.length == 4) {
+        var myD = product(theIntersection.primitive[3], myScale);
         myD = sum(myD, myPolygonOffset);
-	    var myTriangle2nd = new Triangle(myA, myC, myD);
-	    window.draw(myTriangle2nd, [0.5,0,1,1], myMatrix);
-	}
+        var myTriangle2nd = new Triangle(myA, myC, myD);
+        window.draw(myTriangle2nd, [0.5,0,1,1], myMatrix);
+    }
 */
-	// Draw normal
-	//
-	var myNormalTo = sum(theIntersection.position, product(theIntersection.normal, [3,3,3]));
+    // Draw normal
+    //
+    var myNormalTo = sum(theIntersection.position, product(theIntersection.normal, [3,3,3]));
 
-	window.draw(new LineSegment(theIntersection.position, myNormalTo),
-				[0.5,1.0,0.5,1], myMatrix);
+    window.draw(new LineSegment(theIntersection.position, myNormalTo),
+                [0.5,1.0,0.5,1], myMatrix);
 
-	var myPlaneNormalTo = sum(theIntersection.position, product(theIntersection.primitive.normal, [3,3,3]));
-	window.draw(new LineSegment(theIntersection.position, myNormalTo),
-				[1.0,1.0,0.5,1], myMatrix);
+    var myPlaneNormalTo = sum(theIntersection.position, product(theIntersection.primitive.normal, [3,3,3]));
+    window.draw(new LineSegment(theIntersection.position, myNormalTo),
+                [1.0,1.0,0.5,1], myMatrix);
 
     // Reset backface culling to previous state
     renderer.backfaceCulling = myCulling;

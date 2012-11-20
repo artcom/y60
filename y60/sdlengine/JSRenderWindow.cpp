@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
@@ -436,11 +409,11 @@ JSRenderWindow::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *
             return Method<SDLWindow>::call(&SDLWindow::setWindowTitle, cx, obj, 1, vp, &dummy);
         case PROP_position:
             return Method<SDLWindow>::call(&SDLWindow::setPosition, cx, obj, 1, vp, &dummy);
-		case PROP_swapInterval: {
-				JSBool myResult = Method<SDLWindow>::call(&SDLWindow::setSwapInterval, cx, obj, 1, vp, &dummy);
-				AC_TRACE << "You set swapinterval, you may want to adjust window.fixedFrameTime to 1/(MonitorFrequency/" << myObj.getNative().getSwapInterval() << ") for good video performance?";
-				return myResult;
-			}
+        case PROP_swapInterval: {
+                JSBool myResult = Method<SDLWindow>::call(&SDLWindow::setSwapInterval, cx, obj, 1, vp, &dummy);
+                AC_TRACE << "You set swapinterval, you may want to adjust window.fixedFrameTime to 1/(MonitorFrequency/" << myObj.getNative().getSwapInterval() << ") for good video performance?";
+                return myResult;
+            }
         default:
             return JSBASE::setPropertySwitch(myObj.getNative(),theID, cx, obj, id, vp);
     }

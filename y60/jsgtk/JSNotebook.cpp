@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 // own header
@@ -87,11 +60,11 @@ append_page(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_BEGIN("");
     DOC_END;
 /*
-int 	append_page (Widget& child)
-int 	append_page (Widget& child, Widget& tab_label)
-int 	append_page (Widget& child, Widget& tab_label, Widget& menu_label)
-int 	append_page (Widget& child, const Glib::ustring& tab_label, bool use_mnemonic=false)
-int 	append_page (Widget& child, const Glib::ustring& tab_label, const Glib::ustring& menu_label, bool use_mnemonic=false)
+int     append_page (Widget& child)
+int     append_page (Widget& child, Widget& tab_label)
+int     append_page (Widget& child, Widget& tab_label, Widget& menu_label)
+int     append_page (Widget& child, const Glib::ustring& tab_label, bool use_mnemonic=false)
+int     append_page (Widget& child, const Glib::ustring& tab_label, const Glib::ustring& menu_label, bool use_mnemonic=false)
 */
     try {
         ensureParamCount(argc, 1, 4);
@@ -181,11 +154,11 @@ remove_page(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
     DOC_BEGIN("");
     DOC_END;
 /*
-int 	append_page (Widget& child)
-int 	append_page (Widget& child, Widget& tab_label)
-int 	append_page (Widget& child, Widget& tab_label, Widget& menu_label)
-int 	append_page (Widget& child, const Glib::ustring& tab_label, bool use_mnemonic=false)
-int 	append_page (Widget& child, const Glib::ustring& tab_label, const Glib::ustring& menu_label, bool use_mnemonic=false)
+int     append_page (Widget& child)
+int     append_page (Widget& child, Widget& tab_label)
+int     append_page (Widget& child, Widget& tab_label, Widget& menu_label)
+int     append_page (Widget& child, const Glib::ustring& tab_label, bool use_mnemonic=false)
+int     append_page (Widget& child, const Glib::ustring& tab_label, const Glib::ustring& menu_label, bool use_mnemonic=false)
 */
     try {
         ensureParamCount(argc, 1);
@@ -218,7 +191,7 @@ set_tab_label_text(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
     DOC_BEGIN("");
     DOC_END;
 /*
-void 	set_tab_label_text(Widget& child, const Glib::ustring& tab_label)
+void    set_tab_label_text(Widget& child, const Glib::ustring& tab_label)
 */
     try {
         ensureParamCount(argc, 1);

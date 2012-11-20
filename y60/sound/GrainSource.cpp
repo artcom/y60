@@ -27,33 +27,6 @@
 // You should have received a copy of the GNU General Public License
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
-//
-// Description: TODO
-//
-// Last Review: NEVER, NOONE
-//
-//  review status report: (perfect, ok, fair, poor, disaster, notapplicable, unknown)
-//    usefullness            : unknown
-//    formatting             : unknown
-//    documentation          : unknown
-//    test coverage          : unknown
-//    names                  : unknown
-//    style guide conformance: unknown
-//    technical soundness    : unknown
-//    dead code              : unknown
-//    readability            : unknown
-//    understandabilty       : unknown
-//    interfaces             : unknown
-//    confidence             : unknown
-//    integration            : unknown
-//    dependencies           : unknown
-//    cheesyness             : unknown
-//
-//    overall review status  : unknown
-//
-//    recommendations:
-//       - unknown
-// __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
 
@@ -124,18 +97,18 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
     AC_TRACE << "GrainSource::deliverData(): copying overlap buffer frames";
 //    theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u, myNumFrames);
     theBuffer.copyFrames(0u, *_myOverlapBuffer, 0u,
-		    	 std::min(_myOverlapBuffer->getNumFrames(),myNumFrames));
+                 std::min(_myOverlapBuffer->getNumFrames(),myNumFrames));
     // save remaining sample data to tmp buffer
     AudioBufferPtr myTmpBuffer = AudioBufferPtr();
     if (myNumFrames < _myOverlapBuffer->getNumFrames()) {
-	AC_TRACE << "GrainSource::deliverData(): creating temp buffer";
+        AC_TRACE << "GrainSource::deliverData(): creating temp buffer";
         myTmpBuffer = AudioBufferPtr(_myOverlapBuffer->partialClone(myNumFrames, _myOverlapBuffer->getNumFrames()-1));
     }
 
     // resize overlap buffer to fit to new grainsize if needed
     unsigned myMaxGrainFrames = (unsigned)((_myGrainSize + _myGrainSizeJitter) * mySamplesPerMS);
     if (myMaxGrainFrames > _myOverlapBuffer->getNumFrames() - myNumFrames) {
-	AC_TRACE << "GrainSource::deliverData(): resizing overlap buffer";
+        AC_TRACE << "GrainSource::deliverData(): resizing overlap buffer";
         _myOverlapBuffer->resize(myMaxGrainFrames);
     }
     AC_TRACE << "GrainSource::deliverData(): clearing overlap buffer";
@@ -143,7 +116,7 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
 
     // copy tmp to beginning of overlap buffer
     if (myTmpBuffer) {
-	AC_TRACE << "GrainSource::deliverData(): copying temp to overlap";
+        AC_TRACE << "GrainSource::deliverData(): copying temp to overlap";
         _myOverlapBuffer->copyFrames(0u, *myTmpBuffer, 0u, myTmpBuffer->getNumFrames());
     }
 
@@ -165,11 +138,11 @@ void GrainSource::deliverData(AudioBufferBase& theBuffer) {
         // get grain from audio data
         AC_TRACE << "GrainSource::deliverData: creating grain audiobuffer";
         AudioBufferPtr myGrain = AudioBufferPtr(_myAudioData->partialClone(myPositionFrame, myPositionFrame + (unsigned)(ceilf(myGrainFrames * myJitteredRatio))));
-	AC_TRACE << "GrainSource::deliverData: applying resampler";
+        AC_TRACE << "GrainSource::deliverData: applying resampler";
         _myResampler->setTargetFrames(myGrainFrames);
         _myResampler->apply(*myGrain,0);
         _myWindowFunction->setOverlapFactor((float)_myGrainRate/(float)_myGrainSize);
-	AC_TRACE << "GrainSource::deliverData: applying window function";
+        AC_TRACE << "GrainSource::deliverData: applying window function";
         _myWindowFunction->apply(*myGrain,0);
         AC_TRACE << "GrainSource::deliverData: calculating remaining frames and overlap frames";
         unsigned myRemainingFrames = myNumFrames - _myGrainOffset;
