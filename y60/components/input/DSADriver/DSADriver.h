@@ -57,13 +57,15 @@ namespace y60 {
     {
     public:
         DSADriver();
+        virtual ~DSADriver();
 
         void onUpdateSettings(dom::NodePtr theConfiguration);
 
         void init() {};
         std::vector<y60::EventPtr> poll();
         void calibrate(const std::string & theFileName);
-        std::string  getStatus() const;
+        std::string  getStatus();
+        void setStatusInterval(unsigned int theInterval);
 
     private:
         bool             _myInterpolateFlag;

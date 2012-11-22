@@ -37,6 +37,7 @@
 
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSNode.h>
+#include <y60/input/EventDispatcher.h>
 
 namespace jslib {
 
@@ -106,6 +107,7 @@ namespace jslib {
     JSDSADriver::Properties() {
         static JSPropertySpec myProperties[] = {
             {"status",    PROP_status,   JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT},
+            {"statusInterval",    PROP_statusInterval,   JSPROP_ENUMERATE|JSPROP_PERMANENT},
             {0}
         };
         return myProperties;
@@ -126,9 +128,14 @@ namespace jslib {
     // getproperty handling
     JSBool
     JSDSADriver::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+        JSDSADriver::OWNERPTR myNative;
+        if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+            JS_ReportError(cx, "JSDSADriver: self is not a DSADriver");
+            return JS_FALSE;
+        }
         switch (theID) {
             case PROP_status:
-                *vp = as_jsval(cx, getNative().getStatus());
+                *vp = as_jsval(cx, myNative->getStatus());
                 return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSDSADriver::getProperty: index %d out of range", theID);
@@ -139,7 +146,11 @@ namespace jslib {
     // setproperty handling
     JSBool
     JSDSADriver::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+        jsval dummy;
         switch (theID) {
+            case PROP_statusInterval:
+                    return Method<JSDSADriver::NATIVE>::call(&JSDSADriver::NATIVE::setStatusInterval, cx, obj, 1, vp, &dummy);
+                return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSDSADriver::setPropertySwitch: index %d out of range", theID);
         }

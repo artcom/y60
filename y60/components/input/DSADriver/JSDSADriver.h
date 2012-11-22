@@ -69,7 +69,8 @@ namespace jslib {
             static JSFunctionSpec * StaticFunctions();
 
             enum PropertyNumbers {
-                PROP_status = -100
+                PROP_status = -100,
+                PROP_statusInterval
             };
 
             static jslib::JSConstIntPropertySpec * ConstIntProperties();

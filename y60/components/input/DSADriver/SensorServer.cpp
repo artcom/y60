@@ -48,7 +48,7 @@
 
 using namespace std;
 
-SensorServer::SensorServer() {
+SensorServer::SensorServer() : _myStatusInterval(5) {
 }
 
 void
@@ -87,6 +87,8 @@ SensorServer::handleLines(string & theBuffer, SensorData & theData) {
             unsigned myController, myBitmask;
             parseLine(myLine, myController, myBitmask);
             theData.push_back(make_pair(myController, myBitmask));
+            _mySensorStatus = "OK";
+            _myLastStatusTime.setNow();
         }
         theBuffer = theBuffer.substr(i+2);
         i = theBuffer.find("\r\n");
@@ -99,10 +101,33 @@ SensorServer::poll(SensorData & theData) {
     size_t myBytesRead = sizeof(myBuffer);
 
     _myComPort->read(myBuffer, myBytesRead);
-
     if(myBytesRead) {
         string myData(myBuffer, myBytesRead);
-        _myFifo += myData;
-        handleLines(_myFifo, theData);
+        if (myData.find("OK") != string::npos) {
+            _mySensorStatus = "OK";
+            _myLastStatusTime.setNow();
+        } else {
+            _myFifo += myData;
+            handleLines(_myFifo, theData);
+        }
+        AC_PRINT<<myData;
     }
 }
+
+std::string
+SensorServer::getStatus() {
+    std::string myCurrentStatus = _mySensorStatus;
+    if (isStatusOutDated() || myCurrentStatus.empty()) {
+        _myComPort->write("C", 1);
+        _mySensorStatus = "outdated";
+    }
+    return myCurrentStatus;
+}
+
+bool
+SensorServer::isStatusOutDated() {
+    asl::Time now;
+    AC_PRINT<<"statusInterval: "<<_myStatusInterval;
+    return now - _myLastStatusTime > _myStatusInterval;
+}
+

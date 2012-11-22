@@ -37,23 +37,39 @@
 
 #include <asl/math/Vector234.h>
 #include <asl/base/file_functions.h>
+#include <asl/base/string_functions.h>
 #include <asl/dom/Nodes.h>
 #include <y60/input/TouchEvent.h>
 #include <y60/base/DataTypes.h>
+#include <y60/input/EventDispatcher.h>
 
 using namespace std;
 
 namespace y60 {
 
-    DSADriver::DSADriver () : _myInterpolateFlag(false)
-    {}
+    DSADriver::DSADriver () : _myInterpolateFlag(false) {
+    }
 
+    DSADriver::~DSADriver () {
+    }
     void DSADriver::calibrate(const std::string & theFileName) {
         std::string myContent = asl::readFile(theFileName);
     }
 
-    std::string DSADriver::getStatus() const {
-        return "ok";
+    std::string DSADriver::getStatus() {
+        std::string myStatus;
+        for (SensorServerList::iterator ssli = _mySensorServers.begin();
+             ssli != _mySensorServers.end(); ++ssli) {
+            myStatus += std::string("portId:") + asl::as_string(ssli->first) + " status: " + ssli->second->getStatus() + " ";
+        }
+        return myStatus;
+    }
+
+    void DSADriver::setStatusInterval(unsigned int theInterval) {
+        for (SensorServerList::iterator ssli = _mySensorServers.begin();
+             ssli != _mySensorServers.end(); ++ssli) {
+            ssli->second->_myStatusInterval = theInterval;
+        }
     }
 
     void DSADriver::onUpdateSettings(dom::NodePtr theConfiguration) {
@@ -151,7 +167,6 @@ namespace y60 {
 
             SensorServer::SensorData mySensorData;
             ssli->second->poll(mySensorData);
-
             for (SensorArrayList::iterator sali = _mySensorArray.begin();
                  sali != _mySensorArray.end(); ++sali) {
 

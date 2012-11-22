@@ -57,14 +57,18 @@ public:
     typedef std::vector< std::pair<unsigned,unsigned> > SensorData;
     void poll(SensorData & theSensorData);
     void openDevice(const std::string & theComPort, unsigned theBaudRate);
+    std::string getStatus();
+    bool isStatusOutDated();
+    unsigned int         _myStatusInterval;
 
 private:
     void parseLine(const std::string & theLine, unsigned & theController, unsigned & theBitMask);
     void handleLines(std::string & theBuffer, SensorData & theSensorData);
 
-private:
     asl::Ptr<asl::SerialDevice> _myComPort;
     std::string                 _myFifo;
+    std::string                 _mySensorStatus;
+    asl::Time                   _myLastStatusTime;
 };
 
 typedef asl::Ptr<SensorServer> SensorServerPtr;
