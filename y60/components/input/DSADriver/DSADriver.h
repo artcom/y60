@@ -63,7 +63,7 @@ namespace y60 {
 
         void init() {};
         std::vector<y60::EventPtr> poll();
-        void calibrate(const std::string & theFileName);
+        void calibrate(unsigned int thePortId, const std::string & theFileName);
         std::string  getStatus();
         void setStatusInterval(unsigned int theInterval);
 

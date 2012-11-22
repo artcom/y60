@@ -128,3 +128,7 @@ SensorServer::isStatusOutDated() {
     return now - _myLastStatusTime > _myStatusInterval;
 }
 
+void
+SensorServer::calibrate(const std::string & theString) {
+    _myComPort->write(theString.c_str(), theString.size());
+}

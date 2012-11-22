@@ -59,6 +59,7 @@ public:
     void openDevice(const std::string & theComPort, unsigned theBaudRate);
     std::string getStatus();
     bool isStatusOutDated();
+    void calibrate(const std::string & theString);
     unsigned int         _myStatusInterval;
 
 private:

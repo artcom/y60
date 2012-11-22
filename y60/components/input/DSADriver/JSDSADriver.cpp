@@ -46,15 +46,23 @@ namespace jslib {
         DOC_BEGIN("");
         DOC_END;
         try {
+            unsigned int myPortId;
             std::string myFileName;
-            convertFrom(cx, argv[0], myFileName );
+            if (!convertFrom(cx, argv[0], myPortId )) {
+                JS_ReportError(cx, "JSDSADriver::calibrate(): Argument #1 must be a integer");
+                return JS_FALSE;
+            }
+            if (!convertFrom(cx, argv[1], myFileName )) {
+                JS_ReportError(cx, "JSDSADriver::calibrate(): Argument #2 must be a filename");
+                return JS_FALSE;
+            }
             JSDSADriver::OWNERPTR myNative;
             if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
                 JS_ReportError(cx, "JSDSADriver: self is not a DSADriver");
                 return JS_FALSE;
             }
 
-            myNative->calibrate(myFileName);
+            myNative->calibrate(myPortId, myFileName);
             return JS_TRUE;
         } HANDLE_CPP_EXCEPTION;
     }
@@ -90,7 +98,7 @@ namespace jslib {
     JSDSADriver::Functions() {
         static JSFunctionSpec myFunctions[] = {
             // name                  native            nargs
-            {"calibrate",            calibrate,         1},
+            {"calibrate",            calibrate,         2},
             {"onUpdateSettings",     onUpdateSettings,  1},
             {0}
         };

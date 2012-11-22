@@ -52,8 +52,14 @@ namespace y60 {
 
     DSADriver::~DSADriver () {
     }
-    void DSADriver::calibrate(const std::string & theFileName) {
-        std::string myContent = asl::readFile(theFileName);
+
+    void DSADriver::calibrate(unsigned int thePortId, const std::string & theFileName) {
+        SensorServerList::iterator it = _mySensorServers.find(thePortId);
+        if (it != _mySensorServers.end()) {
+            std::string myData = asl::readFile(theFileName);
+            AC_PRINT<<myData;
+            it->second->calibrate(myData);
+        }
     }
 
     std::string DSADriver::getStatus() {
