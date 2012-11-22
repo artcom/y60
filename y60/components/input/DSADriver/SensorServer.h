@@ -62,7 +62,7 @@ public:
     unsigned int         _myStatusInterval;
 
 private:
-    void parseLine(const std::string & theLine, unsigned & theController, unsigned & theBitMask);
+    bool parseLine(const std::string & theLine, unsigned & theController, unsigned & theBitMask);
     void handleLines(std::string & theBuffer, SensorData & theSensorData);
 
     asl::Ptr<asl::SerialDevice> _myComPort;

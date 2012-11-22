@@ -43,8 +43,8 @@
 #include <asl/serial/SerialDeviceFactory.h>
 #include <asl/base/Logger.h>
 #include <asl/base/string_functions.h>
-#include <sstream>
-#include <memory>
+
+#include <boost/regex.hpp> 
 
 using namespace std;
 
@@ -64,19 +64,17 @@ SensorServer::openDevice(const std::string & theComPort, unsigned theBaudRate) {
     _myComPort->open(theBaudRate, 8, asl::SerialDevice::NO_PARITY, 1);
 }
 
-void
+bool
 SensorServer::parseLine(const string & theLine, unsigned & theController, unsigned & theBitMask) {
-    istringstream myStream(theLine);
-
-    char  c;
-    if (theLine[0] == 7) {
-        myStream >> c; // skip bell
+    boost::regex expr("(\\w+)\\s*,\\s*(\\w+)");
+    boost::smatch what;
+    if (boost::regex_search(theLine, what, expr)) {
+        theController = asl::as<unsigned>(what[1]);
+        theBitMask = asl::as<unsigned>(what[2]);
+        return true;
     }
-    myStream >> theController;
-    myStream >> c; // skip comma
-    myStream >> theBitMask;
+    return false;
 }
-
 
 void
 SensorServer::handleLines(string & theBuffer, SensorData & theData) {
@@ -85,10 +83,11 @@ SensorServer::handleLines(string & theBuffer, SensorData & theData) {
         string myLine = theBuffer.substr(0 ,i);
         if (!myLine.empty()) {
             unsigned myController, myBitmask;
-            parseLine(myLine, myController, myBitmask);
-            theData.push_back(make_pair(myController, myBitmask));
-            _mySensorStatus = "OK";
-            _myLastStatusTime.setNow();
+            if (parseLine(myLine, myController, myBitmask)) {
+                theData.push_back(make_pair(myController, myBitmask));
+                _mySensorStatus = "OK";
+                _myLastStatusTime.setNow();
+            }
         }
         theBuffer = theBuffer.substr(i+2);
         i = theBuffer.find("\r\n");
@@ -110,7 +109,6 @@ SensorServer::poll(SensorData & theData) {
             _myFifo += myData;
             handleLines(_myFifo, theData);
         }
-        AC_PRINT<<myData;
     }
 }
 
@@ -127,7 +125,6 @@ SensorServer::getStatus() {
 bool
 SensorServer::isStatusOutDated() {
     asl::Time now;
-    AC_PRINT<<"statusInterval: "<<_myStatusInterval;
     return now - _myLastStatusTime > _myStatusInterval;
 }
 
