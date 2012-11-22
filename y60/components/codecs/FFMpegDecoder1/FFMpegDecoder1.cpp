@@ -663,15 +663,7 @@ namespace y60 {
 
         AVCodecContext * myVCodec = _myVStream->codec;
 
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(51,38,0)
-        START_TIMER(decodeFrame_img_convert);
-        img_convert(&myDestPict, _myDestinationPixelFormat,
-                    (AVPicture*)theFrame, myVCodec->pix_fmt,
-                    myVCodec->width, myVCodec->height);
-        STOP_TIMER(decodeFrame_img_convert);
-
-#else
-    START_TIMER(decodeFrame_sws_scale);
+        START_TIMER(decodeFrame_sws_scale);
 
         int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;
         SwsContext * img_convert_ctx = sws_getContext(myVCodec->width, myVCodec->height,
@@ -684,8 +676,6 @@ namespace y60 {
             myDestPict.data, myDestPict.linesize);
 
         sws_freeContext(img_convert_ctx);
-    STOP_TIMER(decodeFrame_sws_scale);
-
-#endif
+        STOP_TIMER(decodeFrame_sws_scale);
     }
 }

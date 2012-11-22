@@ -442,14 +442,9 @@ namespace y60 {
         const uint8_t* myData = thePacket.data;
         int myDataLen = thePacket.size;
         while (myDataLen > 0) {
-#   if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)
             myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE *10;
             int myLen = avcodec_decode_audio2(_myAStream->codec,
                 myAlignedBuf, &myBytesDecoded, myData, myDataLen);
-#   else
-            int myLen = avcodec_decode_audio(_myAStream->codec,
-                myAlignedBuf, &myBytesDecoded, myData, myDataLen);
-#   endif
             if (myLen < 0) {
                 AC_WARNING << "---- av_decode_audio error";
                 myDataLen = 0;
@@ -618,15 +613,7 @@ namespace y60 {
         myDestPict.linesize[2] = myLineSizeBytes;
 
         AVCodecContext * myVCodec = _myVStream->codec;
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(51,38,0)
-        START_TIMER(decodeFrame_img_convert);
-        img_convert(&myDestPict, _myDestinationPixelFormat,
-                    (AVPicture*)theFrame, myVCodec->pix_fmt,
-                    myVCodec->width, myVCodec->height);
-        STOP_TIMER(decodeFrame_img_convert);
-
-#else
-    START_TIMER(decodeFrame_sws_scale);
+        START_TIMER(decodeFrame_sws_scale);
 
         int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;
         SwsContext * img_convert_ctx = sws_getContext(myVCodec->width, myVCodec->height,
@@ -639,9 +626,7 @@ namespace y60 {
             myDestPict.data, myDestPict.linesize);
 
         sws_freeContext(img_convert_ctx);
-    STOP_TIMER(decodeFrame_sws_scale);
-
-#endif
+        STOP_TIMER(decodeFrame_sws_scale);
     }
 
     VideoMsgPtr FFMpegDecoder2::createFrame(double theTimestamp) {

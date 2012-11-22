@@ -55,9 +55,7 @@
 #endif
 extern "C" {
 #    include <libavformat/avformat.h>
-#    if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
-#        include <libswscale/swscale.h>
-#    endif
+#    include <libswscale/swscale.h>
 }
 #if defined(_MSC_VER)
 #    pragma warning(pop)

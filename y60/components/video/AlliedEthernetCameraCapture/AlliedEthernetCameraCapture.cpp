@@ -50,11 +50,8 @@
 #define EMULATE_INTTYPES
 #endif
 extern "C" {
-#include <libavcodec/avcodec.h>
-
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
+#   include <libavcodec/avcodec.h>
 #   include <libswscale/swscale.h>
-#endif
 }
 
 using namespace std;

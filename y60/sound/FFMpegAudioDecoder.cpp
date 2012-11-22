@@ -106,11 +106,7 @@ void FFMpegAudioDecoder::decodeEverything() {
 Time FFMpegAudioDecoder::getDuration() const {
     if (_myFormatContext) {
         AVStream * myStream = _myFormatContext->streams[_myStreamIndex];
-#if LIBAVCODEC_BUILD >= 0x5100
         return (double(myStream->duration)*av_q2d(myStream->time_base));
-#else
-        return (double(myStream->duration)/double(AV_TIME_BASE));
-#endif
     } else {
         return 0;
     }
@@ -119,12 +115,8 @@ Time FFMpegAudioDecoder::getDuration() const {
 void FFMpegAudioDecoder::seek (Time thePosition)
 {
     AC_TRACE << "FFMpegAudioDecoder::seek(" << thePosition << ")";
-#if (LIBAVCODEC_BUILD < 4738)
-    int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE));
-#else
     int ret = av_seek_frame(_myFormatContext, -1, (long long)(thePosition*AV_TIME_BASE),
             AVSEEK_FLAG_BACKWARD);
-#endif
     if (ret < 0) {
         AC_WARNING << "Unable to seek to timestamp=" << thePosition;
         return;
@@ -160,14 +152,10 @@ void FFMpegAudioDecoder::open() {
         // find first audio stream
         _myStreamIndex = -1;
         for (unsigned int i = 0; i < _myFormatContext->nb_streams; ++i) {
-#if (LIBAVCODEC_BUILD >= 0x4910)
-        #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 64, 0)
             if (_myFormatContext->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
-        #else
-            if (_myFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) {
-        #endif
 #else
-            if (_myFormatContext->streams[i]->codec.codec_type == CODEC_TYPE_AUDIO) {
+            if (_myFormatContext->streams[i]->codec->codec_type == CODEC_TYPE_AUDIO) {
 #endif
                 _myStreamIndex = i;
                 break;
@@ -179,11 +167,7 @@ void FFMpegAudioDecoder::open() {
         }
 
         // open codec
-#if (LIBAVCODEC_BUILD >= 0x4910)
         AVCodecContext * myCodecContext = _myFormatContext->streams[_myStreamIndex]->codec;
-#else
-        AVCodecContext * myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
-#endif
         AVCodec * myCodec = avcodec_find_decoder(myCodecContext->codec_id);
         if (!myCodec) {
             throw DecoderException(std::string("Unable to find decoder: ") + _myURI,
@@ -238,11 +222,7 @@ void FFMpegAudioDecoder::close() {
         }
         AVCodecContext * myCodecContext = NULL;
         if(_myStreamIndex >= 0) {
-#           if (LIBAVCODEC_BUILD >= 0x4910)
-                myCodecContext = _myFormatContext->streams[_myStreamIndex]->codec;
-#           else
-                myCodecContext = &_myFormatContext->streams[_myStreamIndex]->codec;
-#           endif
+            myCodecContext = _myFormatContext->streams[_myStreamIndex]->codec;
         }
         if (_mySampleRate && _myNumChannels) {
             AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
@@ -264,11 +244,7 @@ bool FFMpegAudioDecoder::decode() {
     ASSURE(_myFormatContext);
     AVPacket myPacket;
 
-#if (LIBAVCODEC_BUILD >= 0x4910)
     AVCodecContext * myCodec = _myFormatContext->streams[_myStreamIndex]->codec;
-#else
-    AVCodecContext * myCodec = &(_myFormatContext->streams[_myStreamIndex]->codec);
-#endif
 
     int err = av_read_frame(_myFormatContext, &myPacket);
     if (err < 0) {
@@ -304,14 +280,9 @@ bool FFMpegAudioDecoder::decode() {
         const uint8_t* myData = myPacket.data;
         int myDataLen = myPacket.size;
         while (myDataLen > 0) {
-#   if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,28,0)
             myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1;
             int myLen = avcodec_decode_audio2(myCodec,
                 myAlignedBuf, &myBytesDecoded, myData, myDataLen);
-#   else
-            int myLen = avcodec_decode_audio(myCodec,
-                myAlignedBuf, &myBytesDecoded, myData, myDataLen);
-#   endif
             if (myLen < 0) {
                 AC_WARNING << "av_decode_audio error";
                 myDataLen = 0;

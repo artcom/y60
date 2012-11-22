@@ -46,10 +46,7 @@
 #pragma warning(disable:4244)
 extern "C" {
 #   include <libavformat/avformat.h>
-
-#   if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
-#       include <libswscale/swscale.h>
-#   endif
+#   include <libswscale/swscale.h>
 }
 #pragma warning(pop)
 
@@ -114,10 +111,6 @@ namespace y60 {
         int
 #endif
                     myDestPixelFormat = PIX_FMT_YUV444P;
-#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0)
-                    img_convert(&myYUVPict, myDestPixelFormat, &mySrcPict, myPixelFormat,
-                                _myGraph->getWidth(), _myGraph->getHeight());
-#else
                     int mySWSFlags = SWS_FAST_BILINEAR;//SWS_BICUBIC;
                     SwsContext * img_convert_ctx = sws_getContext(_myGraph->getWidth(), _myGraph->getHeight(),
                         myPixelFormat,
@@ -129,7 +122,6 @@ namespace y60 {
                         myYUVPict.data, myYUVPict.linesize);
 
                     sws_freeContext(img_convert_ctx);
-#endif
 
                     avpicture_deinterlace(&myYUVPict, &myYUVPict, myDestPixelFormat,  _myGraph->getWidth(), _myGraph->getHeight());
 
@@ -141,10 +133,6 @@ namespace y60 {
                     myDestPict.linesize[1] = myLineSizeBytes;
                     myDestPict.linesize[2] = myLineSizeBytes;
 
-#if LIBAVCODEC_VERSION_INT < ((51<<16)+(38<<8)+0)
-                    img_convert(&myDestPict, myPixelFormat, &myYUVPict, myDestPixelFormat,
-                                _myGraph->getWidth(), _myGraph->getHeight());
-#else
                     img_convert_ctx = sws_getCachedContext(img_convert_ctx, _myGraph->getWidth(), _myGraph->getHeight(),
                         myDestPixelFormat,
                         _myGraph->getWidth(), _myGraph->getHeight(),
@@ -155,8 +143,6 @@ namespace y60 {
                         myDestPict.data, myDestPict.linesize);
 
                     sws_freeContext(img_convert_ctx);
-#endif
-
                 } else {
                     memcpy(theTargetRaster->pixels().begin(), myData, myBufferLength);
                 }
