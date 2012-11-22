@@ -45,10 +45,10 @@
 #pragma warning(push)
 #pragma warning(disable:4244)
 extern "C" {
-#   include <avformat.h>
+#   include <libavformat/avformat.h>
 
 #   if LIBAVCODEC_VERSION_INT >= ((51<<16)+(38<<8)+0)
-#       include <swscale.h>
+#       include <libswscale/swscale.h>
 #   endif
 }
 #pragma warning(pop)

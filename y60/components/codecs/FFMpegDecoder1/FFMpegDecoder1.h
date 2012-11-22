@@ -42,28 +42,17 @@
 #include <string>
 #include <vector>
 
-#ifdef OSX
-    extern "C" {
-#       include <libavformat/avformat.h>
-#       if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
-#           include <libswscale/swscale.h>
-#       endif
-    }
-#   undef AV_NOPTS_VALUE
-#   define AV_NOPTS_VALUE 0x8000000000000000LL
-#else
-#   if defined(_MSC_VER)
-#       pragma warning(push,1)
-#   endif
-    extern "C" {
-#   include <avformat.h>
-#   if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
-#       include <swscale.h>
-#   endif
-    }
-#   if defined(_MSC_VER)
-#       pragma warning(pop)
-#   endif
+#if defined(_MSC_VER)
+#    pragma warning(push,1)
+#endif
+extern "C" {
+#    include <libavformat/avformat.h>
+#    if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(51,38,0)
+#        include <libswscale/swscale.h>
+#    endif
+}
+#if defined(_MSC_VER)
+#    pragma warning(pop)
 #endif
 
 #ifndef AV_VERSION_INT

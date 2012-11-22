@@ -33,22 +33,14 @@
 #include "FFMpegAudioDecoder.h"
 
 #if defined(_MSC_VER)
-#    pragma warning (push, 1)
-#else
-#    pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif //defined(_MSC_VER)
-
-extern "C" {
-#ifdef OSX
-#   include <libavformat/avformat.h>
-#else
-#   include <avformat.h>
+#    pragma warning(push,1)
 #endif
+extern "C" {
+#    include <libavformat/avformat.h>
 }
-
 #if defined(_MSC_VER)
-#    pragma warning (pop)
-#endif //defined(_MSC_VER)
+#    pragma warning(pop)
+#endif
 
 #ifndef AV_VERSION_INT
 #define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
