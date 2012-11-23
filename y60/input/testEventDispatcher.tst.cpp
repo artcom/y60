@@ -108,6 +108,22 @@ class EventDispatcherTest : public UnitTest, IEventSink {
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP)));
             _myExpectedEvents.assign(myTestEvents.begin(), myTestEvents.end());
             startDispatchTest(myTestEvents);
+            
+            // test removing source and sink
+            _testDispatcher.removeSource(&_myTestSource);
+            _testDispatcher.removeSink(this);
+            myTestEvents.clear();
+            myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP)));
+            _myExpectedEvents.assign(myTestEvents.begin(), myTestEvents.end());
+            deque<EventPtr> myEventQueue(myTestEvents.begin(),myTestEvents.end());
+            _myTestSource.setEvents(myEventQueue);
+            _testDispatcher.dispatch();
+            
+            ENSURE(_myExpectedEvents.size() == 1);
+            ENSURE(_myTestSource._myTestEvents.size() == 1);
+
+            _testDispatcher.addSource(&_myTestSource);
+            _testDispatcher.addSink(this);
             // simple presorted test
             myTestEvents.clear();
             myTestEvents.push_back(EventPtr(new Event(Event::KEY_UP,1)));

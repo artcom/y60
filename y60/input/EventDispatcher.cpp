@@ -86,7 +86,7 @@ namespace y60 {
 
     void
     EventDispatcher::removeSource(IEventSource * theSource) {
-        std::remove(_myEventSources.begin(), _myEventSources.end(), theSource);
+        _myEventSources.erase(std::remove(_myEventSources.begin(), _myEventSources.end(), theSource), _myEventSources.end());
     }
 
     void
@@ -95,6 +95,6 @@ namespace y60 {
     }
     void
     EventDispatcher::removeSink(IEventSink * theSink) {
-        std::remove(_myEventSinks.begin(), _myEventSinks.end(), theSink);
+        _myEventSinks.erase(std::remove(_myEventSinks.begin(), _myEventSinks.end(), theSink), _myEventSinks.end());
     }
 }
