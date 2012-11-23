@@ -63,6 +63,7 @@ SensorServer::openDevice(const std::string & theComPort, unsigned theBaudRate) {
     }
     _myComPort = asl::Ptr<asl::SerialDevice>(myComPort);
     _myComPort->open(theBaudRate, 8, asl::SerialDevice::NO_PARITY, 1);
+    /*std::string myStatus = */getStatus();
 }
 
 bool
