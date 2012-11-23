@@ -43,26 +43,62 @@ namespace jslib {
 
     static JSBool
     calibrate(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-        DOC_BEGIN("");
+        DOC_BEGIN("Calibrates the sensors from a given calibration file.");
+        DOC_PARAM("theFile", "calibration file", DOC_TYPE_STRING);
+        DOC_PARAM_OPT("thePortId", "sensor port to calibrate", DOC_TYPE_INTEGER, 0);
         DOC_END;
         try {
-            unsigned int myPortId;
-            std::string myFileName;
-            if (!convertFrom(cx, argv[0], myPortId )) {
-                JS_ReportError(cx, "JSDSADriver::calibrate(): Argument #1 must be a integer");
-                return JS_FALSE;
-            }
-            if (!convertFrom(cx, argv[1], myFileName )) {
-                JS_ReportError(cx, "JSDSADriver::calibrate(): Argument #2 must be a filename");
-                return JS_FALSE;
-            }
+            ensureParamCount(argc, 1, 2);
+
             JSDSADriver::OWNERPTR myNative;
             if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
                 JS_ReportError(cx, "JSDSADriver: self is not a DSADriver");
                 return JS_FALSE;
             }
 
-            myNative->calibrate(myPortId, myFileName);
+            unsigned int myPortId;
+            std::string myFileName;
+            if (!convertFrom(cx, argv[0], myFileName )) {
+                JS_ReportError(cx, "JSDSADriver::calibrate(): Argument #2 must be a filename");
+                return JS_FALSE;
+            }
+            if (argc == 2) {
+                if (!convertFrom(cx, argv[1], myPortId )) {
+                    JS_ReportError(cx, "JSDSADriver::calibrate(): Argument #1 must be a integer");
+                    return JS_FALSE;
+                }
+                myNative->calibrate(myFileName, myPortId);
+                return JS_TRUE;
+            }
+            myNative->calibrate(myFileName);
+            return JS_TRUE;
+        } HANDLE_CPP_EXCEPTION;
+    }
+
+    static JSBool
+    reset(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+        DOC_BEGIN("Resets the sensoric.");
+        DOC_PARAM_OPT("thePortId", "sensor port to reset", DOC_TYPE_INTEGER, 0);
+        DOC_END;
+        try {
+            ensureParamCount(argc, 0, 1);
+
+            JSDSADriver::OWNERPTR myNative;
+            if (!convertFrom(cx, OBJECT_TO_JSVAL(obj), myNative)) {
+                JS_ReportError(cx, "JSDSADriver: self is not a DSADriver");
+                return JS_FALSE;
+            }
+
+            unsigned int myPortId;
+            if (argc == 1) {
+                if (!convertFrom(cx, argv[1], myPortId )) {
+                    JS_ReportError(cx, "JSDSADriver::reset(): Argument #1 must be a integer");
+                    return JS_FALSE;
+                }
+                myNative->reset(myPortId);
+                return JS_TRUE;
+            }
+            myNative->reset();
             return JS_TRUE;
         } HANDLE_CPP_EXCEPTION;
     }
@@ -99,6 +135,7 @@ namespace jslib {
         static JSFunctionSpec myFunctions[] = {
             // name                  native            nargs
             {"calibrate",            calibrate,         2},
+            {"reset",                reset,             1},
             {"onUpdateSettings",     onUpdateSettings,  1},
             {0}
         };

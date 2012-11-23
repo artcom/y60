@@ -60,6 +60,8 @@ public:
     std::string getStatus();
     bool isStatusOutDated();
     void calibrate(const std::string & theString);
+    void reset();
+
     unsigned int         _myStatusInterval;
 
 private:

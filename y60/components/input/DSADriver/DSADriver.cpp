@@ -55,12 +55,18 @@ namespace y60 {
         y60::EventDispatcher::get().removeSource(this);
     }
 
-    void DSADriver::calibrate(unsigned int thePortId, const std::string & theFileName) {
+    void DSADriver::calibrate(const std::string & theFileName, unsigned int thePortId) {
         SensorServerList::iterator it = _mySensorServers.find(thePortId);
         if (it != _mySensorServers.end()) {
             std::string myData = asl::readFile(theFileName);
-            AC_PRINT<<myData;
             it->second->calibrate(myData);
+        }
+    }
+
+    void DSADriver::reset(unsigned int thePortId) {
+        SensorServerList::iterator it = _mySensorServers.find(thePortId);
+        if (it != _mySensorServers.end()) {
+            it->second->reset();
         }
     }
 

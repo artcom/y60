@@ -137,3 +137,8 @@ SensorServer::calibrate(const std::string & theString) {
         asl::msleep(10);
     }
 }
+
+void
+SensorServer::reset() {
+    _myComPort->write("R", 1);
+}
