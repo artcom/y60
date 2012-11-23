@@ -28,15 +28,6 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//    $RCSfile: SensorArray.h,v $
-//     $Author: ulrich $
-//   $Revision: 1.4 $
-//       $Date: 2005/02/03 16:59:51 $
-//
-// Dieters Sensor Array...
-//
-//=============================================================================
 
 #ifndef _SENSOR_ARRAY_INCLUDED
 #define _SENSOR_ARRAY_INCLUDED

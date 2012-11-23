@@ -28,15 +28,6 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//    $RCSfile: SensorServer.cpp,v $
-//     $Author: ulrich $
-//   $Revision: 1.8 $
-//       $Date: 2005/02/03 16:59:51 $
-//
-// Dieters Sensor Array...
-//
-//=============================================================================
 
 #include "SensorServer.h"
 
