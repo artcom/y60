@@ -39,6 +39,7 @@ spark.enableDSASensoric = function (theSettingsFile) {
     plug("DSADriver");
     var myDSADriver = new DSADriver();
     myDSADriver.onUpdateSettings(myDSAConfig);
+    return myDSADriver;
 };
 
 spark.DSAEvent = spark.Class("DSAEvent");
