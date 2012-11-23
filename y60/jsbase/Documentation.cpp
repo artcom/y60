@@ -43,7 +43,7 @@
 #include <asl/base/Logger.h>
 #include <asl/base/string_functions.h>
 
-#define DB() //x
+#define DB(x) //x
 
 using namespace std;
 
