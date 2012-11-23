@@ -48,9 +48,11 @@ using namespace std;
 namespace y60 {
 
     DSADriver::DSADriver () : _myInterpolateFlag(false) {
+        y60::EventDispatcher::get().addSource(this);
     }
 
     DSADriver::~DSADriver () {
+        y60::EventDispatcher::get().removeSource(this);
     }
 
     void DSADriver::calibrate(unsigned int thePortId, const std::string & theFileName) {

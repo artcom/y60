@@ -177,7 +177,6 @@ namespace jslib {
 
             OWNERPTR myNewNative;
             myNewNative = OWNERPTR(new y60::DSADriver());
-            y60::EventDispatcher::get().addSource(myNewNative.get());
             JSDSADriver * myNewObject = new JSDSADriver(myNewNative, myNewNative.get());
             if (myNewObject) {
                 JS_SetPrivate(cx, obj, myNewObject);
