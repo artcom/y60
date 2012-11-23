@@ -40,96 +40,99 @@
 
 using namespace std;
 
-SensorServer::SensorServer() : _myStatusInterval(5) {
-}
+namespace y60 {
 
-void
-SensorServer::openDevice(const std::string & theComPort, unsigned theBaudRate) {
-    unsigned port = -1;
-    asl::SerialDevice * myComPort = 0;
-    if (asl::is_decimal_number(theComPort, port)) {
-        myComPort = asl::getSerialDevice(port);
-    } else {
-        myComPort = asl::getSerialDeviceByName(theComPort);
+    SensorServer::SensorServer() : _myStatusInterval(5) {
     }
-    _myComPort = asl::Ptr<asl::SerialDevice>(myComPort);
-    _myComPort->open(theBaudRate, 8, asl::SerialDevice::NO_PARITY, 1);
-    /*std::string myStatus = */getStatus();
-}
 
-bool
-SensorServer::parseLine(const string & theLine, unsigned & theController, unsigned & theBitMask) {
-    boost::regex expr("(\\d+)\\s*,\\s*(\\d+)");
-    boost::smatch what;
-    if (boost::regex_search(theLine, what, expr)) {
-        theController = asl::as<unsigned>(what[1]);
-        theBitMask = asl::as<unsigned>(what[2]);
-        return true;
+    void
+    SensorServer::openDevice(const std::string & theComPort, unsigned theBaudRate) {
+        unsigned port = -1;
+        asl::SerialDevice * myComPort = 0;
+        if (asl::is_decimal_number(theComPort, port)) {
+            myComPort = asl::getSerialDevice(port);
+        } else {
+            myComPort = asl::getSerialDeviceByName(theComPort);
+        }
+        _myComPort = asl::Ptr<asl::SerialDevice>(myComPort);
+        _myComPort->open(theBaudRate, 8, asl::SerialDevice::NO_PARITY, 1);
+        /*std::string myStatus = */getStatus();
     }
-    return false;
-}
 
-void
-SensorServer::handleLines(string & theBuffer, SensorData & theData) {
-    std::string::size_type i = theBuffer.find("\r\n");
-    while(i != string::npos) {
-        string myLine = theBuffer.substr(0 ,i);
-        if (!myLine.empty()) {
-            unsigned myController, myBitmask;
-            if (parseLine(myLine, myController, myBitmask)) {
-                theData.push_back(make_pair(myController, myBitmask));
+    bool
+    SensorServer::parseLine(const string & theLine, unsigned & theController, unsigned & theBitMask) {
+        boost::regex expr("(\\d+)\\s*,\\s*(\\d+)");
+        boost::smatch what;
+        if (boost::regex_search(theLine, what, expr)) {
+            theController = asl::as<unsigned>(what[1]);
+            theBitMask = asl::as<unsigned>(what[2]);
+            return true;
+        }
+        return false;
+    }
+
+    void
+    SensorServer::handleLines(string & theBuffer, SensorData & theData) {
+        std::string::size_type i = theBuffer.find("\r\n");
+        while(i != string::npos) {
+            string myLine = theBuffer.substr(0 ,i);
+            if (!myLine.empty()) {
+                unsigned myController, myBitmask;
+                if (parseLine(myLine, myController, myBitmask)) {
+                    theData.push_back(make_pair(myController, myBitmask));
+                    _mySensorStatus = "OK";
+                    _myLastStatusTime.setNow();
+                }
+            }
+            theBuffer = theBuffer.substr(i+2);
+            i = theBuffer.find("\r\n");
+        }
+    }
+
+    void
+    SensorServer::poll(SensorData & theData) {
+        char myBuffer[1024];
+        size_t myBytesRead = sizeof(myBuffer);
+
+        _myComPort->read(myBuffer, myBytesRead);
+        if(myBytesRead) {
+            string myData(myBuffer, myBytesRead);
+            if (myData.find("OK") != string::npos) {
                 _mySensorStatus = "OK";
                 _myLastStatusTime.setNow();
+            } else {
+                _myFifo += myData;
+                handleLines(_myFifo, theData);
             }
         }
-        theBuffer = theBuffer.substr(i+2);
-        i = theBuffer.find("\r\n");
     }
-}
 
-void
-SensorServer::poll(SensorData & theData) {
-    char myBuffer[1024];
-    size_t myBytesRead = sizeof(myBuffer);
+    std::string
+    SensorServer::getStatus() {
+        std::string myCurrentStatus = _mySensorStatus;
+        if (isStatusOutDated() || myCurrentStatus.empty()) {
+            _myComPort->write("C", 1);
+            _mySensorStatus = "outdated";
+        }
+        return myCurrentStatus;
+    }
 
-    _myComPort->read(myBuffer, myBytesRead);
-    if(myBytesRead) {
-        string myData(myBuffer, myBytesRead);
-        if (myData.find("OK") != string::npos) {
-            _mySensorStatus = "OK";
-            _myLastStatusTime.setNow();
-        } else {
-            _myFifo += myData;
-            handleLines(_myFifo, theData);
+    bool
+    SensorServer::isStatusOutDated() {
+        asl::Time now;
+        return now - _myLastStatusTime > _myStatusInterval;
+    }
+
+    void
+    SensorServer::calibrate(const std::string & theString) {
+        for (unsigned int i = 0; i < theString.size(); ++i) {
+            _myComPort->write(&theString[i], 1);
+            asl::msleep(10);
         }
     }
-}
 
-std::string
-SensorServer::getStatus() {
-    std::string myCurrentStatus = _mySensorStatus;
-    if (isStatusOutDated() || myCurrentStatus.empty()) {
-        _myComPort->write("C", 1);
-        _mySensorStatus = "outdated";
+    void
+    SensorServer::reset() {
+        _myComPort->write("R", 1);
     }
-    return myCurrentStatus;
-}
-
-bool
-SensorServer::isStatusOutDated() {
-    asl::Time now;
-    return now - _myLastStatusTime > _myStatusInterval;
-}
-
-void
-SensorServer::calibrate(const std::string & theString) {
-    for (unsigned int i = 0; i < theString.size(); ++i) {
-        _myComPort->write(&theString[i], 1);
-        asl::msleep(10);
-    }
-}
-
-void
-SensorServer::reset() {
-    _myComPort->write("R", 1);
 }

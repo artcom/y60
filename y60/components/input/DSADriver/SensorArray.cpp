@@ -34,56 +34,57 @@
 #include <iostream>
 using namespace std;
 
+namespace y60 {
 
-unsigned
-SensorArray::makeKey(unsigned thePortId,
-                     unsigned theControllerId,
-                     unsigned theBitNumber)
-{
-    return (((thePortId & 0xff) << 16) | ((theControllerId & 0xff) << 8) | (theBitNumber & 0xff));
-}
-
-
-SensorArray :: SensorArray(const std::string & theName,
-                           const asl::Vector2i & theGridSize) :
-    _myName(theName), _myGridSize(theGridSize)
-{
-}
+    unsigned
+    SensorArray::makeKey(unsigned thePortId,
+                         unsigned theControllerId,
+                         unsigned theBitNumber)
+    {
+        return (((thePortId & 0xff) << 16) | ((theControllerId & 0xff) << 8) | (theBitNumber & 0xff));
+    }
 
 
-void
-SensorArray::addSensor(unsigned thePortId, unsigned theControllerId, unsigned theBitNumber,
-                       const asl::Vector2i & theCoordinate)
-{
-    unsigned key = makeKey(thePortId, theControllerId, theBitNumber);
-    _mySensorMap[key] = theCoordinate;
-    //cerr << "addSensor port=" << thePortId << " ctrl=" << theControllerId << " bit=" << theBitNumber << " pos=" << theCoordinate << endl;
-}
+    SensorArray :: SensorArray(const std::string & theName,
+                               const asl::Vector2i & theGridSize) :
+        _myName(theName), _myGridSize(theGridSize)
+    {
+    }
 
 
-void
-SensorArray::createCookedEvents(std::vector<asl::Vector2i> & theEventList,
-                          unsigned thePortId, unsigned theControllerId, unsigned theBitMask)
-{
-    for (unsigned bit = 0; bit < 8; ++bit) {
+    void
+    SensorArray::addSensor(unsigned thePortId, unsigned theControllerId, unsigned theBitNumber,
+                           const asl::Vector2i & theCoordinate)
+    {
+        unsigned key = makeKey(thePortId, theControllerId, theBitNumber);
+        _mySensorMap[key] = theCoordinate;
+    }
 
-        if (theBitMask & (1 << bit)) {
-            unsigned key = makeKey(thePortId, theControllerId, bit);
-            SensorMap::iterator iter = _mySensorMap.find(key);
-            if (iter != _mySensorMap.end()) {
-                theEventList.push_back(iter->second);
+
+    void
+    SensorArray::createCookedEvents(std::vector<asl::Vector2i> & theEventList,
+                              unsigned thePortId, unsigned theControllerId, unsigned theBitMask)
+    {
+        for (unsigned bit = 0; bit < 8; ++bit) {
+
+            if (theBitMask & (1 << bit)) {
+                unsigned key = makeKey(thePortId, theControllerId, bit);
+                SensorMap::iterator iter = _mySensorMap.find(key);
+                if (iter != _mySensorMap.end()) {
+                    theEventList.push_back(iter->second);
+                }
             }
         }
     }
-}
-void
-SensorArray::createRawEvents(std::vector<asl::Vector2i> & theEventList,
-                          unsigned thePortId, unsigned theControllerId, unsigned theBitMask)
-{
-    for (unsigned bit = 0; bit < 8; ++bit) {
+    void
+    SensorArray::createRawEvents(std::vector<asl::Vector2i> & theEventList,
+                              unsigned thePortId, unsigned theControllerId, unsigned theBitMask)
+    {
+        for (unsigned bit = 0; bit < 8; ++bit) {
 
-        if (theBitMask & (1 << bit)) {
-             theEventList.push_back(asl::Vector2i(theControllerId, 1 << bit));
+            if (theBitMask & (1 << bit)) {
+                 theEventList.push_back(asl::Vector2i(theControllerId, 1 << bit));
+            }
         }
     }
 }

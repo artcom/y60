@@ -41,40 +41,42 @@
 #include <map>
 #include <vector>
 
+namespace y60 {
 
-class SensorArray {
-public:
-    static unsigned makeKey(unsigned thePortId,
-                            unsigned theControllerId,
-                            unsigned theBitNumber);
+    class SensorArray {
+    public:
+        static unsigned makeKey(unsigned thePortId,
+                                unsigned theControllerId,
+                                unsigned theBitNumber);
 
-    SensorArray (const std::string & theName,
-                 const asl::Vector2i & theGridSize);
+        SensorArray (const std::string & theName,
+                     const asl::Vector2i & theGridSize);
 
-    const std::string & getName() const {
-        return _myName;
-    }
+        const std::string & getName() const {
+            return _myName;
+        }
 
-    const asl::Vector2i & getGridSize() const {
-        return _myGridSize;
-    }
+        const asl::Vector2i & getGridSize() const {
+            return _myGridSize;
+        }
 
-    void addSensor(unsigned thePortId, unsigned theControllerId, unsigned theBitNumber,
-                   const asl::Vector2i & theCoordinate);
+        void addSensor(unsigned thePortId, unsigned theControllerId, unsigned theBitNumber,
+                       const asl::Vector2i & theCoordinate);
 
-    void createCookedEvents(std::vector<asl::Vector2i> & theEventList,
-                      unsigned thePortId, unsigned theControllerId, unsigned theBitMask);
-    void createRawEvents(std::vector<asl::Vector2i> & theEventList,
-                      unsigned thePortId, unsigned theControllerId, unsigned theBitMask);
+        void createCookedEvents(std::vector<asl::Vector2i> & theEventList,
+                          unsigned thePortId, unsigned theControllerId, unsigned theBitMask);
+        void createRawEvents(std::vector<asl::Vector2i> & theEventList,
+                          unsigned thePortId, unsigned theControllerId, unsigned theBitMask);
 
-private:
-    std::string   _myName;
-    asl::Vector2i _myGridSize;
+    private:
+        std::string   _myName;
+        asl::Vector2i _myGridSize;
 
-    typedef std::map<unsigned, asl::Vector2i> SensorMap;
-    SensorMap     _mySensorMap;
-};
+        typedef std::map<unsigned, asl::Vector2i> SensorMap;
+        SensorMap     _mySensorMap;
+    };
 
-typedef asl::Ptr<SensorArray> SensorArrayPtr;
+    typedef asl::Ptr<SensorArray> SensorArrayPtr;
+}
 
 #endif
