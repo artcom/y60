@@ -37,6 +37,8 @@
 #include <asl/base/SingletonManager.h>
 
 #include <asl/base/Arguments.h>
+#include <asl/base/Dashboard.h>
+#include <asl/base/Logger.h>
 #include <asl/base/StdOutputRedirector.h>
 #include <asl/base/string_functions.h>
 #include <asl/base/os_functions.h>
@@ -76,6 +78,10 @@ main(int argc, char **argv) {
     int rv = EXIT_FAILURE;
 
     try {
+        // Make sure the logger & dashboard gets deleted at last
+        asl::Logger::get();
+        asl::Dashboard::get();
+
         ourArguments.addAllowedOptionsWithDocumentation(ourAllowedOptions);
         if (!ourArguments.parse(argc, argv)) {
             return 0;
