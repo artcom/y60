@@ -43,6 +43,8 @@
 #include <asl/base/Logger.h>
 #include <asl/base/string_functions.h>
 
+#define DB() //x
+
 using namespace std;
 
 namespace jslib {
@@ -67,7 +69,7 @@ namespace jslib {
         theConstructor(0, reinterpret_cast<JSObject*>(&myFunctionDocumentation),
                             0, 0, 0);
         DocumentationSingleton::get()[make_pair(theModule,theClassName)].constructors.push_back(myFunctionDocumentation);
-        AC_TRACE << "added doku-ctor for " << theClassName << " in module " << theModule << endl;
+        DB(AC_TRACE << "added doku-ctor for " << theClassName << " in module " << theModule << endl;)
     }
 
     void
@@ -91,7 +93,7 @@ namespace jslib {
                 ++theFunctions;
             }
         } else {
-            AC_TRACE << "No functions defined for class " << theClassName << endl;
+            DB(AC_TRACE << "No functions defined for class " << theClassName << endl;)
         }
 
         if (theProperties) {
@@ -104,7 +106,7 @@ namespace jslib {
                 ++theProperties;
             }
         } else {
-            AC_TRACE << "No properties defined for class " << theClassName << endl;
+            DB(AC_TRACE << "No properties defined for class " << theClassName << endl;)
         }
 
         if (theStaticFunctions) {
@@ -151,12 +153,12 @@ namespace jslib {
             const char * theBaseClassName)
     {
         ObjectDocumentation & myDocumentation = DocumentationSingleton::get()[make_pair(theModule, theClassName)];
-        AC_TRACE << "creating doku for " << theClassName << " in module " << theModule << endl;
+        DB(AC_TRACE << "creating doku for " << theClassName << " in module " << theModule << endl;)
         document(myDocumentation, theClassName, theProperties, theFunctions, theConstants,
                 theStaticProperties, theStaticFunctions, theBaseClassName);
 
         //DocumentationSingleton::get()[make_pair(theModule,theClassName)] = myDocumentation;
-        AC_TRACE << "...created doku for " << theClassName << " in module " << theModule << endl;
+        DB(AC_TRACE << "...created doku for " << theClassName << " in module " << theModule << endl;)
     }
 
     void
@@ -175,7 +177,7 @@ namespace jslib {
     void
     createFunctionDocumentation(const char * theSection, JSFunctionSpec * theFunctions) {
         ObjectDocumentation & myDocumentation = DocumentationSingleton::get()[make_pair(theSection,"")];
-        AC_TRACE << "adding doku for free-functions in module " << theSection << endl;
+        DB(AC_TRACE << "adding doku for free-functions in module " << theSection << endl;)
 
         if (theFunctions) {
             while (theFunctions->name) {
@@ -183,13 +185,13 @@ namespace jslib {
                 myFunctionDocumentation.name = theFunctions->name;
                 theFunctions->call( 0, reinterpret_cast<JSObject*>(&myFunctionDocumentation),
                                     0, 0, 0);
-                AC_TRACE << "called " << theFunctions->name;
+                DB(AC_TRACE << "called " << theFunctions->name;)
                 myDocumentation.functions.push_back(myFunctionDocumentation);
                 ++theFunctions;
             }
         } else {
             AC_WARNING << "No functions defined for section " << theSection << endl;
         }
-        AC_TRACE << "added doku for free-functions in module " << theSection << endl;
+        DB(AC_TRACE << "added doku for free-functions in module " << theSection << endl;)
     }
 }
