@@ -41,6 +41,7 @@
 #include "SensorServer.h"
 
 #include <asl/serial/SerialDeviceFactory.h>
+#include <asl/base/Time.h>
 #include <asl/base/Logger.h>
 #include <asl/base/string_functions.h>
 
@@ -130,5 +131,8 @@ SensorServer::isStatusOutDated() {
 
 void
 SensorServer::calibrate(const std::string & theString) {
-    _myComPort->write(theString.c_str(), theString.size());
+    for (unsigned int i = 0; i < theString.size(); ++i) {
+        _myComPort->write(&theString[i], 1);
+        asl::msleep(10);
+    }
 }
