@@ -67,7 +67,7 @@ SensorServer::openDevice(const std::string & theComPort, unsigned theBaudRate) {
 
 bool
 SensorServer::parseLine(const string & theLine, unsigned & theController, unsigned & theBitMask) {
-    boost::regex expr("(\\w+)\\s*,\\s*(\\w+)");
+    boost::regex expr("(\\d+)\\s*,\\s*(\\d+)");
     boost::smatch what;
     if (boost::regex_search(theLine, what, expr)) {
         theController = asl::as<unsigned>(what[1]);
