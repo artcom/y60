@@ -19,7 +19,7 @@
 //d change z-rotation of widget
 //"down" moves down in z direction
 //"up" moves up in z direction
-//o toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>)
+//o toggles visibility of layoutImage, which can be an commandLineArgument (layoutimage=<src>, layoutimagesize=WxH)
 
 //classes using Layouter can implement hooks
 // * layouterUpdatePosition - for additional updates in the widget
@@ -108,15 +108,19 @@ spark.Layouter.Constructor = function(Protected) {
         _myStage = findStage();
         _myStage.focusKeyboard(_myStage);
         
-        for (var i in _myStage["arguments"]) {
-            if (i.search(/layoutimage/i) !== -1) {
-                _myLayoutImage = _myStage["arguments"][i];
-                Logger.warning("found layoutimage: " + _myLayoutImage);
-                //XXX: TODO change to overlay
-                var myNode = new Node("<Image name='layoutimage' z='50' src='" + _myLayoutImage + "' visible='false' alpha='0.4' sensible='false'/>");
-                _myLayoutImage = spark.loadDocument(myNode, _myStage);
-                _myLayoutImage.sensible = false;
-            }
+        if ("layoutimage" in _myStage.arguments) {
+            _myLayoutImage = _myStage.arguments.layoutimage;
+            Logger.warning("found layoutimage: " + _myLayoutImage);
+            //XXX: TODO change to overlay
+            var myNode = new Node("<Image name='layoutimage' z='50' src='" + _myLayoutImage + "' visible='false' alpha='0.4' sensible='false'/>");
+            _myLayoutImage = spark.loadDocument(myNode, _myStage);
+            _myLayoutImage.sensible = false;
+        }
+        if ("layoutimagesize" in _myStage.arguments && _myLayoutImage) {
+            var mySizeString = _myStage.arguments.layoutimagesize;
+            Logger.warning("found layoutimagesize: " + mySizeString);
+            _myLayoutImage.width = mySizeString.split("x")[0];
+            _myLayoutImage.height = mySizeString.split("x")[1];
         }
         Base.onKey = _myStage.onKey;
         _myStage.onKey = function(theKey, theKeyState, theX, theY,
@@ -217,6 +221,10 @@ spark.Layouter.Constructor = function(Protected) {
 
     Public.__defineGetter__("listening", function () {
         return (_myState === LISTENING);
+    });
+
+    Public.__defineGetter__("layoutimage", function () {
+        return _myLayoutImage;
     });
 
     Public.__defineGetter__("target", function () {
