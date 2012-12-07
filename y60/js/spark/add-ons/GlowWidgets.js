@@ -25,6 +25,7 @@ spark.GlowPlug.Constructor = function (Protected) {
         var myBlur = Protected.getNumber("blur", 0);
         var myScale = Protected.getNumber("glow_scale", 1);
         var myGlowIntensity = Protected.getNumber("glow_intensity", 1);
+        var myGlowAlpha = Protected.getNumber("glow_alpha", 1);
         _myAnythingGlowsOrBlursFlag = true;
         if (myBlur >0 && myGlow > 0) {
             addMaterialRequirement(_myMaterial, "effect", "[10[glowBlur]]");
@@ -45,6 +46,7 @@ spark.GlowPlug.Constructor = function (Protected) {
                 _myMaterial.properties.offset = Protected.getVector2f("offset", "[0,0]");
                 _myMaterial.properties.glow_radius = myGlow;
                 _myMaterial.properties.glow_color = Protected.getVector4f("glow_color", "[1,1,1,1]");
+                _myMaterial.properties.glow_color[3] = myGlowAlpha;
                 _myMaterial.properties.scale = myScale;
                 _myMaterial.properties.glow_intensity = myGlowIntensity;
             }
