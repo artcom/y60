@@ -527,18 +527,40 @@ namespace y60 {
         y60::RasterOfGRAY & myDenoisedRaster = *
             dom::dynamic_cast_and_openWriteableValue<y60::RasterOfGRAY>(&* (_myDenoisedRaster.value) );
 
+        float x0y0 = 0,
+              x1y0 = 0,
+              x2y0 = 0,
+              x0y1 = 0,
+              x2y1 = 0,
+              x0y2 = 0,
+              x1y2 = 0,
+              x2y2 = 0;
 
-        float x0y0 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]-1).get();
-        float x1y0 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]-1).get();
-        float x2y0 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]-1).get();
+        if (theCenter[0]-1 >= 0) {
+            if (theCenter[1]-1 >= 0) {
+                x0y0 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]-1).get();
+            }
+            x0y1 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]).get();
+            if (theCenter[1]+1 < _myGridSize[1]) {
+                x0y2 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]+1).get();
+            }
+        }
+        if (theCenter[0]+1 < _myGridSize[0]) {
+            if (theCenter[1]-1 >= 0) {
+                x2y0 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]-1).get();
+            }
+            x2y1 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]).get();
+            if (theCenter[1]+1 < _myGridSize[1]) {
+                x2y2 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]+1).get();
+            }
+        }
 
-        float x0y1 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]).get();
-        //float x1y1 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]).get();
-        float x2y1 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]).get();
-
-        float x0y2 = myDenoisedRaster((unsigned)theCenter[0]-1, (unsigned)theCenter[1]+1).get();
-        float x1y2 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]+1).get();
-        float x2y2 = myDenoisedRaster((unsigned)theCenter[0]+1, (unsigned)theCenter[1]+1).get();
+        if (theCenter[1]-1 >= 0) {
+            x1y0 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]-1).get();
+        }
+        if (theCenter[1]+1 < _myGridSize[1]) {
+            x1y2 = myDenoisedRaster((unsigned)theCenter[0], (unsigned)theCenter[1]+1).get();
+        }
 
         float x = theCenter[0]
                 + 0.125f * ((- (x0y0 / theMaximum)) + (x2y0 / theMaximum))
