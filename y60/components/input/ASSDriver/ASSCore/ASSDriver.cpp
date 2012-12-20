@@ -1392,7 +1392,7 @@ namespace y60 {
         getConfigSetting( theSettings, "MinTouchThreshold", _myMinTouchThreshold, 9.0f );
         getConfigSetting( theSettings, "ClampToScreen", _myClampToScreenFlag, 0);
         getConfigSetting( theSettings, "CCRegion4MomentumFlag", _myUseCCRegionForMomentumFlag, 0);
-        getConfigSetting( theSettings, "InterpolationMethod", _myInterpolationMethod, 0);
+        getConfigSetting( theSettings, "InterpolationMethod", _myInterpolationMethod, 1);
         getConfigSetting( theSettings, "CureBrokenElectrodes", _myCureBrokenElectrodesFlag, 0);
         getConfigSetting( theSettings, "CaptureSensorData", _myCaputureSensorDataFlag, 0);
 
