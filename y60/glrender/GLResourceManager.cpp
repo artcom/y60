@@ -115,7 +115,7 @@ namespace y60 {
 
     unsigned
     GLResourceManager::setupTexture(TexturePtr & theTexture) {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_setupTexture);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_setupTexture);
         glPushAttrib(GL_PIXEL_MODE_BIT | GL_TEXTURE_BIT); //GL_ALL_ATTRIB_BITS);
 
         if (theTexture->getTextureId() > 0) {
@@ -165,7 +165,7 @@ namespace y60 {
 
     void
     GLResourceManager::updateTextureData(const TexturePtr & theTexture) {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTextureData);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTextureData);
 
         ImagePtr myImage = theTexture->getImage();
         if (!myImage) {
@@ -224,7 +224,7 @@ namespace y60 {
 
     void
     GLResourceManager::unbindTexture(Texture * theTexture) {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_unbindTexture);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_unbindTexture);
 
         if (!hasGLContext()) {
             return;
@@ -440,7 +440,7 @@ namespace y60 {
     void
     GLResourceManager::setupTexture2D(TexturePtr & theTexture)
     {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_setupTexture2D);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_setupTexture2D);
         ImagePtr myImage = theTexture->getImage();
         if (!myImage) {
             AC_ERROR << "Texture id=" << theTexture->get<IdTag>()
@@ -600,7 +600,7 @@ namespace y60 {
     void
     GLResourceManager::setupTexture3D(TexturePtr & theTexture)
     {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_setupTexture3D);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_setupTexture3D);
         ImagePtr myImage = theTexture->getImage();
         if (!myImage) {
             AC_ERROR << "Texture id=" << theTexture->get<IdTag>()
@@ -722,7 +722,7 @@ namespace y60 {
     void
     GLResourceManager::setupCubemap(TexturePtr & theTexture)
     {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_setupCubemap);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_setupCubemap);
         ImagePtr myImage = theTexture->getImage();
         if (!myImage) {
             AC_ERROR << "Texture node id=" << theTexture->get<IdTag>() << " has no image associated";
@@ -824,7 +824,7 @@ namespace y60 {
      **********************************************************************/
     void
     GLResourceManager::updateTexture2D(const TexturePtr & theTexture, ImagePtr & theImage) {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTexture2D);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTexture2D);
 
         unsigned myIndex = theTexture->get<TextureImageIndexTag>();
         unsigned int myWidth = theImage->getRasterPtr(myIndex)->width();
@@ -882,7 +882,7 @@ namespace y60 {
 
     void
     GLResourceManager::updateTexture3D(const TexturePtr & theTexture, ImagePtr & theImage) {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTexture3D);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTexture3D);
 
         unsigned myIndex = theTexture->get<TextureImageIndexTag>();
         unsigned int myWidth = theImage->getRasterPtr(myIndex)->width();
@@ -921,7 +921,7 @@ namespace y60 {
 
     void
     GLResourceManager::updateCubemap(const TexturePtr & theTexture, ImagePtr & theImage) {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_updateCubemap);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_updateCubemap);
 
         AC_DEBUG << "GLResourceManager::updateCubemap '" << theTexture->get<NameTag>()
                  << "' node id=" << theTexture->get<IdTag>();
@@ -978,7 +978,7 @@ namespace y60 {
      */
     void
     GLResourceManager::updateTextureParams(const TexturePtr & theTexture) {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTextureParams);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_updateTextureParams);
 
 
         glPushAttrib(GL_TEXTURE_BIT);
@@ -1062,7 +1062,7 @@ namespace y60 {
 
     void
     GLResourceManager::updatePixelTransfer(const TexturePtr & theTexture) {
-        MAKE_GL_SCOPE_TIMER(GLResourceManager_updatePixelTransfer);
+        // MAKE_GL_SCOPE_TIMER(GLResourceManager_updatePixelTransfer);
         AC_DEBUG << "GLResourceManager::updatePixelTransfer '" << theTexture->get<NameTag>()
                  << ", colorbias = "<< theTexture->get<TextureColorBiasTag>()
                  << ", colorscale = "<< theTexture->get<TextureColorScaleTag>() ;

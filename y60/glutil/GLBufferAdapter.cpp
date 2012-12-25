@@ -230,7 +230,8 @@ namespace y60 {
     BufferToFile::encodeBuffer(const std::string thePath, const unsigned int theFormat,
                                const int theCompressionOrQualityLevel, boost::shared_ptr<PLAnyBmp> & theBmp)
     {
-        MAKE_SCOPE_TIMER(GLBufferAdapter_MakeFileFromBmp);
+        // should not be timed this way, because it is running in a different thread.
+        // MAKE_SCOPE_TIMER(GLBufferAdapter_MakeFileFromBmp);
         switch(theFormat) {
             case PL_FT_PNG:
                 {
