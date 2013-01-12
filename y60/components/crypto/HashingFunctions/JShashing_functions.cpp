@@ -31,8 +31,11 @@
 
 #include "JShashing_functions.h"
 #include <y60/jsbase/Documentation.h>
-
+#ifdef OSX
+#include <cryptopp/sha.h>
+#else
 #include <crypto++/sha.h>
+#endif
 
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JScppUtils.impl>
