@@ -134,6 +134,9 @@ spark.Image.Constructor = function (Protected) {
     Public.__defineGetter__("loadasync", function () {
         return _myASyncLoad;
     });
+    Public.__defineSetter__("loadasync", function (i) {
+        _myASyncLoad = i;
+    });
     // XXX: this should not exist.
     Public.__defineGetter__("texture", function () {
         return _myTexture;
@@ -202,7 +205,7 @@ spark.Image.Constructor = function (Protected) {
         if (_myImage) {                                
             Public.width = Protected.getNumber("width", _myImage.raster.width);
             Public.height = Protected.getNumber("height", _myImage.raster.height);
-            _myLoadCB ? _myLoadCB():null
+            _myLoadCB ? _myLoadCB(Public):null
         }
     }
     Base.postRealize = Public.postRealize;
