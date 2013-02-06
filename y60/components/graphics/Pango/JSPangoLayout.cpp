@@ -31,6 +31,9 @@
 
 #include <string>
 
+#include <pango/pangocairo.h>
+#include <glib-object.h>
+
 #include <y60/image/Image.h>
 
 #include <y60/jsbase/JScppUtils.h>
@@ -40,14 +43,12 @@
 
 #include <y60/jsbase/JSWrapper.impl>
 
-#include <glib-object.h>
+#include <y60/components/graphics/Cairo/JSCairoContext.h>
 
-#include "JSCairoContext.h"
 #include "JSPangoContext.h"
 #include "JSPangoLayout.h"
 #include "JSPangoFontDescription.h"
 
-#include <pango/pangocairo.h>
 
 using namespace std;
 using namespace asl;

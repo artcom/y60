@@ -32,6 +32,7 @@ use("SceneViewer.js");
 use("Overlay.js");
 
 plug("Cairo");
+plug("Pango");
 
 var ourShow = new SceneViewer(arguments);
 var _myImage = null;
@@ -51,19 +52,19 @@ ourShow.setup = function() {
     myTestOverlay.width = 1024;
     myTestOverlay.height = 768;
 
-    var xc = 128.0;
-    var yc = 128.0;
-    var radius = 100.0;
-    var angle1 = radFromDeg(45.0);
-    var angle2 = radFromDeg(180.0);
-
     var mySurface = new Cairo.Surface(myImage);
     var cairoContext = new Cairo.Context(mySurface);
     cairoContext.setAntialias(Cairo.ANTIALIAS_NONE);
     cairoContext.setSourceRGB(255,0,0);
-    cairoContext.setLineWidth(10.0);
-    cairoContext.arc(xc, yc, radius, angle1, angle2);
-    cairoContext.stroke();
+
+    var myLayout = new Pango.Layout(cairoContext);
+    var myFontDesc = new Pango.FontDescription("Tele-Antiqua Regular 100");
+    myLayout.font_description = myFontDesc;
+    myLayout.text = "\u1E78berl\u00E4nge";
+    myLayout.update_from_cairo_context(cairoContext);
+    myLayout.show_in_cairo_context(cairoContext);
+    Logger.warning(myLayout.context);
+    Logger.warning(myLayout.font_description);
 };
 
 
