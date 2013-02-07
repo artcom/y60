@@ -29,7 +29,6 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 use("SceneViewer.js");
-use("Overlay.js");
 
 plug("Cairo");
 plug("Pango");
@@ -43,14 +42,14 @@ ourShow.SceneViewer.setup = ourShow.setup;
 ourShow.setup = function() {
     ourShow.SceneViewer.setup();
     window.resize(1024, 768);
-    window.canvas.backgroundcolor = new Vector4f(0.8, 0.7, 0.9, 1.0);
+    window.canvas.backgroundcolor = new Vector4f(0.0, 0.7, 0.9, 1.0);
 
-    var myImage = Modelling.createImage(window.scene, 1024, 768, "BGRA");
-    myImage.resize = "none";
-
-    var myTestOverlay = new ImageOverlay(window.scene, myImage, [0,0]);
-    myTestOverlay.width = 1024;
-    myTestOverlay.height = 768;
+    var myImage = Modelling.createImage(window.scene, 1024, 1024, "BGRA");
+    var myTexture  = Modelling.createTexture(window.scene, myImage);
+    myTexture.wrapmode = "clamp_to_edge";
+    var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myTexture);
+    var myShape = Modelling.createQuad(window.scene, myMaterial.id, new Vector3f(-0.04, -0.06, -0.1), new Vector3f(0.04, 0.02, -0.1));
+    var myNode = Modelling.createBody(window.scene.world, myShape.id);
 
     var mySurface = new Cairo.Surface(myImage);
     var cairoContext = new Cairo.Context(mySurface);
