@@ -56,6 +56,7 @@ using namespace y60;
 
 namespace jslib {
 
+////////////////////////////////////////////////////// Functions
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -68,23 +69,44 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+setColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("set text color");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    ensureParamCount(argc, 1);
+    Vector4f colorVector;
+    convertFrom(cx, argv[0], colorVector);
+    cairo_set_source_rgba(myOwner->get()->getCairoContext(), 
+                          colorVector[0],
+                          colorVector[1],
+                          colorVector[2],
+                          colorVector[3]);
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 pango::JSLayout::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"setColor",             setColor,                1},
         {0}
     };
     return myFunctions;
 }
 
+/////////////////////////////////////////////////////// Properties
 JSPropertySpec *
 pango::JSLayout::Properties() {
     static JSPropertySpec myProperties[] = {
         {"font_description", PROP_font_description, JSPROP_ENUMERATE|JSPROP_PERMANENT},
-        {"text", PROP_text, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"context", PROP_context, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_READONLY},
+        {"text", PROP_text, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -194,7 +216,7 @@ pango::JSLayout::Constructor(::JSContext *cx, JSObject *obj, uintN argc, jsval *
 
             cairo_surface_t *mySurface = cairo::JSSurface::createFromImageNode(myImageNode);
             cairo_t *cairoContext = cairo_create(mySurface);
-            cairo_set_source_rgb(cairoContext, 1.0, 0.0, 0.0); //TODO: use color
+            cairo_set_source_rgba(cairoContext, 1.0, 1.0, 1.0, 1.0);
 
             PangoLayout * newLayout = pango_cairo_create_layout(cairoContext);
             PangoCairo* pangoCairo = new PangoCairo(newLayout, cairoContext);

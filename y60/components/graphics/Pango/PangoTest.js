@@ -51,10 +51,9 @@ ourShow.setup = function() {
     var myNode = Modelling.createBody(window.scene.world, myShape.id);
 
     var myLayout = new Pango.Layout(myImage);
-
+    myLayout.setColor([0.1,0.8,0.4,1.0]);
     var myFontDesc = new Pango.FontDescription("Alex Brush 100");
     myLayout.font_description = myFontDesc;
-
     myLayout.text = "\u1E78berl\u00E4nge";
     Logger.warning(myLayout.context);
     Logger.warning(myLayout.font_description);
