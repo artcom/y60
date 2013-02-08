@@ -32,32 +32,58 @@
 #ifndef _Y60_PANGO_JSLAYOUT_INCLUDED_
 #define _Y60_PANGO_JSLAYOUT_INCLUDED_
 
+#include <pango/pango-layout.h>
+
 #include <asl/dom/Nodes.h>
 
 #include <y60/jsbase/JSWrapper.h>
 
-#include <pango/pango-layout.h>
+#include <y60/components/graphics/Cairo/JSCairoContext.h>
 
 namespace jslib {
 
     namespace pango {
+
+        //use layout with CairoContext
+        class PangoCairo {
+            public:
+                PangoCairo(PangoLayout * theLayout, cairo_t * theCairoContext) :
+                    _myPangoLayout(theLayout),
+                    _myCairoContext(theCairoContext) { 
+                    };
+                ~PangoCairo() {
+                    if (_myPangoLayout) {
+                        g_object_unref(_myPangoLayout);
+                    }
+                    cairo_destroy(_myCairoContext);
+                }
+                PangoLayout* getLayout() {
+                    return _myPangoLayout;
+                }
+                cairo_t* getCairoContext() {
+                    return _myCairoContext;
+                }
+            private:
+                PangoLayout* _myPangoLayout;
+                cairo_t* _myCairoContext;
+        };
+
         // a quick wrapper to ensure the correct *_free is called on destruction
         class LayoutWrapper {
             public:
-                LayoutWrapper(PangoLayout * theNative) :
+                LayoutWrapper(PangoCairo * theNative) :
                     _myNative(theNative) {};
                 ~LayoutWrapper() {
                     if (_myNative) {
-                        g_object_unref(_myNative);
+                        delete _myNative;
                     }
                 }
-                PangoLayout * get() const { return _myNative; };
+                PangoCairo * get() const { return _myNative; };
             private:
                 // not copy-safe: hide copy ctor & assignment op
                 LayoutWrapper(const LayoutWrapper &);
                 LayoutWrapper & operator=(const LayoutWrapper &);
-                PangoLayout * _myNative;
-                
+                PangoCairo * _myNative;
         };
         class JSLayout : public JSWrapper<LayoutWrapper, asl::Ptr< LayoutWrapper >, StaticAccessProtocol> {
             JSLayout();  // hide default constructor

@@ -43,7 +43,7 @@
 
 #include <y60/jsbase/JSWrapper.impl>
 
-#include <y60/components/graphics/Cairo/JSCairoContext.h>
+#include <y60/components/graphics/Cairo/JSCairoSurface.h>
 
 #include "JSPangoContext.h"
 #include "JSPangoLayout.h"
@@ -62,48 +62,10 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     pango::JSLayout::OWNERPTR myOwner;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-    const char * theText = pango_layout_get_text(myOwner->get());
+    const char * theText = pango_layout_get_text(myOwner->get()->getLayout());
     std::string myStringRep = string("Pango.Layout: '"+string(theText)+"'");
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
-}
-
-static JSBool
-update_from_cairo_context(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1, PLUS_FILE_LINE);
-
-        cairo_t * cairoContext;
-        if (!convertFrom(cx, argv[0], cairoContext)) {
-            JS_ReportError(cx,"update_from_cairo_context - argument must be a Cairo.Context");
-
-        }
-        pango::JSLayout::OWNERPTR myOwner;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-        pango_cairo_update_layout(cairoContext, myOwner->get());
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
-}
-
-static JSBool
-show_in_cairo_context(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    DOC_BEGIN("");
-    DOC_END;
-    try {
-        ensureParamCount(argc, 1, PLUS_FILE_LINE);
-
-        cairo_t * cairoContext;
-        if (!convertFrom(cx, argv[0], cairoContext)) {
-            JS_ReportError(cx,"show_in_cairo_context - argument must be a Cairo.Context");
-
-        }
-        pango::JSLayout::OWNERPTR myOwner;
-        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-        pango_cairo_show_layout(cairoContext, myOwner->get());
-        return JS_TRUE;
-    } HANDLE_CPP_EXCEPTION;
 }
 
 JSFunctionSpec *
@@ -112,9 +74,6 @@ pango::JSLayout::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
-        {"update_from_cairo_context",  update_from_cairo_context, 1},
-        {"show_in_cairo_context",      show_in_cairo_context,     1},
-
         {0}
     };
     return myFunctions;
@@ -149,20 +108,20 @@ pango::JSLayout::getPropertySwitch(NATIVE & theNative, unsigned long theID,
 {
     switch (theID) {
         case PROP_text:
-            *vp = as_jsval(cx, pango_layout_get_text(theNative.get()));
+            *vp = as_jsval(cx, pango_layout_get_text(theNative.get()->getLayout()));
             return JS_TRUE;
         case PROP_font_description:
             try {
                 // this getter returns a read-only, non-owned reference to the PangoFontDescription
                 // since we can't wrap that, we'll return a copy
-                PangoFontDescription * myCopy = pango_font_description_copy(pango_layout_get_font_description(theNative.get()));
+                PangoFontDescription * myCopy = pango_font_description_copy(pango_layout_get_font_description(theNative.get()->getLayout()));
                 JSFontDescription::NATIVE * wrappedCopy = new JSFontDescription::NATIVE(myCopy);
                 *vp = as_jsval(cx, JSFontDescription::OWNERPTR(wrappedCopy), wrappedCopy);
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         case PROP_context:
             try {
-                PangoContext * myContext = pango_layout_get_context(theNative.get());
+                PangoContext * myContext = pango_layout_get_context(theNative.get()->getLayout());
                 // pango_layout_get_context doesn't inc the refcount, so we have to (pass true) 
                 pango::JSContext::NATIVE * wrappedContext = new pango::JSContext::NATIVE(myContext, true);
                 *vp = as_jsval(cx, pango::JSContext::OWNERPTR(wrappedContext), wrappedContext);
@@ -179,16 +138,35 @@ pango::JSLayout::setPropertySwitch(NATIVE & theNative, unsigned long theID,
     switch (theID) {
         case PROP_text:
             try {
+
+                cairo_t* cairo = theNative.get()->getCairoContext();
+
+                //clear canvas
+                cairo_save(cairo);
+                cairo_set_operator (cairo, CAIRO_OPERATOR_CLEAR);
+                cairo_paint (cairo);
+                cairo_restore (cairo);
+
+                //write new text
                 string theText;
                 convertFrom(cx, *vp, theText);
-                pango_layout_set_text(theNative.get(), theText.c_str(), theText.size());
+                pango_layout_set_text(theNative.get()->getLayout(), 
+                                      theText.c_str(), theText.size());
+                pango_cairo_update_layout(cairo, 
+                                        theNative.get()->getLayout());
+                pango_cairo_show_layout(cairo,
+                                        theNative.get()->getLayout());
+                int width, height;
+                pango_layout_get_pixel_size(theNative.get()->getLayout(),
+                                            &width, &height);
+                //TODO: use width, height for image resizing
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         case PROP_font_description:
             try {
                 pango::JSFontDescription::OWNERPTR fontDesc;
                 convertFrom(cx, *vp, fontDesc);
-                pango_layout_set_font_description(theNative.get(), fontDesc->get());
+                pango_layout_set_font_description(theNative.get()->getLayout(), fontDesc->get());
                 return JS_TRUE;
             } HANDLE_CPP_EXCEPTION;
         default:
@@ -209,11 +187,19 @@ pango::JSLayout::Constructor(::JSContext *cx, JSObject *obj, uintN argc, jsval *
     pango::JSLayout * myNewObject = 0;
     NATIVE * newNative = 0;
 
+    dom::NodePtr myImageNode;
     if (argc == 1) {
-        cairo_t * cairoContext;
-        if (convertFrom(cx, argv[0], cairoContext)) {
+
+        if (convertFrom(cx, argv[0], myImageNode)) {
+
+            cairo_surface_t *mySurface = cairo::JSSurface::createFromImageNode(myImageNode);
+            cairo_t *cairoContext = cairo_create(mySurface);
+            cairo_set_source_rgb(cairoContext, 1.0, 0.0, 0.0); //TODO: use color
+
             PangoLayout * newLayout = pango_cairo_create_layout(cairoContext);
-            newNative = new NATIVE(newLayout);
+            PangoCairo* pangoCairo = new PangoCairo(newLayout, cairoContext);
+            newNative = new NATIVE(pangoCairo);
+            cairo_surface_destroy(mySurface);
         } else {
             JS_ReportError(cx,"Constructor for %s: first argument must be a Cairo.Context",ClassName());
             return JS_FALSE;

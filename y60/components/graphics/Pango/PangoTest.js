@@ -30,7 +30,6 @@
 */
 use("SceneViewer.js");
 
-plug("Cairo");
 plug("Pango");
 
 var ourShow = new SceneViewer(arguments);
@@ -42,7 +41,7 @@ ourShow.SceneViewer.setup = ourShow.setup;
 ourShow.setup = function() {
     ourShow.SceneViewer.setup();
     window.resize(1024, 768);
-    window.canvas.backgroundcolor = new Vector4f(0.0, 0.7, 0.9, 1.0);
+    window.canvas.backgroundcolor = new Vector4f(0.2, 0.8, 1.0, 1.0);
 
     var myImage = Modelling.createImage(window.scene, 1024, 1024, "BGRA");
     var myTexture  = Modelling.createTexture(window.scene, myImage);
@@ -51,17 +50,12 @@ ourShow.setup = function() {
     var myShape = Modelling.createQuad(window.scene, myMaterial.id, new Vector3f(-0.04, -0.06, -0.1), new Vector3f(0.04, 0.02, -0.1));
     var myNode = Modelling.createBody(window.scene.world, myShape.id);
 
-    var mySurface = new Cairo.Surface(myImage);
-    var cairoContext = new Cairo.Context(mySurface);
-    cairoContext.setAntialias(Cairo.ANTIALIAS_NONE);
-    cairoContext.setSourceRGB(255,0,0);
+    var myLayout = new Pango.Layout(myImage);
 
-    var myLayout = new Pango.Layout(cairoContext);
-    var myFontDesc = new Pango.FontDescription("Tele-Antiqua Regular 100");
+    var myFontDesc = new Pango.FontDescription("Alex Brush 100");
     myLayout.font_description = myFontDesc;
+
     myLayout.text = "\u1E78berl\u00E4nge";
-    myLayout.update_from_cairo_context(cairoContext);
-    myLayout.show_in_cairo_context(cairoContext);
     Logger.warning(myLayout.context);
     Logger.warning(myLayout.font_description);
 };
