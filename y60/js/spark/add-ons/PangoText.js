@@ -23,6 +23,9 @@ spark.PangoText.Constructor = function (Protected) {
     var _myText  = "";
     var _myImage = null;
 
+    var _myMaxWidth = null;
+    var _myMaxHeight = null;
+
     var _myStyle = {};
     var _myPangoLayout = null;
 
@@ -68,7 +71,13 @@ spark.PangoText.Constructor = function (Protected) {
         _myText = Protected.getString("text", "");
         _myStyle.fontName = Protected.getString("fontName", "Arial");
         _myStyle.fontSize = Protected.getString("fontSize", 23);
-        _myStyle.textColor = asColor(Protected.getString("textColor", "777777"));
+        _myStyle.textColor = asColor(Protected.getString("textColor", "777777ff"));
+        _myStyle.backgroundColor = Protected.getString("backgroundColor", null);
+        if (_myStyle.backgroundColor) {
+            _myStyle.backgroundColor = asColor(_myStyle.backgroundColor);
+        }
+        _myMaxWidth = Protected.getNumber("maxWidth", -1);
+        _myMaxHeight = Protected.getNumber("maxHeight", -1);
 
         _myImage = Modelling.createImage(window.scene, RENDER_AREA_SIZE, RENDER_AREA_SIZE, "BGRA");
         var myTexture  = Modelling.createTexture(window.scene, _myImage);
@@ -82,9 +91,22 @@ spark.PangoText.Constructor = function (Protected) {
         var description = _myStyle.fontName + " " + _myStyle.fontSize;
         var myFontDesc = new Pango.FontDescription(description);
         _myPangoLayout.font_description = myFontDesc;
+        if (_myMaxWidth > -1) {
+            _myPangoLayout.setWidth(_myMaxWidth);
+        }
+        if (_myMaxHeight > -1) {
+            _myPangoLayout.setHeight(_myMaxHeight);
+        }
         _myPangoLayout.setColor(new Vector4f(_myStyle.textColor[0],
-                                         _myStyle.textColor[1],
-                                         _myStyle.textColor[2],1.0));
+                                             _myStyle.textColor[1],
+                                             _myStyle.textColor[2],
+                                             _myStyle.textColor[3]));
+        if (_myStyle.backgroundColor) {
+            _myPangoLayout.setBackground(new Vector4f(_myStyle.backgroundColor[0],
+                                             _myStyle.backgroundColor[1],
+                                             _myStyle.backgroundColor[2],
+                                             _myStyle.backgroundColor[3]));
+        }
         Public.text = _myText;
     };
 
