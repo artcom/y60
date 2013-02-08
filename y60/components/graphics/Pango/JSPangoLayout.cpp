@@ -109,6 +109,13 @@ setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     cairo_paint (cairo);
     cairo_restore (cairo);
 
+    //clear canvas with background color
+    //cairo_save (cairo);
+    //cairo_set_operator (cairo, CAIRO_OPERATOR_SOURCE);
+    //cairo_set_source_rgba (cairo, 1.0, 1.0, 1.0, 1.0);
+    //cairo_paint (cairo);
+    //cairo_restore (cairo);
+
     //write new text
     pango_layout_set_text(layout, myText.c_str(), myText.size());
     pango_cairo_update_layout(cairo, layout);
@@ -118,7 +125,6 @@ setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     //return dimensions
     Vector2f dimensions(width, height);
-    AC_PRINT << "dimensions " << dimensions;
     *rval = as_jsval(cx, dimensions);
 
     return JS_TRUE;
