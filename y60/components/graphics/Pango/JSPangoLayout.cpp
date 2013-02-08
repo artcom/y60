@@ -89,6 +89,21 @@ setColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+setBackground(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("set background color");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    ensureParamCount(argc, 1);
+    Vector4f colorVector;
+    convertFrom(cx, argv[0], colorVector);
+    myOwner->get()->style.backgroundColor = colorVector;
+    return JS_TRUE;
+}
+
+static JSBool
 setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets text and returns dimensions of rendered text");
     DOC_END;
@@ -103,18 +118,20 @@ setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     string myText;
     convertFrom(cx, argv[0], myText);
 
-    //clear canvas
-    cairo_save(cairo);
-    cairo_set_operator (cairo, CAIRO_OPERATOR_CLEAR);
+    cairo_save (cairo);
+    if (myOwner->get()->style.backgroundColor[3] > 0) {
+        //clear canvas with background color
+        cairo_set_operator (cairo, CAIRO_OPERATOR_SOURCE);
+        Vector4f background = myOwner->get()->style.backgroundColor;
+        cairo_set_source_rgba (cairo, background[0], background[1], 
+                                      background[2], background[3]);
+    } else {
+        //clear canvas
+        cairo_set_operator (cairo, CAIRO_OPERATOR_CLEAR);
+    }
     cairo_paint (cairo);
     cairo_restore (cairo);
 
-    //clear canvas with background color
-    //cairo_save (cairo);
-    //cairo_set_operator (cairo, CAIRO_OPERATOR_SOURCE);
-    //cairo_set_source_rgba (cairo, 1.0, 1.0, 1.0, 1.0);
-    //cairo_paint (cairo);
-    //cairo_restore (cairo);
 
     //write new text
     pango_layout_set_text(layout, myText.c_str(), myText.size());
@@ -130,6 +147,44 @@ setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets the maximum text block width (wrap width). Default is '-1' which means no wrapping.");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    ensureParamCount(argc, 1);
+    int width;
+    convertFrom(cx, argv[0], width);
+    width *= 1000; //convert from spark-pixel-unit to pango-unit
+
+    PangoLayout *layout = myOwner->get()->getLayout();
+    pango_layout_set_width(layout, width);
+
+    return JS_TRUE;
+}
+
+static JSBool
+setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets the maximum height of an text block. Negative and positive values allowed (resulting in diverse ellipsis behavior). See pango docs. Default is '-1'.");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    ensureParamCount(argc, 1);
+    int height;
+    convertFrom(cx, argv[0], height);
+    height *= 1000; //convert from spark-pixel-unit to pango-unit
+
+    PangoLayout *layout = myOwner->get()->getLayout();
+    pango_layout_set_height(layout, height);
+
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 pango::JSLayout::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -137,7 +192,10 @@ pango::JSLayout::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"setColor",             setColor,                1},
+        {"setBackground",        setBackground,           1},
         {"setText",              setText,                 1}, //returns dimensions
+        {"setWidth",             setWidth,                1},
+        {"setHeight",            setHeight,               1},
         {0}
     };
     return myFunctions;

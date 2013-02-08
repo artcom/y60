@@ -44,12 +44,17 @@ namespace jslib {
 
     namespace pango {
 
+        struct StyleStore {
+            asl::Vector4f backgroundColor;
+        };
+
         //use layout with CairoContext
         class PangoCairo {
             public:
                 PangoCairo(PangoLayout * theLayout, cairo_t * theCairoContext) :
                     _myPangoLayout(theLayout),
                     _myCairoContext(theCairoContext) { 
+                        style.backgroundColor[3] = -1;
                     };
                 ~PangoCairo() {
                     if (_myPangoLayout) {
@@ -63,6 +68,7 @@ namespace jslib {
                 cairo_t* getCairoContext() {
                     return _myCairoContext;
                 }
+                StyleStore style;
             private:
                 PangoLayout* _myPangoLayout;
                 cairo_t* _myCairoContext;
