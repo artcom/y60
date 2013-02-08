@@ -54,7 +54,8 @@ ourShow.setup = function() {
     myLayout.setColor([0.1,0.8,0.4,1.0]);
     var myFontDesc = new Pango.FontDescription("Alex Brush 100");
     myLayout.font_description = myFontDesc;
-    myLayout.text = "\u1E78berl\u00E4nge";
+    var dimensions = myLayout.setText("\u1E78berl\u00E4nge");
+    Logger.warning("text dimensions: "+ dimensions);
     Logger.warning(myLayout.context);
     Logger.warning(myLayout.font_description);
 };

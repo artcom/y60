@@ -63,8 +63,8 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_END;
     pango::JSLayout::OWNERPTR myOwner;
     convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-    const char * theText = pango_layout_get_text(myOwner->get()->getLayout());
-    std::string myStringRep = string("Pango.Layout: '"+string(theText)+"'");
+    const char * myText = pango_layout_get_text(myOwner->get()->getLayout());
+    std::string myStringRep = string("Pango.Layout: '"+string(myText)+"'");
     *rval = as_jsval(cx, myStringRep);
     return JS_TRUE;
 }
@@ -88,6 +88,42 @@ setColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets text and returns dimensions of rendered text");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    cairo_t* cairo = myOwner->get()->getCairoContext();
+    PangoLayout * layout = myOwner->get()->getLayout();
+
+    ensureParamCount(argc, 1);
+    string myText;
+    convertFrom(cx, argv[0], myText);
+
+    //clear canvas
+    cairo_save(cairo);
+    cairo_set_operator (cairo, CAIRO_OPERATOR_CLEAR);
+    cairo_paint (cairo);
+    cairo_restore (cairo);
+
+    //write new text
+    pango_layout_set_text(layout, myText.c_str(), myText.size());
+    pango_cairo_update_layout(cairo, layout);
+    pango_cairo_show_layout(cairo, layout);
+    int width, height;
+    pango_layout_get_pixel_size(layout, &width, &height);
+
+    //return dimensions
+    Vector2f dimensions(width, height);
+    AC_PRINT << "dimensions " << dimensions;
+    *rval = as_jsval(cx, dimensions);
+
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 pango::JSLayout::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -95,6 +131,7 @@ pango::JSLayout::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"setColor",             setColor,                1},
+        {"setText",              setText,                 1}, //returns dimensions
         {0}
     };
     return myFunctions;
@@ -106,7 +143,6 @@ pango::JSLayout::Properties() {
     static JSPropertySpec myProperties[] = {
         {"font_description", PROP_font_description, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {"context", PROP_context, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_READONLY},
-        {"text", PROP_text, JSPROP_ENUMERATE|JSPROP_PERMANENT},
         {0}
     };
     return myProperties;
@@ -129,9 +165,6 @@ pango::JSLayout::getPropertySwitch(NATIVE & theNative, unsigned long theID,
         ::JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        case PROP_text:
-            *vp = as_jsval(cx, pango_layout_get_text(theNative.get()->getLayout()));
-            return JS_TRUE;
         case PROP_font_description:
             try {
                 // this getter returns a read-only, non-owned reference to the PangoFontDescription
@@ -158,32 +191,6 @@ pango::JSLayout::setPropertySwitch(NATIVE & theNative, unsigned long theID,
         ::JSContext *cx, JSObject *obj, jsval id, jsval *vp)
 {
     switch (theID) {
-        case PROP_text:
-            try {
-
-                cairo_t* cairo = theNative.get()->getCairoContext();
-
-                //clear canvas
-                cairo_save(cairo);
-                cairo_set_operator (cairo, CAIRO_OPERATOR_CLEAR);
-                cairo_paint (cairo);
-                cairo_restore (cairo);
-
-                //write new text
-                string theText;
-                convertFrom(cx, *vp, theText);
-                pango_layout_set_text(theNative.get()->getLayout(), 
-                                      theText.c_str(), theText.size());
-                pango_cairo_update_layout(cairo, 
-                                        theNative.get()->getLayout());
-                pango_cairo_show_layout(cairo,
-                                        theNative.get()->getLayout());
-                int width, height;
-                pango_layout_get_pixel_size(theNative.get()->getLayout(),
-                                            &width, &height);
-                //TODO: use width, height for image resizing
-                return JS_TRUE;
-            } HANDLE_CPP_EXCEPTION;
         case PROP_font_description:
             try {
                 pango::JSFontDescription::OWNERPTR fontDesc;
@@ -196,6 +203,7 @@ pango::JSLayout::setPropertySwitch(NATIVE & theNative, unsigned long theID,
     }
 }
 
+/////////////////////////////////////////////////////// Constructor
 JSBool
 pango::JSLayout::Constructor(::JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
