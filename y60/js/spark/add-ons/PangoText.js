@@ -6,7 +6,6 @@
  * setting the 'text' property.
  */
 
-plug("Cairo");
 plug("Pango");
 
 
@@ -23,8 +22,11 @@ spark.PangoText.Constructor = function (Protected) {
 
     var _myText  = "";
     var _myImage = null;
-    var _myFont = null;
-    var _mySize = null;
+
+    var _myStyle = {};
+    var _myPangoLayout = null;
+
+    var RENDER_AREA_SIZE = 700; //TODO: maybe this should be maxwidth/maxheight later
 
     /////////////////////
     // Private Methods //
@@ -39,17 +41,11 @@ spark.PangoText.Constructor = function (Protected) {
     });
     
     Protected.render = function () {
-        var mySurface = new Cairo.Surface(_myImage);
-        var cairoContext = new Cairo.Context(mySurface);
-        cairoContext.setAntialias(Cairo.ANTIALIAS_NONE);
-        cairoContext.setSourceRGB(0,0,0);
-
-        var myLayout = new Pango.Layout(cairoContext);
-        var myFontDesc = new Pango.FontDescription(_myFont + " " + _mySize);
-        myLayout.font_description = myFontDesc;
-        myLayout.text = _myText;
-        myLayout.update_from_cairo_context(cairoContext);
-        myLayout.show_in_cairo_context(cairoContext);
+        applyImageFilter(_myImage, "resizebox", [RENDER_AREA_SIZE, RENDER_AREA_SIZE]);
+        var dimensions = _myPangoLayout.setText(_myText);
+        applyImageFilter(_myImage, "crop", [0,0,dimensions[0],dimensions[1]]);
+        Public.width = dimensions[0];
+        Public.height = dimensions[1];
     };
     
     ////////////////////
@@ -70,22 +66,25 @@ spark.PangoText.Constructor = function (Protected) {
     Public.realize = function () {
 
         _myText = Protected.getString("text", "");
-        _myFont = "Atrissi-ATV";
-        _mySize = 22;
-        _myText = readFileAsString("text.txt");
+        _myStyle.fontName = Protected.getString("fontName", "Arial");
+        _myStyle.fontSize = Protected.getString("fontSize", 23);
+        _myStyle.textColor = asColor(Protected.getString("textColor", "777777"));
 
-
-        _myImage = Modelling.createImage(window.scene, 700, 700, "BGRA");
+        _myImage = Modelling.createImage(window.scene, RENDER_AREA_SIZE, RENDER_AREA_SIZE, "BGRA");
         var myTexture  = Modelling.createTexture(window.scene, _myImage);
+        myTexture.name = Public.name + "-texture";
         myTexture.wrapmode = "clamp_to_edge";
-        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myTexture);
-
+        var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
+                myTexture, Public.name + "-material", true);
 
         Base.realize(myMaterial);
-
-        //var myShape = Modelling.createQuad(window.scene, myMaterial.id, new Vector3f(50, 50, 1), new Vector3f(800, 800, 2));
-        //var myNode = Modelling.createBody(window.scene.world, myShape.id);
-        
+        _myPangoLayout = new Pango.Layout(_myImage);
+        var description = _myStyle.fontName + " " + _myStyle.fontSize;
+        var myFontDesc = new Pango.FontDescription(description);
+        _myPangoLayout.font_description = myFontDesc;
+        _myPangoLayout.setColor(new Vector4f(_myStyle.textColor[0],
+                                         _myStyle.textColor[1],
+                                         _myStyle.textColor[2],1.0));
         Public.text = _myText;
     };
 
