@@ -72,10 +72,14 @@ spark.PangoText.Constructor = function (Protected) {
         return _myImage;
     });
     
-    Protected.render = function () {
+    Protected.render = function (debug) {
         applyImageFilter(_myImage, "resizebox", [RENDER_AREA_SIZE, RENDER_AREA_SIZE]);
         var dimensions = _myPangoLayout.setText(_myText);
         //for some fonts small parts of the letters are drawn outside the box given by dimension
+        if (debug) {
+            _myPangoLayout.saveToPNG();
+        }
+
         //TODO: make this configurable?
         dimensions[0] += 10;
         dimensions[1] += 10;
@@ -165,6 +169,9 @@ spark.PangoText.Constructor = function (Protected) {
         Base.postRealize();
     };
 
+    Public.debug = function() {
+        Protected.render(true);
+    };
 
     //////////////////////////////////////////////////Getter/Setter
     Public.__defineGetter__("textId", function () {
