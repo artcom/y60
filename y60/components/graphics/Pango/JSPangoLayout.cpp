@@ -185,6 +185,43 @@ setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+setIndent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets the indentation of first line of each paragraph. May be negative.");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    ensureParamCount(argc, 1);
+    int indent;
+    convertFrom(cx, argv[0], indent);
+    indent *= 1000; //convert from spark-pixel-unit to pango-unit
+
+    PangoLayout *layout = myOwner->get()->getLayout();
+    pango_layout_set_indent(layout, indent);
+
+    return JS_TRUE;
+}
+
+static JSBool
+setSpacing(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets (additional) spacing between lines in pixel and thus the lineheight. Negative values are possible.");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    ensureParamCount(argc, 1);
+    float spacing;
+    convertFrom(cx, argv[0], spacing);
+
+    PangoLayout *layout = myOwner->get()->getLayout();
+    pango_layout_set_spacing(layout, spacing * PANGO_SCALE);
+
+    return JS_TRUE;
+}
+
 JSFunctionSpec *
 pango::JSLayout::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -196,6 +233,8 @@ pango::JSLayout::Functions() {
         {"setText",              setText,                 1}, //returns dimensions
         {"setWidth",             setWidth,                1},
         {"setHeight",            setHeight,               1},
+        {"setIndent",            setIndent,               1},
+        {"setSpacing",           setSpacing,              1},
         {0}
     };
     return myFunctions;
