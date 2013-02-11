@@ -115,6 +115,7 @@ spark.PangoText.Constructor = function (Protected) {
         _myMaxHeight = Protected.getNumber("maxHeight", -1);
         _myStyle.lineSpacing = Protected.getString("lineSpacing", null);
         _myStyle.indent = Protected.getString("indent", null);
+        _myStyle.hAlign = Protected.getString("hAlign", null);
 
         _myImage = Modelling.createImage(window.scene, RENDER_AREA_SIZE, RENDER_AREA_SIZE, "BGRA");
         var myTexture  = Modelling.createTexture(window.scene, _myImage);
@@ -149,6 +150,9 @@ spark.PangoText.Constructor = function (Protected) {
         }
         if (_myStyle.indent) {
             _myPangoLayout.setIndent(_myStyle.indent);
+        }
+        if (_myStyle.hAlign) {
+            _myPangoLayout.setAlignment(_myStyle.hAlign);
         }
         Public.text = _myText;
     };
