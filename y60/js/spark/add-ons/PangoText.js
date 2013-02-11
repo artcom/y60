@@ -21,6 +21,9 @@ spark.PangoText.Constructor = function (Protected) {
     /////////////////////
 
     var _myText  = "";
+    var _myTextId = null;
+    var _myTextItem = null;
+
     var _myImage = null;
 
     var _myMaxWidth = null;
@@ -35,6 +38,32 @@ spark.PangoText.Constructor = function (Protected) {
     // Private Methods //
     /////////////////////
     
+    Protected.handleI18nLanguage = function(e) {
+        applyTextItemData();
+    };
+
+    function attachToI18nItem(theItemId) {
+        if (_myTextItem) {
+            _myTextItem.removeEventListener(spark.I18nEvent.LANGUAGE,
+                                            Protected.handleI18nLanguage);
+            _myTextItem = null;
+        }
+        if (theItemId) {
+            _myTextItem = Public.getI18nItemByName(theItemId);
+            if (!_myTextItem) {
+                Logger.fatal("no i18n item named " + theItemId);
+            }
+            _myTextItem.addEventListener(spark.I18nEvent.LANGUAGE,
+                    Protected.handleI18nLanguage);
+            applyTextItemData();
+        } else {
+            Public.text = "";
+        }
+    }
+    function applyTextItemData() {
+        //TODO: font style merging needed? (done by widget/Text)
+        Public.text = _myTextItem.text;
+    }
    
     ///////////////////////
     // Protected Methods //
@@ -72,6 +101,9 @@ spark.PangoText.Constructor = function (Protected) {
     Public.realize = function () {
 
         _myText = Protected.getString("text", "");
+        // handle internationalization
+        _myTextId = Protected.getString("textId", "");
+
         _myStyle.fontName = Protected.getString("fontName", "Arial");
         _myStyle.fontSize = Protected.getString("fontSize", 23);
         _myStyle.textColor = asColor(Protected.getString("textColor", "777777ff"));
@@ -123,6 +155,39 @@ spark.PangoText.Constructor = function (Protected) {
 
     Base.postRealize = Public.postRealize;
     Public.postRealize = function () {
+        if (_myTextId) {
+            attachToI18nItem(_myTextId);
+        }
         Base.postRealize();
     };
+
+
+    //////////////////////////////////////////////////Getter/Setter
+    Public.__defineGetter__("textId", function () {
+        return _myTextId;
+    });
+    Public.__defineSetter__("textId", function (id) {
+        _myTextId = id;
+        attachToI18nItem(id);
+    });
+    Public.__defineGetter__("i18nItem", function () {
+        return Public.textId;
+    });
+    Public.__defineSetter__("i18nItem", function (id) {
+        Public.textId = id;
+    });
+    Public.__defineGetter__("maxWidth", function () {
+        return _myMaxWidth;
+    });
+    Public.__defineSetter__("maxWidth", function (w) {
+        _myMaxWidth = w;
+        Protected.render();
+    });
+    Public.__defineGetter__("maxHeight", function () {
+        return _myMaxHeight;
+    });
+    Public.__defineSetter__("maxHeight", function (h) { 
+        _myMaxHeight = h; 
+        Protected.render();
+    });
 };
