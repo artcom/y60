@@ -223,6 +223,31 @@ setSpacing(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 }
 
 static JSBool
+setAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sets alignment. Parameter should one of 'left', 'center', 'right'.");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    ensureParamCount(argc, 1);
+    std::string alignment;
+    convertFrom(cx, argv[0], alignment);
+
+    PangoAlignment pangoAlignment = PANGO_ALIGN_LEFT;
+    if (alignment == "right") {
+        pangoAlignment = PANGO_ALIGN_RIGHT;
+    } else if (alignment == "center") {
+        pangoAlignment = PANGO_ALIGN_CENTER;
+    }
+
+    PangoLayout *layout = myOwner->get()->getLayout();
+    pango_layout_set_alignment(layout, pangoAlignment);
+
+    return JS_TRUE;
+}
+
+static JSBool
 saveToPNG(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("save cairo surface to png");
     DOC_END;
@@ -252,6 +277,7 @@ pango::JSLayout::Functions() {
         {"setHeight",            setHeight,               1},
         {"setIndent",            setIndent,               1},
         {"setSpacing",           setSpacing,              1},
+        {"setAlignment",         setAlignment,            1},
         {"saveToPNG",            saveToPNG,               0},
         {0}
     };
