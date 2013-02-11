@@ -222,6 +222,23 @@ setSpacing(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+saveToPNG(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("save cairo surface to png");
+    DOC_END;
+
+    pango::JSLayout::OWNERPTR myOwner;
+    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+
+    cairo_t* cairoContext = myOwner->get()->getCairoContext();
+    cairo_surface_t *cairoSurface = cairo_get_target(cairoContext);
+    cairo_status_t status = cairo_surface_write_to_png(cairoSurface, "pango_rendered.png");
+    if (status == CAIRO_STATUS_SUCCESS) {
+        return JS_TRUE;
+    } 
+    return JS_FALSE;
+}
+
 JSFunctionSpec *
 pango::JSLayout::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
@@ -235,6 +252,7 @@ pango::JSLayout::Functions() {
         {"setHeight",            setHeight,               1},
         {"setIndent",            setIndent,               1},
         {"setSpacing",           setSpacing,              1},
+        {"saveToPNG",            saveToPNG,               0},
         {0}
     };
     return myFunctions;
