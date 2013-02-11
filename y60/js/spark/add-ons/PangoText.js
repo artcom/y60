@@ -46,6 +46,10 @@ spark.PangoText.Constructor = function (Protected) {
     Protected.render = function () {
         applyImageFilter(_myImage, "resizebox", [RENDER_AREA_SIZE, RENDER_AREA_SIZE]);
         var dimensions = _myPangoLayout.setText(_myText);
+        //for some fonts small parts of the letters are drawn outside the box given by dimension
+        //TODO: make this configurable?
+        dimensions[0] += 10;
+        dimensions[1] += 10;
         applyImageFilter(_myImage, "crop", [0,0,dimensions[0],dimensions[1]]);
         Public.width = dimensions[0];
         Public.height = dimensions[1];
@@ -63,7 +67,6 @@ spark.PangoText.Constructor = function (Protected) {
         _myText = theValue;
         Protected.render();
     });
-
 
     Base.realize = Public.realize;
     Public.realize = function () {
