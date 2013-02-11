@@ -132,9 +132,9 @@ setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     cairo_paint (cairo);
     cairo_restore (cairo);
 
-
     //write new text
-    pango_layout_set_text(layout, myText.c_str(), myText.size());
+    //if there are no tags in text we could also use pango_layout_set_text
+    pango_layout_set_markup(layout, myText.c_str(), myText.size());
     pango_cairo_update_layout(cairo, layout);
     pango_cairo_show_layout(cairo, layout);
     int width, height;
