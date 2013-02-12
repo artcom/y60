@@ -294,17 +294,23 @@ saveToPNG(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("save cairo surface to png");
     DOC_PARAM("theFilename", "filename of saved image", DOC_TYPE_STRING);
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-
-    cairo_t* cairoContext = myOwner->get()->getCairoContext();
-    cairo_surface_t *cairoSurface = cairo_get_target(cairoContext);
-    cairo_status_t status = cairo_surface_write_to_png(cairoSurface, "pango_rendered.png");
-    if (status == CAIRO_STATUS_SUCCESS) {
-        return JS_TRUE;
-    } 
-    return JS_FALSE;
+        std::string filename;
+        if (!convertFrom(cx, argv[0], filename)) {
+            JS_ReportError(cx, "JSPangoLayout::setAlignment(): argument #1 must be a string");
+            return JS_FALSE;
+        }
+        cairo_t* cairoContext = myOwner->get()->getCairoContext();
+        cairo_surface_t *cairoSurface = cairo_get_target(cairoContext);
+        cairo_status_t status = cairo_surface_write_to_png(cairoSurface, filename.c_str());
+        if (status == CAIRO_STATUS_SUCCESS) {
+            return JS_TRUE;
+        } 
+        return JS_FALSE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 JSFunctionSpec *
@@ -321,7 +327,7 @@ pango::JSLayout::Functions() {
         {"setIndent",            setIndent,               1},
         {"setSpacing",           setSpacing,              1},
         {"setAlignment",         setAlignment,            1},
-        {"saveToPNG",            saveToPNG,               0},
+        {"saveToPNG",            saveToPNG,               1},
         {0}
     };
     return myFunctions;

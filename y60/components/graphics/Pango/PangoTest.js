@@ -58,7 +58,7 @@ ourShow.setup = function() {
     Logger.warning("text dimensions: "+ dimensions);
     Logger.warning(myLayout.context);
     Logger.warning(myLayout.font_description);
-    myLayout.saveToPNG();
+    myLayout.saveToPNG("pango_rendered.png");
 };
 
 
