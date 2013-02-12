@@ -253,27 +253,6 @@ cairo::JSSurface::setPropertySwitch(NATIVE & theNative, unsigned long theID,
     return JS_FALSE;
 }
 
-void
-cairo::JSSurface::convertRGBAtoBGRA(ResizeableRasterPtr theOld, ResizeableRasterPtr theNew) {
-    ReadableBlock  &myOld = theOld->pixels();
-    WriteableBlock &myNew = theNew->pixels();
-
-    if(myOld.size() != myNew.size()) {
-        AC_FATAL << "Trying to convert between rasters with unequal sizes.";
-    }
-
-    const unsigned char *src = const_cast<unsigned char*>(myOld.begin());
-    unsigned char *dst = myNew.begin();
-    unsigned int l = myOld.size();
-    unsigned int i;
-    for(i = 0; i < l; i += 4) {
-        dst[i+0] = src[i+2];
-        dst[i+1] = src[i+1];
-        dst[i+2] = src[i+0];
-        dst[i+3] = src[i+3];
-    }
-}
-
 JSBool
 cairo::JSSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
