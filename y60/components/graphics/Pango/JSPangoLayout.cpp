@@ -169,19 +169,23 @@ setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the maximum text block width (wrap width). Default is '-1' which means no wrapping.");
     DOC_PARAM("theWidth", "text width", DOC_TYPE_INTEGER);
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+        ensureParamCount(argc, 1);
+        int width;
+        if (!convertFrom(cx, argv[0], width)) {
+            JS_ReportError(cx, "JSPangoLayout::setWidth(): argument #1 must be a integer");
+            return JS_FALSE;
+        }
+        width *= 1000; //convert from spark-pixel-unit to pango-unit
 
-    ensureParamCount(argc, 1);
-    int width;
-    convertFrom(cx, argv[0], width);
-    width *= 1000; //convert from spark-pixel-unit to pango-unit
+        PangoLayout *layout = myOwner->get()->getLayout();
+        pango_layout_set_width(layout, width);
 
-    PangoLayout *layout = myOwner->get()->getLayout();
-    pango_layout_set_width(layout, width);
-
-    return JS_TRUE;
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
