@@ -408,12 +408,12 @@ pango::JSLayout::Constructor(::JSContext *cx, JSObject *obj, uintN argc, jsval *
             newNative = new NATIVE(pangoCairo);
             cairo_surface_destroy(mySurface);
         } else {
-            JS_ReportError(cx,"Constructor for %s: first argument must be a Cairo.Context",ClassName());
+            JS_ReportError(cx,"Constructor for %s: first argument must be a ImageNode",ClassName());
             return JS_FALSE;
         };
 
     } else {
-        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected none () %d",ClassName(), argc);
+        JS_ReportError(cx,"Constructor for %s: bad number of arguments: expected one, got %d",ClassName(), argc);
         return JS_FALSE;
     }
 
