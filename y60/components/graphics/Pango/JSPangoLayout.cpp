@@ -74,6 +74,7 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("set text color");
+    DOC_PARAM("theColor", "text color", DOC_TYPE_VECTOR4F);
     DOC_END;
     try {
         pango::JSLayout::OWNERPTR myOwner;
@@ -97,6 +98,7 @@ setColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setBackground(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("set background color");
+    DOC_PARAM("theColor", "background color", DOC_TYPE_VECTOR4F);
     DOC_END;
     try {
         pango::JSLayout::OWNERPTR myOwner;
@@ -116,6 +118,7 @@ setBackground(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 static JSBool
 setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets text and returns dimensions of rendered text");
+    DOC_PARAM("theText", "text to render", DOC_TYPE_STRING);
     DOC_END;
     try {
         pango::JSLayout::OWNERPTR myOwner;
@@ -164,6 +167,7 @@ setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the maximum text block width (wrap width). Default is '-1' which means no wrapping.");
+    DOC_PARAM("theWidth", "text width", DOC_TYPE_INTEGER);
     DOC_END;
 
     pango::JSLayout::OWNERPTR myOwner;
@@ -183,6 +187,7 @@ setWidth(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the maximum height of an text block. Negative and positive values allowed (resulting in diverse ellipsis behavior). See pango docs. Default is '-1'.");
+    DOC_PARAM("theHeight", "text height", DOC_TYPE_INTEGER);
     DOC_END;
     try {
         pango::JSLayout::OWNERPTR myOwner;
@@ -206,6 +211,7 @@ setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setIndent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the indentation of first line of each paragraph. May be negative.");
+    DOC_PARAM("theIndent", "text indentation", DOC_TYPE_INTEGER);
     DOC_END;
     try {
         pango::JSLayout::OWNERPTR myOwner;
@@ -229,6 +235,7 @@ setIndent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setSpacing(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets (additional) spacing between lines in pixel and thus the lineheight. Negative values are possible.");
+    DOC_PARAM("theSpacing", "text spacing", DOC_TYPE_FLOAT);
     DOC_END;
     try {
         pango::JSLayout::OWNERPTR myOwner;
@@ -251,6 +258,7 @@ setSpacing(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets alignment. Parameter should one of 'left', 'center', 'right'.");
+    DOC_PARAM("theAlignment", "text alignment", DOC_TYPE_STRING);
     DOC_END;
     try {
         pango::JSLayout::OWNERPTR myOwner;
@@ -280,6 +288,7 @@ setAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 static JSBool
 saveToPNG(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("save cairo surface to png");
+    DOC_PARAM("theFilename", "filename of saved image", DOC_TYPE_STRING);
     DOC_END;
 
     pango::JSLayout::OWNERPTR myOwner;
