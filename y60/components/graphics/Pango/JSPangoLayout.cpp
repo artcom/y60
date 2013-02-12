@@ -61,90 +61,104 @@ static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
     DOC_END;
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-    const char * myText = pango_layout_get_text(myOwner->get()->getLayout());
-    std::string myStringRep = string("Pango.Layout: '"+string(myText)+"'");
-    *rval = as_jsval(cx, myStringRep);
-    return JS_TRUE;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+        const char * myText = pango_layout_get_text(myOwner->get()->getLayout());
+        std::string myStringRep = string("Pango.Layout: '"+string(myText)+"'");
+        *rval = as_jsval(cx, myStringRep);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
 setColor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("set text color");
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-
-    ensureParamCount(argc, 1);
-    Vector4f colorVector;
-    convertFrom(cx, argv[0], colorVector);
-    cairo_set_source_rgba(myOwner->get()->getCairoContext(), 
-                          colorVector[0],
-                          colorVector[1],
-                          colorVector[2],
-                          colorVector[3]);
-    return JS_TRUE;
+        ensureParamCount(argc, 1);
+        Vector4f colorVector;
+        if (!convertFrom(cx, argv[0], colorVector)) {
+            JS_ReportError(cx, "JSPangoLayout::setColor(): argument #1 must be a Vector4f");
+            return JS_FALSE;
+        }
+        cairo_set_source_rgba(myOwner->get()->getCairoContext(), 
+                              colorVector[0],
+                              colorVector[1],
+                              colorVector[2],
+                              colorVector[3]);
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
 setBackground(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("set background color");
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
-
-    ensureParamCount(argc, 1);
-    Vector4f colorVector;
-    convertFrom(cx, argv[0], colorVector);
-    myOwner->get()->style.backgroundColor = colorVector;
-    return JS_TRUE;
+        ensureParamCount(argc, 1);
+        Vector4f colorVector;
+        if (!convertFrom(cx, argv[0], colorVector)) {
+            JS_ReportError(cx, "JSPangoLayout::setBackground(): argument #1 must be a Vector4f");
+            return JS_FALSE;
+        }
+        myOwner->get()->style.backgroundColor = colorVector;
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
 setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets text and returns dimensions of rendered text");
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+        cairo_t* cairo = myOwner->get()->getCairoContext();
+        PangoLayout * layout = myOwner->get()->getLayout();
 
-    cairo_t* cairo = myOwner->get()->getCairoContext();
-    PangoLayout * layout = myOwner->get()->getLayout();
+        ensureParamCount(argc, 1);
+        std::string myText;
+        if (!convertFrom(cx, argv[0], myText)) {
+            JS_ReportError(cx, "JSPangoLayout::setText(): argument #1 must be a string");
+            return JS_FALSE;
+        }
 
-    ensureParamCount(argc, 1);
-    string myText;
-    convertFrom(cx, argv[0], myText);
+        cairo_save (cairo);
+        if (myOwner->get()->style.backgroundColor[3] > 0) {
+            //clear canvas with background color
+            cairo_set_operator (cairo, CAIRO_OPERATOR_SOURCE);
+            Vector4f background = myOwner->get()->style.backgroundColor;
+            cairo_set_source_rgba (cairo, background[0], background[1], 
+                                          background[2], background[3]);
+        } else {
+            //clear canvas
+            cairo_set_operator (cairo, CAIRO_OPERATOR_CLEAR);
+        }
+        cairo_paint (cairo);
+        cairo_restore (cairo);
 
-    cairo_save (cairo);
-    if (myOwner->get()->style.backgroundColor[3] > 0) {
-        //clear canvas with background color
-        cairo_set_operator (cairo, CAIRO_OPERATOR_SOURCE);
-        Vector4f background = myOwner->get()->style.backgroundColor;
-        cairo_set_source_rgba (cairo, background[0], background[1], 
-                                      background[2], background[3]);
-    } else {
-        //clear canvas
-        cairo_set_operator (cairo, CAIRO_OPERATOR_CLEAR);
-    }
-    cairo_paint (cairo);
-    cairo_restore (cairo);
+        //write new text
+        //if there are no tags in text we could also use pango_layout_set_text
+        pango_layout_set_markup(layout, myText.c_str(), myText.size());
+        pango_cairo_update_layout(cairo, layout);
+        pango_cairo_show_layout(cairo, layout);
+        int width, height;
+        pango_layout_get_pixel_size(layout, &width, &height);
 
-    //write new text
-    //if there are no tags in text we could also use pango_layout_set_text
-    pango_layout_set_markup(layout, myText.c_str(), myText.size());
-    pango_cairo_update_layout(cairo, layout);
-    pango_cairo_show_layout(cairo, layout);
-    int width, height;
-    pango_layout_get_pixel_size(layout, &width, &height);
+        //return dimensions
+        Vector2f dimensions(width, height);
+        *rval = as_jsval(cx, dimensions);
 
-    //return dimensions
-    Vector2f dimensions(width, height);
-    *rval = as_jsval(cx, dimensions);
-
-    return JS_TRUE;
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
@@ -170,81 +184,97 @@ static JSBool
 setHeight(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the maximum height of an text block. Negative and positive values allowed (resulting in diverse ellipsis behavior). See pango docs. Default is '-1'.");
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+        ensureParamCount(argc, 1);
+        int height;
+        if (!convertFrom(cx, argv[0], height)) {
+            JS_ReportError(cx, "JSPangoLayout::setHeight(): argument #1 must be a integer");
+            return JS_FALSE;
+        }
+        height *= 1000; //convert from spark-pixel-unit to pango-unit
 
-    ensureParamCount(argc, 1);
-    int height;
-    convertFrom(cx, argv[0], height);
-    height *= 1000; //convert from spark-pixel-unit to pango-unit
+        PangoLayout *layout = myOwner->get()->getLayout();
+        pango_layout_set_height(layout, height);
 
-    PangoLayout *layout = myOwner->get()->getLayout();
-    pango_layout_set_height(layout, height);
-
-    return JS_TRUE;
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
 setIndent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets the indentation of first line of each paragraph. May be negative.");
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+        ensureParamCount(argc, 1);
+        int indent;
+        if (!convertFrom(cx, argv[0], indent)) {
+            JS_ReportError(cx, "JSPangoLayout::setIndent(): argument #1 must be a integer");
+            return JS_FALSE;
+        }
+        indent *= 1000; //convert from spark-pixel-unit to pango-unit
 
-    ensureParamCount(argc, 1);
-    int indent;
-    convertFrom(cx, argv[0], indent);
-    indent *= 1000; //convert from spark-pixel-unit to pango-unit
+        PangoLayout *layout = myOwner->get()->getLayout();
+        pango_layout_set_indent(layout, indent);
 
-    PangoLayout *layout = myOwner->get()->getLayout();
-    pango_layout_set_indent(layout, indent);
-
-    return JS_TRUE;
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
 setSpacing(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets (additional) spacing between lines in pixel and thus the lineheight. Negative values are possible.");
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+        ensureParamCount(argc, 1);
+        float spacing;
+        if (!convertFrom(cx, argv[0], spacing)) {
+            JS_ReportError(cx, "JSPangoLayout::setSpacing(): argument #1 must be a float");
+            return JS_FALSE;
+        }
 
-    ensureParamCount(argc, 1);
-    float spacing;
-    convertFrom(cx, argv[0], spacing);
+        PangoLayout *layout = myOwner->get()->getLayout();
+        pango_layout_set_spacing(layout, spacing * PANGO_SCALE);
 
-    PangoLayout *layout = myOwner->get()->getLayout();
-    pango_layout_set_spacing(layout, spacing * PANGO_SCALE);
-
-    return JS_TRUE;
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
 setAlignment(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets alignment. Parameter should one of 'left', 'center', 'right'.");
     DOC_END;
+    try {
+        pango::JSLayout::OWNERPTR myOwner;
+        convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
-    pango::JSLayout::OWNERPTR myOwner;
-    convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
+        ensureParamCount(argc, 1);
+        std::string alignment;
+        if (!convertFrom(cx, argv[0], alignment)) {
+            JS_ReportError(cx, "JSPangoLayout::setAlignment(): argument #1 must be a string");
+            return JS_FALSE;
+        }
 
-    ensureParamCount(argc, 1);
-    std::string alignment;
-    convertFrom(cx, argv[0], alignment);
+        PangoAlignment pangoAlignment = PANGO_ALIGN_LEFT;
+        if (alignment == "right") {
+            pangoAlignment = PANGO_ALIGN_RIGHT;
+        } else if (alignment == "center") {
+            pangoAlignment = PANGO_ALIGN_CENTER;
+        }
 
-    PangoAlignment pangoAlignment = PANGO_ALIGN_LEFT;
-    if (alignment == "right") {
-        pangoAlignment = PANGO_ALIGN_RIGHT;
-    } else if (alignment == "center") {
-        pangoAlignment = PANGO_ALIGN_CENTER;
-    }
+        PangoLayout *layout = myOwner->get()->getLayout();
+        pango_layout_set_alignment(layout, pangoAlignment);
 
-    PangoLayout *layout = myOwner->get()->getLayout();
-    pango_layout_set_alignment(layout, pangoAlignment);
-
-    return JS_TRUE;
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
 }
 
 static JSBool
