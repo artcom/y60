@@ -29,9 +29,8 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 use("SceneViewer.js");
-use("Overlay.js");
 
-plug("Cairo");
+plug("Pango");
 
 var ourShow = new SceneViewer(arguments);
 var _myImage = null;
@@ -42,28 +41,24 @@ ourShow.SceneViewer.setup = ourShow.setup;
 ourShow.setup = function() {
     ourShow.SceneViewer.setup();
     window.resize(1024, 768);
-    window.canvas.backgroundcolor = new Vector4f(0.8, 0.7, 0.9, 1.0);
+    window.canvas.backgroundcolor = new Vector4f(0.2, 0.8, 1.0, 1.0);
 
-    var myImage = Modelling.createImage(window.scene, 1024, 768, "BGRA");
-    myImage.resize = "none";
+    var myImage = Modelling.createImage(window.scene, 1024, 1024, "BGRA");
+    var myTexture  = Modelling.createTexture(window.scene, myImage);
+    myTexture.wrapmode = "clamp_to_edge";
+    var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene, myTexture);
+    var myShape = Modelling.createQuad(window.scene, myMaterial.id, new Vector3f(-0.04, -0.06, -0.1), new Vector3f(0.04, 0.02, -0.1));
+    var myNode = Modelling.createBody(window.scene.world, myShape.id);
 
-    var myTestOverlay = new ImageOverlay(window.scene, myImage, [0,0]);
-    myTestOverlay.width = 1024;
-    myTestOverlay.height = 768;
-
-    var xc = 128.0;
-    var yc = 128.0;
-    var radius = 100.0;
-    var angle1 = radFromDeg(45.0);
-    var angle2 = radFromDeg(180.0);
-
-    var mySurface = new Cairo.Surface(myImage);
-    var cairoContext = new Cairo.Context(mySurface);
-    cairoContext.setAntialias(Cairo.ANTIALIAS_NONE);
-    cairoContext.setSourceRGB(255,0,0);
-    cairoContext.setLineWidth(10.0);
-    cairoContext.arc(xc, yc, radius, angle1, angle2);
-    cairoContext.stroke();
+    var myLayout = new Pango.Layout(myImage);
+    myLayout.setColor([0.1,0.8,0.4,1.0]);
+    var myFontDesc = new Pango.FontDescription("Alex Brush 100");
+    myLayout.font_description = myFontDesc;
+    var dimensions = myLayout.setText("\u1E78berl\u00E4nge");
+    Logger.warning("text dimensions: "+ dimensions);
+    Logger.warning(myLayout.context);
+    Logger.warning(myLayout.font_description);
+    myLayout.saveToPNG();
 };
 
 

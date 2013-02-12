@@ -30,6 +30,7 @@
 */
 
 #include <string>
+#include <glib-object.h>
 
 #include <y60/image/Image.h>
 
@@ -40,13 +41,8 @@
 
 #include <y60/jsbase/JSWrapper.impl>
 
-#include <glib-object.h>
-
 #include "JSPangoContext.h"
 
-#include "CairoUtilities.h"
-
-#include "CairoWrapper.impl"
 
 using namespace std;
 using namespace asl;
