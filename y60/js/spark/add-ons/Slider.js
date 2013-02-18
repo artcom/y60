@@ -66,6 +66,9 @@ spark.Slider.Constructor = function (Protected) {
     function getRelativeY() {
         if (_mySliderBackground.height === _myActiveCursor.height) {
             return 0;
+        } else if (_snaps.length > 0) {
+            var myRelativeY = _myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height);
+            return setSnapsPos(myRelativeY);
         } else {
             var myRelativeY = _myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height);
             return (_precision === 0) ? myRelativeY : myRelativeY.toFixed(_precision);
@@ -75,10 +78,27 @@ spark.Slider.Constructor = function (Protected) {
     function getRelativeX() {
         if (_mySliderBackground.width === _myActiveCursor.width) {
             return 0;
+        } else if (_snaps.length > 0) {
+            var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
+            return setSnapsPos(myRelativeX);
         } else {
             var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
             return (_precision === 0) ? myRelativeX : myRelativeX.toFixed(_precision);
         }
+    }
+
+    function setSnapsPos(theYPos){
+        var myDistance = 0;
+        var mySnapPos = 1;
+        for (var i = 0; i < _snaps.length; i++) {
+            myDistance = Math.abs(_snaps[i] - theYPos);
+
+            if (myDistance < mySnapPos) {
+                mySnapPos = myDistance;
+                var mySnapPoint = i;
+            }                    
+        };
+        return _snaps[mySnapPoint];
     }
 
     var centerCursor = function () {
