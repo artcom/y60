@@ -32,6 +32,8 @@ spark.Slider.Constructor = function (Protected) {
     var _myCursorOffset     = null;
 
     var DAMPENING_HISTORY = 5;
+
+    var _snaps            = [];
     
     
     /////////////////////
