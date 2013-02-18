@@ -192,7 +192,7 @@ spark.Slider.Constructor = function (Protected) {
         _sticky         = Protected.getBoolean("sticky", true);
         _snappy         = Protected.getBoolean("snappy", true);
         _precision      = Protected.getNumber("precision", _precision);
-        
+        _snaps          = Protected.getArray("snaps", []);
         Public.addEventListener(spark.CursorEvent.APPEAR_ENTER, Public.onSlideStart, true);
         Public.addEventListener(spark.CursorEvent.MOVE, Public.onSlide, true);
         Public.addEventListener(spark.CursorEvent.VANISH_LEAVE, Public.onSlideStop, true);
