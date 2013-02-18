@@ -102,10 +102,10 @@ spark.Image.Constructor = function (Protected) {
             }
         }
         if (_myASyncLoad && !myCachedImageFlag) {
-            bindOnSetCB();        
+            bindOnSetCB();
         } else {
             onLoad();
-        }        
+        }
     });
 
     Public.__defineGetter__("srcId", function () {
@@ -159,7 +159,7 @@ spark.Image.Constructor = function (Protected) {
 
         var myWidth = 0;
         var myHeight = 0;
-        var myCachedImageFlag = false;        
+        var myCachedImageFlag = false;
         if (myImageSource === "") {
             myWidth = Protected.getNumber("width", 1);
             myHeight = Protected.getNumber("height", 1);
@@ -171,9 +171,9 @@ spark.Image.Constructor = function (Protected) {
             }
         } else {
             if (_myUseCaching) {
-                var myCacheInfo = spark.getCachedImage(myImageSource, _myASyncLoad);                 
+                var myCacheInfo = spark.getCachedImage(myImageSource, _myASyncLoad);
                 _myImage = myCacheInfo.image;
-                myCachedImageFlag = myCacheInfo.cached;                 
+                myCachedImageFlag = myCacheInfo.cached;
             } else {
                 _myImage = Modelling.createImage(window.scene, myImageSource, _myASyncLoad);
             }
@@ -185,7 +185,7 @@ spark.Image.Constructor = function (Protected) {
         _myTexture  = Modelling.createTexture(window.scene, _myImage);
         _myTexture.name = Public.name + "-texture";
         _myTexture.wrapmode = "clamp_to_edge";
-        
+
         var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
                 _myTexture, Public.name + "-material", true);
         Base.realize(myMaterial);
@@ -193,10 +193,10 @@ spark.Image.Constructor = function (Protected) {
         Public.width = myWidth;
         Public.height = myHeight;
         if (_myASyncLoad && !myCachedImageFlag) {
-            bindOnSetCB();        
+            bindOnSetCB();
         } else {
             onLoad();
-        }        
+        }
     };
     function bindOnSetCB() {
         registerImageOnLoadCallBack(_myImage, Public, function(theAttribNode) {onLoad();});

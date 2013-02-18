@@ -77,7 +77,7 @@ class JSBitset : public JSWrapper<BITSET> {
             return BITSET::Flags::MAX;
         }
         virtual JSBool getPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
-            if (theID >= 0 && theID < BITSET::Flags::MAX) {
+            if (theID < BITSET::Flags::MAX) {
                 const NATIVE & myBitset = this->getNative();
                 *vp = BOOLEAN_TO_JSVAL(myBitset.test(theID));
                 return JS_TRUE;
@@ -86,7 +86,7 @@ class JSBitset : public JSWrapper<BITSET> {
         }
         virtual JSBool setPropertyByNumericId(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
             typename JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
-            if (theID >= 0 && theID < BITSET::Flags::MAX) {
+            if (theID < BITSET::Flags::MAX) {
                 bool myFlag;
                 convertFrom(cx, *vp, myFlag);
                 myObj.getNative()[theID] = myFlag;

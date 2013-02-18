@@ -58,6 +58,7 @@ const asl::Arguments::AllowedOptionWithDocumentation ourAllowedOptions[] = {
     {"--jsversion", "version", ""}, // TODO: check was this does exactly
     {"-I", "include path", "semicolon-separated list of directories"},
     {"--no-jswarnings", "", "disable javascript warnings"},
+    {"--no-strict-mode", "", "disable javascript strict mode"},
     {"--pause-on-error", "", "if an exception occurs wait for input before quitting"},
     {"--std-logfile", "basename", "logfile basename for stdout/stderr"},
 #ifdef USE_TRACEMONKEY
@@ -103,7 +104,11 @@ main(int argc, char **argv) {
             myApp.setReportWarnings(false);
         }
 
-        myApp.setStrictFlag(true);
+        bool myStrictMode = true;
+        if (ourArguments.haveOption("--no-strict-mode")) {
+            myStrictMode = false;
+        }
+        myApp.setStrictFlag(myStrictMode);
 
         if (ourArguments.haveOption("--jsversion")) {
             myApp.setJSVersion(asl::as<int>(ourArguments.getOptionArgument("--jsversion")));
