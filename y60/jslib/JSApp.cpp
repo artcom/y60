@@ -278,6 +278,7 @@ JSApp::ShellErrorReporter(JSContext *cx, const char * message, JSErrorReport * r
 JS_STATIC_DLL_CALLBACK(JSBool)
 Line(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns the linenumber in the script currently being executed.");
+    DOC_PARAM_OPT("theStackIndex", "Caller stack index", DOC_TYPE_INTEGER, 1);
     DOC_RVAL("Current linenumber", DOC_TYPE_INTEGER);
     DOC_END;
     try {
@@ -296,6 +297,7 @@ Line(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JS_STATIC_DLL_CALLBACK(JSBool)
 File(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns filename of the current script.");
+    DOC_PARAM_OPT("theStackIndex", "Caller stack index", DOC_TYPE_INTEGER, 1);
     DOC_RVAL("Current filename", DOC_TYPE_STRING);
     DOC_END;
     try {
@@ -1653,8 +1655,8 @@ static JSFunctionSpec glob_functions[] = {
     {"incrementalGC",     IncrementalGC,  0},
 #endif
     {"clear",             Clear,          1},
-    {"__FILE__",          File,           0},
-    {"__LINE__",          Line,           0},
+    {"__FILE__",          File,           1},
+    {"__LINE__",          Line,           1},
     {"fileline",          FileLine,       1},
     {"dumpstack",         DumpStack,      0},
     {"milliSecSince1970", MilliSecSince1970,0},
