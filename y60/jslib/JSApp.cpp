@@ -312,6 +312,7 @@ File(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 JS_STATIC_DLL_CALLBACK(JSBool)
 FileLine(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Returns line and filename of the current scriptfile as properties of an object");
+    DOC_PARAM_OPT("theStackIndex", "Caller stack index", DOC_TYPE_INTEGER, 1);
     DOC_RVAL("", DOC_TYPE_STRING);
     DOC_END;
     try {
@@ -1654,7 +1655,7 @@ static JSFunctionSpec glob_functions[] = {
     {"clear",             Clear,          1},
     {"__FILE__",          File,           0},
     {"__LINE__",          Line,           0},
-    {"fileline",          FileLine,       0},
+    {"fileline",          FileLine,       1},
     {"dumpstack",         DumpStack,      0},
     {"milliSecSince1970", MilliSecSince1970,0},
     {"millisec",          MilliSec,       0},

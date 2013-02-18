@@ -61,6 +61,9 @@ static JSBool log(asl::Severity theSeverity, JSContext *cx, JSObject *obj, uintN
         if (argc > 1 ) {
             convertFrom(cx, argv[1], myModuleName);         
         }
+        if (argc > 2 ) {
+            convertFrom(cx, argv[2], myLineNo);         
+        }
         AC_LOG_CHECK(theSeverity, myModuleName.c_str(), myLineNo) << myMessage;
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
@@ -272,13 +275,13 @@ JSLogger::StaticFunctions() {
     AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
     static JSFunctionSpec myFunctions[] = {
         // name                    native          nargs
-        {"fatal",     fatal,     2},
-        {"error",     error,     2},
-        {"warning",   warning,   2},
-        {"info",      info,      2},
-        {"debug",     debug,     2},
-        {"trace",     trace,     2},
-        {"print",     print,     2},
+        {"fatal",     fatal,     3},
+        {"error",     error,     3},
+        {"warning",   warning,   3},
+        {"info",      info,      3},
+        {"debug",     debug,     3},
+        {"trace",     trace,     3},
+        {"print",     print,     3},
         {"setVerbosity", setVerbosity, 4},
         {"addFileSink", addFileSink, 1},
         {"addFarewellSink", addFarewellSink, 0},
