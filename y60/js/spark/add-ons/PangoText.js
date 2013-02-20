@@ -6,15 +6,14 @@
  * setting the 'text' property.
  */
 
-plug("Pango");
-
-
 spark.PangoText = spark.ComponentClass("PangoText");
 
 spark.PangoText.Constructor = function (Protected) {
     var Base = {};
     var Public = this;
     Public.Inherit(spark.ResizableRectangle);
+
+    plug("Pango");
 
     /////////////////////
     // Private Members //
