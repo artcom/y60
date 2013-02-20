@@ -582,6 +582,11 @@ Plug(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
             return JS_FALSE;
         }
         PlugInBasePtr myPlugIn = PlugInManager::get().getPlugIn(myPluginName);
+        PlugInList::iterator it = std::find(ourLoadedPlugIns.begin(), ourLoadedPlugIns.end(), myPlugIn);
+        if (it != ourLoadedPlugIns.end()) {
+            AC_DEBUG << myPluginName << " already loaded";
+            return JS_TRUE;
+        }
 
         if (IScriptablePluginPtr myScriptablePlugin = dynamic_cast_Ptr<IScriptablePlugin>(myPlugIn)) {
             AC_INFO << myPluginName << ": as ScriptablePlugin" << endl;
