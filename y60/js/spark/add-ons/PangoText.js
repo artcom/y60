@@ -76,7 +76,7 @@ spark.PangoText.Constructor = function (Protected) {
         var dimensions = _myPangoLayout.setText(_myText);
         //for some fonts small parts of the letters are drawn outside the box given by dimension
         if (debug) {
-            _myPangoLayout.saveToPNG();
+            _myPangoLayout.saveToPNG("PangoText_debug.png");
         }
 
         //TODO: make this configurable?
