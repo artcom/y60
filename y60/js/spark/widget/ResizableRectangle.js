@@ -151,6 +151,9 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         applySize();
     };
 
+    Public.__defineGetter__("material", function () {
+        return _myMaterial;
+    });
     Protected.__defineGetter__("material", function () {
         return _myMaterial;
     });
