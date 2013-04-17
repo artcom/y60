@@ -92,7 +92,7 @@ typedef JSIntn intn;
 #ifdef AIX4_3
 #include <sys/inttypes.h>
 #else
-typedef JSInt64 int64;
+typedef long long int64;//JSInt64 int64;
 
 /* /usr/include/model.h on HP-UX defines int8, int16, and int32 */
 #ifdef HPUX
