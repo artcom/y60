@@ -92,7 +92,9 @@ typedef JSIntn intn;
 #ifdef AIX4_3
 #include <sys/inttypes.h>
 #else
-typedef long long int64;//JSInt64 int64;
+#define int64 JSInt64
+ // Sorry, but a awesomium lib has the same typedef to a different target and untypedef is not possible in c++, so i changed it to a define
+//typedef JSInt64 int64; 
 
 /* /usr/include/model.h on HP-UX defines int8, int16, and int32 */
 #ifdef HPUX
