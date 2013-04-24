@@ -557,6 +557,7 @@ namespace y60 {
         MaterialPropGroup1HashTag::Plug::dependsOn<LineWidthTag,MaterialPropertiesFacade>(*this);
         MaterialPropGroup1HashTag::Plug::dependsOn<PointSizeTag,MaterialPropertiesFacade>(*this);
         MaterialPropGroup1HashTag::Plug::dependsOn<LineSmoothTag,MaterialPropertiesFacade>(*this);
+        MaterialPropGroup1HashTag::Plug::dependsOn<PointSmoothTag,MaterialPropertiesFacade>(*this);
 
         MaterialPropertiesFacadePtr mySelf = dynamic_cast_Ptr<MaterialPropertiesFacade>(getSelf());
         MaterialPropGroup1HashTag::Plug::getValuePtr()->setCalculatorFunction(mySelf, &MaterialPropertiesFacade::updateGroup1Hash);
@@ -592,7 +593,8 @@ namespace y60 {
         appendCRC32(myCRC32, get<LineWidthTag>());
         appendCRC32(myCRC32, get<PointSizeTag>());
         appendCRC32(myCRC32, get<LineSmoothTag>());
-
+        appendCRC32(myCRC32, get<PointSmoothTag>());
+ 
         string myMaterialName = getNode().parentNode()->getFacade<MaterialBase>()->get<NameTag>();
         set<MaterialPropGroup1HashTag>(myCRC32);
     }

@@ -87,6 +87,7 @@ namespace y60 {
     DEFINE_MATERIAL_PROPERTY_TAG(LineWidthTag, float, LINEWIDTH_PROPERTY, float(1.0));
     DEFINE_MATERIAL_PROPERTY_TAG(PointSizeTag, asl::Vector3f, POINTSIZE_PROPERTY, asl::Vector3f(1,1,1));
     DEFINE_MATERIAL_PROPERTY_TAG(LineSmoothTag, bool, LINESMOOTH_PROPERTY, bool(false));
+    DEFINE_MATERIAL_PROPERTY_TAG(PointSmoothTag, bool, POINTSMOOTH_PROPERTY, bool(false));
     DEFINE_FACADE_ATTRIBUTE_TAG(MaterialPropGroup1HashTag, int, "material_prop_group1_hash_tag", 0, Y60_SCENE_DECL);
 
     DEFINE_PROPERTY_TAG(ReqLightingTag, MaterialRequirementFacade, y60::VectorOfRankedFeature, FEATURE_NODE_NAME,
@@ -108,6 +109,7 @@ namespace y60 {
         public LineWidthTag::Plug,
         public PointSizeTag::Plug,
         public LineSmoothTag::Plug,
+        public PointSmoothTag::Plug,
         public dom::FacadeAttributePlug<MaterialPropGroup1HashTag>
     {
         public:
@@ -127,6 +129,7 @@ namespace y60 {
                 LineWidthTag::Plug(this),
                 PointSizeTag::Plug(this),
                 LineSmoothTag::Plug(this),
+                PointSmoothTag::Plug(this),
                 dom::FacadeAttributePlug<MaterialPropGroup1HashTag>(this)
             {}
             IMPLEMENT_FACADE(MaterialPropertiesFacade);
