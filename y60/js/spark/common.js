@@ -408,7 +408,7 @@ function Class(theName) {
         myProtected.Property   = Property;
         myProtected.GetterOverride = GetterOverride;
         myProtected.SetterOverride = SetterOverride;
-
+        
         // call the real constructor
         var myArguments = [myProtected].concat(Array.prototype.slice.call(arguments));
         if (theName in myNamespace) {

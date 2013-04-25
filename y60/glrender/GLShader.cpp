@@ -235,13 +235,22 @@ namespace y60 {
             glDisable(GL_LINE_SMOOTH);
             CHECK_OGL_ERROR;
         }
-
+ 
         // line width
         float myLineWidth = myMaterialPropFacade->get<LineWidthTag>();
         glLineWidth(myLineWidth);
         CHECK_OGL_ERROR;
 
-        // point size
+          // point smooth
+        if (myMaterialPropFacade->get<PointSmoothTag>()) {
+            glEnable(GL_POINT_SMOOTH);
+            CHECK_OGL_ERROR;
+        } else {
+            glDisable(GL_POINT_SMOOTH);
+            CHECK_OGL_ERROR;
+        }
+
+       // point size
         const asl::Vector3f & myPointSizeParams = myMaterialPropFacade->get<PointSizeTag>();
         glPointSize(myPointSizeParams[0]);
         CHECK_OGL_ERROR;
