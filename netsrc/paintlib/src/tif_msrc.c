@@ -196,6 +196,7 @@ TIFFOpenMem (unsigned char * pData,
 }
 
 #ifndef OSX /* NON-MACOSX */
+#if TIFFLIB_VERSION < 20120615
 
 tdata_t
 _TIFFmalloc(tsize_t s)
@@ -235,8 +236,8 @@ _TIFFmemcmp(const tdata_t p1, const tdata_t p2, tsize_t c)
 
 TIFFErrorHandler _TIFFerrorHandler = NULL;
 TIFFErrorHandler _TIFFwarningHandler = NULL;
+#endif
 #endif /* NON-MACOSX */
-
 /*
 /--------------------------------------------------------------------
 |
