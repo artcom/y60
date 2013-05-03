@@ -148,6 +148,7 @@ _tiffDummyUnmapProc(thandle_t fd, tdata_t base, toff_t size)
 
 
 #ifndef OSX /* NON-MACOSX ONLY */
+#if TIFFLIB_VERSION < 20120615
 
 TIFF*
 TIFFFdOpen(int ifd, const char* name, const char* mode)
@@ -169,6 +170,7 @@ TIFFOpen(const char* name, const char* mode)
 	return NULL;
 }
 
+#endif
 #endif /* NON-MACOSX */
 
 TIFF*

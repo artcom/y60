@@ -81,7 +81,11 @@ spark.loadFont = function (theName, theSize, theFontScale, theFontStyle, theHint
         // XXX: this is a remnant from before the introduction
         //      of include-path-based font loading.
         var myFontPath = null;
-        if (searchFile("FONTS/" + theName + "-" + theFontStyle + ".otf")) {
+        if (searchFile(theName + "-" + theFontStyle + ".otf")) {
+            myFontPath = theName + "-" + theFontStyle + ".otf";
+        } else if (searchFile(theName + "-" + theFontStyle + ".ttf")) {
+            myFontPath = theName + "-" + theFontStyle + ".ttf";
+        } else if (searchFile("FONTS/" + theName + "-" + theFontStyle + ".otf")) {
             myFontPath = "FONTS/" + theName + "-" + theFontStyle + ".otf";
         } else if (searchFile("FONTS/" + theName + "-" + theFontStyle + ".ttf")) {
             myFontPath = "FONTS/" + theName + "-" + theFontStyle + ".ttf";
