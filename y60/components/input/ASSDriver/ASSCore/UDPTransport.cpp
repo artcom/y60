@@ -36,11 +36,11 @@
 #include <asl/base/file_functions.h>
 #include <y60/base/SettingsParser.h>
 
-#define FRAMESIZE 4096
-#define PROXY_HDR 14*4+32
 #define UDP_HDR 8
-//#define TOUCHSIZE 4*5*3 (= 60 seems not to work properly, either 0 or 64 seems better)
+#define PROXY_HDR 14*4+32
 #define TOUCHSIZE 64
+//#define TOUCHSIZE 4*5*3 TODO: there's something wrong
+#define FRAMESIZE 4096
 
 using namespace std;
 using namespace asl;
@@ -110,10 +110,10 @@ void UDPTransport::readData() {
   AC_DEBUG << "UDPTransport::readData()";
 
   try {
-    char receiveBuffer[4252];
-    size_t bytesReceived = sizeof(receiveBuffer);
+    char receiveBuffer[UDP_HDR+PROXY_HDR+TOUCHSIZE+FRAMESIZE];
 
-    _mySocket->receiveFrom(0, 0, receiveBuffer, bytesReceived);
+    _mySocket->receiveFrom(0, 0, receiveBuffer, sizeof(receiveBuffer));
+
     frame = receiveBuffer+UDP_HDR+PROXY_HDR+TOUCHSIZE;
 
     buildStatusLine();
@@ -122,7 +122,6 @@ void UDPTransport::readData() {
     ++_myFrameCount;
 
     _myTmpBuffer.clear();
-
     _myTmpBuffer.push_back(255);
     _myTmpBuffer.push_back(0);
     _myTmpBuffer.insert(_myTmpBuffer.end(), _myStatusLine.begin(), _myStatusLine.end());
@@ -135,10 +134,10 @@ void UDPTransport::readData() {
     }
     
     receivedData((char*)&_myTmpBuffer[0], _myTmpBuffer.size());
-
+  
     /*
     cout << "##############" << endl;
-    for(int i=0; i<64; i+=4) {
+    for(int i=0; i<64; i++) {
       for(int j=0; j<64; j+=4) {
         cout << (int) frame[i*64+j] << "\t";
       }
