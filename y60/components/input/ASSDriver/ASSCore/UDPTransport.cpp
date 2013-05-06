@@ -40,7 +40,7 @@
 #define PROXY_HDR 14*4+32
 #define TOUCHSIZE 64
 //#define TOUCHSIZE 4*5*3 TODO: there's something wrong
-#define FRAMESIZE 4096
+#define FRAMESIZE 4256
 
 using namespace std;
 using namespace asl;
@@ -110,7 +110,7 @@ void UDPTransport::readData() {
   AC_DEBUG << "UDPTransport::readData()";
 
   try {
-    char receiveBuffer[UDP_HDR+PROXY_HDR+TOUCHSIZE+FRAMESIZE];
+    char receiveBuffer[UDP_HDR+PROXY_HDR+TOUCHSIZE+FRAMESIZE+6600];
 
     _mySocket->receiveFrom(0, 0, receiveBuffer, sizeof(receiveBuffer));
 
@@ -137,11 +137,11 @@ void UDPTransport::readData() {
   
     /*
     cout << "##############" << endl;
-    for(int i=0; i<64; i++) {
+    for(int i=0; i<64; i+=4) {
       for(int j=0; j<64; j+=4) {
         cout << (int) frame[i*64+j] << "\t";
       }
-      cout << endl;
+      cout << endl << endl << endl;
     }
     */
   }
@@ -196,7 +196,6 @@ void UDPTransport::buildStatusLine() {
     writeStatusToken( 'N', _myFrameCount );
     writeStatusToken( 'C', _myGenCheckSum );
 }
-
 
 void UDPTransport::writeStatusToken( const char theToken, unsigned theNumber ) {
     AC_DEBUG << "UDPTransport::writeStatusToken()";
