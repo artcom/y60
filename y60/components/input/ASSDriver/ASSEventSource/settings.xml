@@ -1,13 +1,12 @@
 <settings>
     <ASSDriver>
         <!-- Connection parameters -->
-        <TransportLayer>serial</TransportLayer>
-        <IpAddress>10.1.0.101</IpAddress>
+        <TransportLayer>udp</TransportLayer>
+        <IpAddress>10.1.1.136</IpAddress>
         <Port>10001</Port>
         <SerialPort>-1</SerialPort>
         <SerialPortName>/dev/ttyUSB0</SerialPortName>
         <BaudRate>460800</BaudRate>
-        
         <!-- Enable/disable status and debug display -->
         <ShowASSData min="0" max="1">1.00000</ShowASSData>
         <!-- Position of on-screen value probe (for debugging) -->
@@ -18,20 +17,18 @@
         <CurrentValueDisplay min="0" max="2">0.00000</CurrentValueDisplay>
         <!-- Dump values from raster 2 into PNGs -->
         <CaptureSensorData min="0" max="1" step="1">0</CaptureSensorData>
-        
         <!-- Origin of sensoric in screen/value space -->
         <SensorPosition step="1">[32.00000,32.00000]</SensorPosition>
         <!-- Orientation of value space in radians -->
         <SensorOrientation step="1.5707963">-0.00000</SensorOrientation>
         <!-- Scale of value space in steps per sensing line -->
-        <SensorScale step="0.01">[35.50000,35.50000]</SensorScale>
+        <SensorScale step="0.01">[20.98000,11.39000]</SensorScale>
         <!-- Horizontal mirroring -->
         <MirrorX min="0" max="1">0.00000</MirrorX>
         <!-- Vertical mirroring -->
         <MirrorY min="0" max="1">0.00000</MirrorY>
         <!-- Clamp values to screen dimensions -->
         <ClampToScreen min="0" max="1">1</ClampToScreen>
-        
         <!-- Curing (clamp away known-broken lines) -->
         <CureBrokenElectrodes min="0" max="1" step="1">0</CureBrokenElectrodes>
         <CureVLineValues min="-1" step="1">[-1,-1,-1,-1]</CureVLineValues>
@@ -40,16 +37,12 @@
         <CurePoint2 min="-1" step="1">[-1,-1]</CurePoint2>
         <CurePoint3 min="-1" step="1">[-1,-1]</CurePoint3>
         <CurePoint4 min="-1" step="1">[-1,-1]</CurePoint4>
-        
         <!-- Step 1 - Denoise with static threshold -->
         <NoiseThreshold>10</NoiseThreshold>
-        
         <!-- Step 2 - Gain adjustment (to increase value range coverage) -->
         <GainPower>3.00000</GainPower>
-        
         <!-- Step 3 - Find connected components -->
         <ComponentThreshold>1.50000</ComponentThreshold>
-
         <!-- Step 4 - Interpolate cursor positions
              Method 1 - moment analysis
              Method 0 - interpolation around maximum
@@ -61,13 +54,11 @@
         <InterpolationMethod min="0" max="1" step="1">1</InterpolationMethod>
         <CCRegion4MomentumFlag min="0" max="1" step="1">0.00000</CCRegion4MomentumFlag>
         <MomentumRegion step="1">[-1.00,-1.00000,1.00,1.00000]</MomentumRegion>
-        
         <!-- Surface contact detection ("onTouch") -->
         <FirstDerivativeThreshold step="1">30.00000</FirstDerivativeThreshold>
-        <DebugTouchEvents min="0" max="1" step="1">0</DebugTouchEvents>
+        <DebugTouchEvents min="0" max="1" step="1">1</DebugTouchEvents>
         <MinTouchInterval step="0.01">0.2</MinTouchInterval>
         <MinTouchThreshold step="0.1">9.0</MinTouchThreshold>
-        
         <!-- filter 'move' events -->
         <FilterMultipleMovePerCursor min="0" step="1" max="1">1</FilterMultipleMovePerCursor>
         <!-- smooth cursor position with an average calculation 1==no smoothing -->
