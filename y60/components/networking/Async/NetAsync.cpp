@@ -64,7 +64,7 @@ NetAsync::~NetAsync() {
     AC_TRACE << "~NetAsync - removing keep_busy";
     keep_busy.reset();
     AC_TRACE << "~NetAsync - waiting for ASIO thread";
-    // io.stop();
+    io.stop();
     _myAsioThread->join();
     AC_TRACE << "~NetAsync done";
 };
@@ -96,11 +96,10 @@ NetAsync::run(std::size_t thread_pool_size) {
                     boost::bind(&boost::asio::io_service::run, &io)));
         threads.push_back(thread);
     }
-
     // Wait for all threads in the pool to exit.
-    for (std::size_t i = 0; i < threads.size(); ++i)
+    for (std::size_t i = 0; i < threads.size(); ++i) {
         threads[i]->join();
-
+    }
     AC_DEBUG << "asio threads terminated " << this;
 };
 
