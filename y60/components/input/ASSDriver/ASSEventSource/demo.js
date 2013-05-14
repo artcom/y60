@@ -123,7 +123,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
     Base.onFrame = self.onFrame;
     self.onFrame = function(theTime) {
         Base.onFrame(theTime);
-        _myASSManager.valueColor = [0, 0, 1, 1];
+        _myASSManager.valueColor = [1, 1, 1, 1];
     }
 
     Base.onPostRender = self.onPostRender;
@@ -179,8 +179,7 @@ ASSDriverTestApp.prototype.Constructor = function(self, theArguments) {
 
         _myASSManager.onASSEvent( theNode );
 
-
-        //print( theNode );
+        //print( theNode);
 
         if (theNode.type == "configure" ) {
             _myASSManager.valueColor = new Vector4f(0,0,1,1);

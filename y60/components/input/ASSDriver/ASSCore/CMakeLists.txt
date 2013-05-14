@@ -6,6 +6,7 @@ DummyTransport.cpp
 SerialTransport.cpp
 SocketTransport.cpp
 TransportLayer.cpp
+UDPTransport.cpp
 )
 
 set(HEADERS
@@ -17,6 +18,7 @@ SerialTransport.h
 SocketTransport.h
 TransportLayer.h
 y60_asscore_settings.h
+UDPTransport.h
 )
 
 list(APPEND EXTERNALS GLEW)

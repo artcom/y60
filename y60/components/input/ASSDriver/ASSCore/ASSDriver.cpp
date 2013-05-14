@@ -33,6 +33,7 @@
 #include "SerialTransport.h"
 #include "SocketTransport.h"
 #include "DummyTransport.h"
+#include "UDPTransport.h"
 #include "ASSUtils.h"
 
 #include <asl/base/Logger.h>
@@ -1390,10 +1391,9 @@ namespace y60 {
                 _myTransportLayer = TransportLayerPtr( new SocketTransport(theSettings) );
             } else if ( myTransportName == "dummy" ) {
                 _myTransportLayer = TransportLayerPtr( new DummyTransport(theSettings) );
-            }
-            /*} else if ( myTransportName == "udp") {
-              TODO: UDP transport layer
-              }*/ else {
+            } else if ( myTransportName == "udp") {
+                _myTransportLayer = TransportLayerPtr( new UDPTransport(theSettings) );
+            } else {
                 throw ASSException(string("Unknown transport layer '") + myTransportName + "'",
                                    PLUS_FILE_LINE);
             }
