@@ -147,9 +147,6 @@ namespace y60 {
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        // enable vertex arrays
-        glEnableClientState(GL_VERTEX_ARRAY);
-
         glEnable(GL_MULTISAMPLE_ARB);
     }
 
@@ -244,6 +241,13 @@ namespace y60 {
             DBP2(START_TIMER(renderBodyPart_switchMaterial_register));
             switch (myRegister) {
                 case POSITION_REGISTER:
+                    if (myEnable) {
+                        DB2(AC_TRACE <<"Enable GL_VERTEX_ARRAY"<<endl);
+                        glEnableClientState(GL_VERTEX_ARRAY);
+                    } else {
+                        DB2(AC_TRACE <<"Disable GL_VERTEX_ARRAY"<<endl);
+                        glDisableClientState(GL_VERTEX_ARRAY);
+                    }
                     break;
                 case NORMAL_REGISTER:
                     if (myEnable) {
