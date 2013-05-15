@@ -1267,13 +1267,17 @@ namespace y60 {
     void
     Renderer::setupRenderState(ViewportPtr theViewport) {
         MAKE_GL_SCOPE_TIMER(Renderer_setupRenderState);
-        _myState->setWireframe(theViewport->get<ViewportWireframeTag>());
-        _myState->setFlatShading(theViewport->get<ViewportFlatshadingTag>());
-        _myState->setLighting(theViewport->get<ViewportLightingTag>());
-        _myState->setBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
-        _myState->setTexturing(theViewport->get<ViewportTexturingTag>());
-        _myState->setDepthWrites(true);
-        _myState->setFrontFaceCCW(true);
+        _myState->commitWireframe(theViewport->get<ViewportWireframeTag>());
+        _myState->commitFlatShading(theViewport->get<ViewportFlatshadingTag>());
+        _myState->commitLighting(theViewport->get<ViewportLightingTag>());
+        _myState->commitBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
+        _myState->commitTexturing(theViewport->get<ViewportTexturingTag>());
+        _myState->commitBlend(true);
+        _myState->commitDepthWrites(true);
+        _myState->commitIgnoreDepth(false);
+        _myState->commitFrontFaceCCW(true);
+        _myState->commitPolygonOffset(false);
+        _myState->commitCullFaces(GL_BACK);
 
         // This prevents translucent pixels from being drawn. This way the
         // background can shine through.

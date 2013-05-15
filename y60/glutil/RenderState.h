@@ -50,8 +50,8 @@
         bool get ## THE_NAME () const { \
         return _my ## THE_NAME ## Flag; \
         } \
-    private: \
         void commit ## THE_NAME (bool theFlag); \
+    private: \
         bool _my ## THE_NAME ## Flag; \
     public:
 
@@ -88,8 +88,8 @@ namespace y60 {
             void setClippingPlanes(const std::vector<asl::Planef> & thePlanes);
             void setScissorBox(const asl::Box2f & theBox, const Viewport & theViewport);
 
-        private:
             void commitCullFaces(GLenum theFaces);
+        private:
 
             int  _myEnabledClippingPlanes;
             asl::Vector4i _myScissorParams;
