@@ -35,6 +35,7 @@
 #include <asl/math/linearAlgebra.h>
 #include <asl/math/intersection.h>
 #include <asl/math/numeric_functions.h>
+#include <asl/math/simplexnoise.h>
 
 #include <y60/inet/Request.h>
 
@@ -1220,6 +1221,38 @@ Load(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+simplex_raw_noise(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Calculates a simplex raw noise.");
+    DOC_PARAM("thePos", "input 2D-point for noise", DOC_TYPE_VECTOR2F); DOC_RESET;
+    DOC_PARAM("thePos", "input 3D-point for noise", DOC_TYPE_VECTOR3F); DOC_RESET;
+    DOC_PARAM("thePos", "input 4D-point for noise", DOC_TYPE_VECTOR4F); DOC_RESET;
+    DOC_END;
+
+    if (argc != 1) {
+        JS_ReportError(cx,"simplex_raw_noise: bad number of arguments, expected 1");
+        return JS_FALSE;
+    }
+
+    asl::Vector2f myPos2D;
+    asl::Vector3f myPos3D;
+    asl::Vector4f myPos4D;
+    float myResult = 0.0f;
+    if ( convertFrom(cx, argv[0], myPos2D) ) {
+        myResult = raw_noise_2d(myPos2D[0], myPos2D[1]);
+    } else if ( convertFrom(cx, argv[0], myPos3D) ) {
+        myResult = raw_noise_3d(myPos3D[0], myPos3D[1], myPos3D[2]);
+    } else if ( convertFrom(cx, argv[0], myPos4D) ) {
+        myResult = raw_noise_4d(myPos4D[0], myPos4D[1], myPos4D[2], myPos4D[3]);
+    } else {
+        JS_ReportError(cx,"simplex_raw_noise: bad arguments, argument 1 must be an Vector2f, Vector3f or Vector4f.");
+        return JS_FALSE;        
+    }
+    *rval = as_jsval(cx, myResult);
+    return JS_TRUE;
+}
+
+
 JSFunctionSpec *
 Global::Functions() {
     static JSFunctionSpec myFunctions[] = {
@@ -1244,6 +1277,8 @@ Global::Functions() {
         {"nearest",     nearestDispatcher,     2},
         {"transformedNormal", transformedNormalDispatcher,     2},
         {"smoothStep", smoothStep,     3},
+        {"simplex_raw_noise", simplex_raw_noise,     1},
+        
         {0}
     };
     return myFunctions;

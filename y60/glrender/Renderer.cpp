@@ -131,18 +131,12 @@ namespace y60 {
         glColor3f(1.0, 1.0, 1.0);
 
         glEnable(GL_NORMALIZE);
-        glEnable(GL_DEPTH_TEST);
 
         // enable separate calculation of specular color
         glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 
         // If vertex colors are specified, use them in place of the ambient color value
         glColorMaterial(GL_FRONT, GL_AMBIENT);
-
-        // enable blending
-        // TODO: move this to the material handling
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -597,6 +591,10 @@ namespace y60 {
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         glDisable(GL_LIGHTING);
+        // enable blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glColor4f(1.0, 1.0, 1.0, 0.5);
         glBegin(GL_LINES);
         {
@@ -1267,13 +1265,17 @@ namespace y60 {
     void
     Renderer::setupRenderState(ViewportPtr theViewport) {
         MAKE_GL_SCOPE_TIMER(Renderer_setupRenderState);
-        _myState->setWireframe(theViewport->get<ViewportWireframeTag>());
-        _myState->setFlatShading(theViewport->get<ViewportFlatshadingTag>());
-        _myState->setLighting(theViewport->get<ViewportLightingTag>());
-        _myState->setBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
-        _myState->setTexturing(theViewport->get<ViewportTexturingTag>());
-        _myState->setDepthWrites(true);
-        _myState->setFrontFaceCCW(true);
+        _myState->commitWireframe(theViewport->get<ViewportWireframeTag>());
+        _myState->commitFlatShading(theViewport->get<ViewportFlatshadingTag>());
+        _myState->commitLighting(theViewport->get<ViewportLightingTag>());
+        _myState->commitBackfaceCulling(theViewport->get<ViewportBackfaceCullingTag>());
+        _myState->commitTexturing(theViewport->get<ViewportTexturingTag>());
+        _myState->commitBlend(true);
+        _myState->commitDepthWrites(true);
+        _myState->commitIgnoreDepth(false);
+        _myState->commitFrontFaceCCW(true);
+        _myState->commitPolygonOffset(false);
+        _myState->commitCullFaces(GL_BACK);
 
         // This prevents translucent pixels from being drawn. This way the
         // background can shine through.

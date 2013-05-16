@@ -84,15 +84,8 @@ function main() {
 }
 
 function plugComponentsForDocumentation() {
-    var myComponents = ["Network", "Sound", "ProcessFunctions", "Cairo", "GPUParticles",
-                        "EventLoop", "ASSEventSource", "DSADriver", "VideoProcessing",
-                        "OscReceiver", "SynergyServer"];
-    if (operatingSystem() == "WIN32") {
-        myComponents = myComponents.concat(["TaskManager","WMPPlayer"]);
-    } else if (operatingSystem() == "LINUX") {
-        myComponents = myComponents.concat(["Powermate"]);
-    }
-
+    var myComponents = ["Network", "Sound", "ProcessFunctions", "Cairo",
+                        "EventLoop", "ASSEventSource", "DSADriver", "OscReceiver", "SynergyServer"];
     for (var i = 0;i < myComponents.length; ++i) {
         print("Plugging " + myComponents[i]);
         try {
