@@ -131,18 +131,12 @@ namespace y60 {
         glColor3f(1.0, 1.0, 1.0);
 
         glEnable(GL_NORMALIZE);
-        glEnable(GL_DEPTH_TEST);
 
         // enable separate calculation of specular color
         glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
 
         // If vertex colors are specified, use them in place of the ambient color value
         glColorMaterial(GL_FRONT, GL_AMBIENT);
-
-        // enable blending
-        // TODO: move this to the material handling
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
@@ -597,6 +591,10 @@ namespace y60 {
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         glDisable(GL_LIGHTING);
+        // enable blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glColor4f(1.0, 1.0, 1.0, 0.5);
         glBegin(GL_LINES);
         {
