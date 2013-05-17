@@ -83,7 +83,7 @@ function main() {
 
 function plugComponentsForDocumentation() {
     var myComponents = ["Network", "Sound", "ProcessFunctions", "Cairo",
-                        "EventLoop", "ASSEventSource", "DSADriver" "OscReceiver", "SynergyServer"];
+                        "EventLoop", "ASSEventSource", "DSADriver", "OscReceiver", "SynergyServer"];
 
     for (var i = 0;i < myComponents.length; ++i) {
         print("Plugging " + myComponents[i]);
