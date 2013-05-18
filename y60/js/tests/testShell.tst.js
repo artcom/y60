@@ -31,7 +31,6 @@
 */
 
 use("UnitTest.js");
-use("Timer.js");
 
 function VectorUnitTest() {
     this.Constructor(this, "VectorUnitTest");
@@ -1375,68 +1374,6 @@ function EmptyObject() {
 EmptyObject.prototype.nop = function() {
 }
 
-function testPerformance() {
-        var n = 1000000;
-        var a = 0;
-        var myTimer = new Timer("testPerformance");
-        var myBaseLine = myTimer.add("Baseline",n);
-        for (var i = 0; i < n; ++i) {
-            a = a + 1;
-        }
-        myTimer.stop(myBaseLine);
-
-        n = n/10;
-
-        var v = new Vector3f(1,1,1);
-        var o = new Vector3f(1,1,1);
-
-        var myAddTimer = myTimer.add("method add",n);
-        for (i = 0; i < n; ++i) {
-            v.add(o);
-        }
-        myTimer.stop(myAddTimer);
-
-        var M = new Matrix4f(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
-        var M2 = new Matrix4f(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-
-        var myMultTimer = myTimer.add("function matrix multiplication",n);
-        for (i = 0; i < n; ++i) {
-            M.postMultiply(M2);
-        }
-        myTimer.stop(myMultTimer);
-
-        var myIdentTimer = myTimer.add("function matrix make identity",n);
-        for (i = 0; i < n; ++i) {
-            M.makeIdentity();
-        }
-        myTimer.stop(myIdentTimer);
-
-        var myObject = new EmptyObject();
-
-        var myNopTimer = myTimer.add("function nop",n);
-        for (i = 0; i < n; ++i) {
-            myObject.nop();
-        }
-        myTimer.stop(myNopTimer);
-
-        n = n / 10;
-
-        var mySumFuncTimer = myTimer.add("function sum",n);
-        v = new Vector3f(1,1,1);
-        for (i = 0; i < n; ++i) {
-            v = sum(v,o);
-        }
-        myTimer.stop(mySumFuncTimer);
-
-        mySumFuncTimer = myTimer.add("function sum[][]",n);
-        v = new Vector3f(1,1,1);
-        for (i = 0; i < n; ++i) {
-            v = sum([1,2,3],[4,5,6]);
-        }
-        myTimer.stop(mySumFuncTimer);
-
-        myTimer.print();
-}
 
 try {
     var myTestName = "testShell.tst.js";
@@ -1460,7 +1397,6 @@ try {
     mySuite.run();
 
     print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-    //testPerformance();
     exit(mySuite.returnStatus());
 } catch (ex) {
     print("-----------------------------------------------------------------------------------------");

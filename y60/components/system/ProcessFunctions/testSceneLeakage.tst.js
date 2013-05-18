@@ -31,7 +31,6 @@
 
 plug("ProcessFunctions");
 use("Y60JSSL.js");
-use("ImageManager.js");
 use("Overlay.js");
 
 const OBJECTS_PER_FRAME = 30;
