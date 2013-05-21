@@ -11,8 +11,8 @@
 spark.Canvas = spark.ComponentClass("Canvas");
 
 spark.Canvas.BINDING_SLOT = {
-    PRE  : "PRE_VIEWPORT",
-    POST : "POST_VIEWPORT",
+    PRE_VIEWPORT  : "PRE_VIEWPORT",
+    POST_VIEWPORT : "POST_VIEWPORT",
     RESIZE : "RESIZE"
 };
 
@@ -28,8 +28,6 @@ spark.Canvas.Constructor = function (Protected) {
     var _myWorld            = null;
     var _myViewport         = null;
     var _myCanvasNode       = null;
-    var _onPreViewportFunc  = null;
-    var _onPostViewportFunc = null;
     var _myRenderFlag       = true;
     var _myPickRadius       = 0;
     var _myImage            = null;
@@ -104,14 +102,6 @@ spark.Canvas.Constructor = function (Protected) {
     
     Public.__defineGetter__("viewport", function () {
         return _myViewport;
-    });
-    
-    Public.__defineSetter__("onPreViewportFunc", function (theCallback) {
-        _onPreViewportFunc = theCallback;
-    });
-    
-    Public.__defineSetter__("onPostViewportFunc", function (theCallback) {
-        _onPostViewportFunc = theCallback;
     });
     
     Public.__defineSetter__("render", function (theBoolean) {
@@ -319,24 +309,16 @@ spark.Canvas.Constructor = function (Protected) {
     Base.onPreViewport = Public.onPreViewport;
     Public.onPreViewport = function (theViewport) {
         Base.onPreViewport(theViewport);
-        if (_onPreViewportFunc) {
-            Logger.warning("spark.Canvas.onPreViewportFunc is deprecated - use Bindings now!");
-            _onPreViewportFunc(theViewport);
-        }
-        for (var handleId in _bindings[spark.Canvas.BINDING_SLOT.PRE]) {
-            var myHandle = _bindings[spark.Canvas.BINDING_SLOT.PRE][handleId];
+        for (var handleId in _bindings[spark.Canvas.BINDING_SLOT.PRE_VIEWPORT]) {
+            var myHandle = _bindings[spark.Canvas.BINDING_SLOT.PRE_VIEWPORT][handleId];
             myHandle.cb(theViewport);
         }
     };
     
     Base.onPostViewport = Public.onPostViewport;
     Public.onPostViewport = function (theViewport) {
-        if (_onPostViewportFunc) {
-            Logger.warning("spark.Canvas.onPostViewportFunc is deprecated - use Bindings now!");
-            _onPostViewportFunc(theViewport);
-        }
-        for (var handleId in _bindings[spark.Canvas.BINDING_SLOT.POST]) {
-            var myHandle = _bindings[spark.Canvas.BINDING_SLOT.POST][handleId];
+        for (var handleId in _bindings[spark.Canvas.BINDING_SLOT.POST_VIEWPORT]) {
+            var myHandle = _bindings[spark.Canvas.BINDING_SLOT.POST_VIEWPORT][handleId];
             myHandle.cb(theViewport);
         }
         Base.onPostViewport(theViewport);
