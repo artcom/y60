@@ -177,7 +177,7 @@ spark.Canvas.Constructor = function (Protected) {
         if (myIntersectionInfo && myIntersectionInfo.intersections.length > 0) {
             transformMatrix = new Matrix4f(Public.innerSceneNode.globalmatrix);
             transformMatrix.invert();
-            intersecPointOnCanvas = product(myIntersectionInfo.intersections[0].position,
+            intersecPointOnCanvas = product(sum(myIntersectionInfo.intersections[0].position, Public.origin),
                                             transformMatrix);
             //due to sweeping sphere intersection in spark.Window.. values outside of canvas can result in coordinates of -1, Public.width + 1  etc. 
             intersecPointOnCanvas.x = clamp(intersecPointOnCanvas.x, 0, Public.width-1);
