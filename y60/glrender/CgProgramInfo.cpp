@@ -1078,6 +1078,8 @@ namespace y60 {
         glMatrixMode(GL_TEXTURE);
         bool alreadyHasSpriteTexture = false;
         for (unsigned int i = 0; i < _myTextureParams.size(); ++i) {
+            const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
+            setTextureParameters(myTextureUnit, alreadyHasSpriteTexture, myFrameNumber);
             if (_myTextureParams[i].isUsedByShader()) {
                 setGLTextureState(true, _myTextureParams[i]);
                 cgGLEnableTextureParameter(_myTextureParams[i]._myParameter);
@@ -1087,8 +1089,6 @@ namespace y60 {
                                           " name=" + theMaterial.get<NameTag>() + " has " + as_string(theMaterial.getTextureUnitCount()) + " texture(s)",
                                           PLUS_FILE_LINE);
                 }
-                const TextureUnit & myTextureUnit = theMaterial.getTextureUnit(i);
-                setTextureParameters(myTextureUnit, alreadyHasSpriteTexture, myFrameNumber);
             }
         }
         glMatrixMode(GL_MODELVIEW);
