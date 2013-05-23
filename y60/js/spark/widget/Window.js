@@ -438,6 +438,24 @@ spark.Window.Constructor = function (Protected, theArguments) {
         }
     };
 
+    Base.onPreViewport = Public.onPreViewport;
+    Public.onPreViewport = function (theViewport) {
+        Base.onPreViewport(theViewport);
+        if (Public.hasEventListenersWithType(spark.StageEvent.PRE_VIEWPORT)) {
+            var myEvent = new spark.StageEvent(spark.StageEvent.PRE_VIEWPORT, Public, null, null, theViewport);
+            Public.dispatchEvent(myEvent);
+        }
+    };
+
+    // Will be called after rendering the frame, but before swap buffer
+    Base.onPostViewport = Public.onPostViewport;
+    Public.onPostViewport = function (theViewport) {
+        Base.onPostViewport(theViewport);
+        if (Public.hasEventListenersWithType(spark.StageEvent.POST_VIEWPORT)) {
+            var myEvent = new spark.StageEvent(spark.StageEvent.POST_VIEWPORT, Public, null, null, theViewport);
+            Public.dispatchEvent(myEvent);
+        }
+    };
     // Will be called on a mouse move
     Base.onMouseMotion = Public.onMouseMotion;
     Public.onMouseMotion = function (theX, theY) {

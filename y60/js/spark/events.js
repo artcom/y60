@@ -634,8 +634,10 @@ spark.StageEvent.PROTO_FRAME = "stage-proto-frame";
 spark.StageEvent.FRAME       = "stage-frame";
 spark.StageEvent.PRE_RENDER  = "stage-pre-render";
 spark.StageEvent.POST_RENDER = "stage-post-render";
+spark.StageEvent.PRE_VIEWPORT  = "stage-pre-viewport";
+spark.StageEvent.POST_VIEWPORT = "stage-post-viewport";
 
-spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, theDeltaT) {
+spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, theDeltaT, theViewport) {
     var Public = this;
     Public.Inherit(spark.Event, theType);
     Public.cancelable = false;
@@ -643,6 +645,7 @@ spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, t
     var _myStage = theStage;
     var _myTime = theTime != null ? theTime : 0.0;
     var _myDeltaT = theDeltaT != null ? theDeltaT : 0.0;
+    var _myViewport = theViewport ? theViewport : null;
 
     Public.__defineGetter__("stage", function() {
         return _myStage;
@@ -654,6 +657,10 @@ spark.StageEvent.Constructor = function(Protected, theType, theStage, theTime, t
 
     Public.__defineGetter__("deltaT", function() {
         return _myDeltaT;
+    });
+
+    Public.__defineGetter__("viewport", function() {
+        return _myViewport;
     });
 };
 
