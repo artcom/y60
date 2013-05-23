@@ -195,7 +195,8 @@ namespace y60 {
                     CgTextureParam(const std::string & theParamName, CGparameter theParameter) :
                         CgProgramNamedParam(theParamName, theParameter),
                         _myTextureUnit(0),
-                        _myInUseFlag(false)
+                        _myInUseFlag(false),
+                        _myCheckUsageFlag(false)
                     {}
 
                     void
@@ -219,7 +220,7 @@ namespace y60 {
 
                     bool
                     isUsedByShader() const {
-                        return _myInUseFlag;
+                        return (!_myCheckUsageFlag) || _myInUseFlag;
                     }
                     GLenum
                     getTextureUnit() const {
@@ -229,6 +230,7 @@ namespace y60 {
                 private:
                     GLenum _myTextureUnit;
                     bool   _myInUseFlag;
+                    bool   _myCheckUsageFlag;
             };
             typedef std::vector<CgTextureParam> CgTextureParamVector;
 
