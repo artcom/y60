@@ -196,11 +196,9 @@ namespace y60 {
             } else {
                 glDisable(GL_DEPTH_TEST);
             }
-            AC_PRINT << "disable alpaTest";
         } else {
             glDepthFunc(GL_LESS);
             glEnable(GL_DEPTH_TEST);
-            AC_PRINT << "enable alpaTest";
         }
         _myIgnoreDepthFlag = theFlag;
     }
@@ -208,7 +206,6 @@ namespace y60 {
     void
     RenderState::commitDepthWrites(bool theFlag) {
         if (theFlag) {
-            AC_PRINT << "enable depth mask write";
             glDepthMask(GL_TRUE);
             if (!_myIgnoreDepthFlag) {
                 glEnable(GL_DEPTH_TEST);
@@ -216,7 +213,6 @@ namespace y60 {
             }
         } else {
             glDepthMask(GL_FALSE);
-            AC_PRINT << "disable depth mask write";
         }
         _myDepthWritesFlag = theFlag;
     }
