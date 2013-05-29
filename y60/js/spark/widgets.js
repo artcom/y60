@@ -188,6 +188,8 @@ spark.Widget.Constructor = function (Protected) {
             case spark.StageEvent.FRAME:
             case spark.StageEvent.PRE_RENDER:
             case spark.StageEvent.POST_RENDER:
+            case spark.StageEvent.PRE_VIEWPORT:
+            case spark.StageEvent.POST_VIEWPORT:
                 if (theUseCapture) {
                     Logger.fatal("Capture of stage events is forbidden.");
                 }
@@ -213,17 +215,21 @@ spark.Widget.Constructor = function (Protected) {
      */
     Base.removeEventListener = Public.removeEventListener;
     Public.removeEventListener = function (theType, theListener, theUseCapture) {
-        switch (theType) {
-        case spark.StageEvent.PROTO_FRAME:
-        case spark.StageEvent.FRAME:
-        case spark.StageEvent.PRE_RENDER:
-        case spark.StageEvent.POST_RENDER:
-            Logger.fatal("Removal of stage event listeners is not supported");
-            break;
-        default:
-            Base.removeEventListener(theType, theListener, theUseCapture);
-            break;
+        if (!("Stage" in Public._classes_)) {
+            switch (theType) {
+            case spark.StageEvent.PROTO_FRAME:
+            case spark.StageEvent.FRAME:
+            case spark.StageEvent.PRE_RENDER:
+            case spark.StageEvent.POST_RENDER:
+            case spark.StageEvent.PRE_VIEWPORT:
+            case spark.StageEvent.POST_VIEWPORT:
+                Logger.fatal("Removal of stage event listeners is not supported");
+                break;
+            default:
+                break;
+            }
         }
+        Base.removeEventListener(theType, theListener, theUseCapture);
     };
 
     // ALPHA
