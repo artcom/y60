@@ -44,6 +44,7 @@
 #include <y60/glutil/GLUtils.h>
 #include <y60/glutil/TextureCompressor.h>
 #include <y60/scene/Shape.h>
+#include <y60/scene/External.h>
 #include <y60/scene/Viewport.h>
 #include <y60/scene/Overlay.h>
 #include <y60/base/NodeValueNames.h>
@@ -181,6 +182,7 @@ namespace y60 {
     Renderer::switchMaterial(const Viewport & theViewport,
                              const MaterialBase & theMaterial,
                              bool isOverlay) {
+
         if (_myPreviousMaterial == &theMaterial) {
             return false;
         } else if (_myPreviousMaterial == 0) {
@@ -292,13 +294,36 @@ namespace y60 {
     }
 
     void
-    Renderer::renderBodyPart(const BodyPart & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
+    Renderer::renderExternal( const ExternalPartPtr & theExternalPart, const Viewport & theViewport, const Camera & theCamera) {
+        //const y60::World & myWorld = theExternalPart->getWorld();
+        const External & myExternal = theExternalPart->getExternal();
+
+        glPopMatrix();
+        CHECK_OGL_ERROR;
+
+        _myState->setClippingPlanes(theExternalPart->getClippingPlanes());
+        _myState->setScissorBox(theExternalPart->getScissorBox(), theViewport);
+
+        glPushMatrix();
+
+        glMultMatrixf((myExternal.get<GlobalMatrixTag>().getData()));
+
+        const MaterialBase & myMaterial = myExternal.getMaterial();
+        bool myMaterialHasChanged = switchMaterial(theViewport, myMaterial);
+
+        myExternal.callOnRenderCallBack();
+        _myPreviousMaterial = 0;
+        switchMaterial(theViewport, myMaterial);
+        glMatrixMode( GL_MODELVIEW );
+    }
+    void
+    Renderer::renderBodyPart(const BodyPartPtr & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
         DBP(MAKE_GL_SCOPE_TIMER(renderBodyPart));
         DBP2(START_TIMER(renderBodyPart_pre));
 
-        const y60::World & myWorld = theBodyPart.getWorld();
-        const y60::Body & myBody = theBodyPart.getBody();
-        const y60::Shape & myShape = theBodyPart.getShape();
+        const y60::World & myWorld = theBodyPart->getWorld();
+        const y60::Body & myBody = theBodyPart->getBody();
+        const y60::Shape & myShape = theBodyPart->getShape();
         bool myBodyHasChanged = (_myPreviousBody != &myBody);
         DBP2(STOP_TIMER(renderBodyPart_pre));
         DBP(START_TIMER(renderBodyPart_bodyChanged));
@@ -306,8 +331,8 @@ namespace y60 {
             glPopMatrix();
             CHECK_OGL_ERROR;
 
-            _myState->setClippingPlanes(theBodyPart.getClippingPlanes());
-            _myState->setScissorBox(theBodyPart.getScissorBox(), theViewport);
+            _myState->setClippingPlanes(theBodyPart->getClippingPlanes());
+            _myState->setScissorBox(theBodyPart->getScissorBox(), theViewport);
 
             glPushMatrix();
 
@@ -334,7 +359,7 @@ namespace y60 {
         DBP(STOP_TIMER(renderBodyPart_bodyChanged));
 
         DBP2(START_TIMER(renderBodyPart_getDrawNormals));
-        const y60::Primitive & myPrimitive = theBodyPart.getPrimitive();
+        const y60::Primitive & myPrimitive = theBodyPart->getPrimitive();
         if (theViewport.get<ViewportDrawNormalsTag>()) {
             const Box3f & myBoundingBox = myShape.get<BoundingBoxTag>();
             float myDiameter = magnitude(myBoundingBox[Box3f::MAX] - myBoundingBox[Box3f::MIN]);
@@ -391,9 +416,9 @@ namespace y60 {
                 // render back & front (two passes, supposedly faster
                 DBP2(START_TIMER(renderBodyPart_renderPrimitives1));
                 _myState->setCullFaces(GL_FRONT);
-                renderPrimitives(theBodyPart, myMaterial);
+                renderPrimitives(*theBodyPart, myMaterial);
                 _myState->setCullFaces(GL_BACK);
-                renderPrimitives(theBodyPart, myMaterial);
+                renderPrimitives(*theBodyPart, myMaterial);
                 DBP2(STOP_TIMER(renderBodyPart_renderPrimitives1));
             } else {  // render one or zero faces - single pass
                 DBP2(START_TIMER(renderBodyPart_renderPrimitives2));
@@ -407,12 +432,12 @@ namespace y60 {
                         _myState->setCullFaces(GL_FRONT); // render back
                     }
                 }
-                renderPrimitives(theBodyPart, myMaterial);
+                renderPrimitives(*theBodyPart, myMaterial);
                 DBP2(START_TIMER(renderBodyPart_renderPrimitives2));
             }
         } else { // face culling is disabled - just render it.
             DBP2(START_TIMER(renderBodyPart_renderPrimitives3));
-            renderPrimitives(theBodyPart, myMaterial);
+            renderPrimitives(*theBodyPart, myMaterial);
             DBP2(START_TIMER(renderBodyPart_renderPrimitives3));
         }
         CHECK_OGL_ERROR;
@@ -981,7 +1006,7 @@ namespace y60 {
     void
     Renderer::createRenderList(const WorldPtr & theWorld,
                                const dom::NodePtr & theNode,
-                               BodyPartMap & theBodyParts,
+                               RenderMap & theRenderParts,
                                const CameraPtr theCamera,
                                const Matrix4f & theEyeSpaceTransform,
                                ViewportPtr theViewport,
@@ -1121,19 +1146,20 @@ namespace y60 {
         // Check culling
         bool myOverlapFrustumFlag = true;
         const Frustum & myFrustum = theCamera->get<FrustumTag>();
-        {
+        if (theNode->nodeName() != EXTERNAL_NODE_NAME) {
+            {
 
-            DBP(MAKE_GL_SCOPE_TIMER(createRenderList_cull));
-            if (theOverlapFrustumFlag && theViewport->get<ViewportCullingTag>() && myFacade->get<CullableTag>()) {
-                if (!intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
-                    DB(AC_TRACE << "createRenderList: bbox=" << myFacade->get<BoundingBoxTag>();)
-                    DB(AC_TRACE << "createRenderList: Frustum=" << myFrustum;)
-                    DB(AC_TRACE << "createRenderList: cull return";)
-                    return;
+                DBP(MAKE_GL_SCOPE_TIMER(createRenderList_cull));
+                if (theOverlapFrustumFlag && theViewport->get<ViewportCullingTag>() && myFacade->get<CullableTag>()) {
+                    if (!intersection(myFacade->get<BoundingBoxTag>(), myFrustum, myOverlapFrustumFlag)) {
+                        DB(AC_TRACE << "createRenderList: bbox=" << myFacade->get<BoundingBoxTag>();)
+                        DB(AC_TRACE << "createRenderList: Frustum=" << myFrustum;)
+                        DB(AC_TRACE << "createRenderList: cull return";)
+                        return;
+                    }
                 }
             }
         }
-
         // Collect clipping planes and scissoring
         {
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_collectClippingScissor));
@@ -1142,11 +1168,10 @@ namespace y60 {
         }
 
         myFacade->set<LastActiveFrameTag>(_myFrameNumber);
-
         // Check for lodding
         if (theNode->nodeName() == LOD_NODE_NAME) {
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_lod));
-            createRenderList(theWorld, getActiveLodChild(theNode, theCamera), theBodyParts,
+            createRenderList(theWorld, getActiveLodChild(theNode, theCamera), theRenderParts,
                     theCamera, theEyeSpaceTransform, theViewport, theOverlapFrustumFlag,
                     theClippingPlanes, theScissorBox);
             DB(AC_TRACE << "createRenderList: lod return";)
@@ -1181,26 +1206,41 @@ namespace y60 {
                                                         myTransform,
                                                         myNearPlane,
                                                         myFarPlane);
-                BodyPart::Key myKey(&myMaterial, &myBody, myBodyKey);
-
+                RenderPart::RenderKey myKey(myBodyKey, myBody.get<RenderOrderTag>(), &myMaterial, (void*) &myBody);
                 if (myMaterial.get<TransparencyTag>()) {
                     COUNT(TransparentPrimitives);
                 } else {
                     COUNT(OpaquePrimitives);
+                    
                 }
 
-                theBodyParts.insert(std::make_pair(myKey, BodyPart(*(theWorld),myBody, myShape, myPrimitive, theClippingPlanes, theScissorBox)));
+                theRenderParts.insert(std::make_pair(myKey, BodyPartPtr(new BodyPart(*(theWorld),myBody, myShape, myPrimitive, theClippingPlanes, theScissorBox))));
             }
             DBP2(STOP_TIMER(createRenderList_remainingBodies));
 
             COUNT(RenderedBodies);
         }
+        // Add externals to render list
+        if (theNode->nodeName() == EXTERNAL_NODE_NAME) {
+            const External & myExternal = *(dynamic_cast_Ptr<External>(myFacade));
+            Matrix4f myTransform = myExternal.get<GlobalMatrixTag>();
+            myTransform.postMultiply(theEyeSpaceTransform);
+            double myFarPlane = myFrustum.getFar();
+            double myNearPlane = myFrustum.getNear();
+            const MaterialBase & myMaterial = myExternal.getMaterial();
+            const_cast<MaterialBase&>(myMaterial).set<LastActiveFrameTag>(_myFrameNumber);
+            asl::Unsigned16 myExternalKey = 0;
+            RenderPart::RenderKey myKey(myExternalKey, myExternal.get<RenderOrderTag>(), &myMaterial, (void*) &myExternal);
 
+            theRenderParts.insert(std::make_pair(myKey, ExternalPartPtr(new ExternalPart(*(theWorld),myExternal, theClippingPlanes, theScissorBox))));
+        }
+
+        // do the down step
         {
             DBP2(START_TIMER(createRenderList_nowCREATING));
             DBP(MAKE_GL_SCOPE_TIMER(createRenderList_recurse));
             for (unsigned i = 0; i < theNode->childNodesLength(); ++i) {
-                createRenderList(theWorld, theNode->childNode(i), theBodyParts, theCamera,
+                createRenderList(theWorld, theNode->childNode(i), theRenderParts, theCamera,
                         theEyeSpaceTransform, theViewport, myOverlapFrustumFlag,
                         theClippingPlanes, theScissorBox);
             }
@@ -1355,13 +1395,15 @@ namespace y60 {
             if (myWorld->getFacade<TransformHierarchyFacade>()->get<VisibleTag>()) {
                 COUNT(ActiveWorlds);
                 // (2) Create lists of render objects
-                BodyPartMap myBodyParts;
+                RenderMap myRenderParts;
+                //BodyPartMap myBodyParts;
+                //ExternalMap myExternalParts;
                 {
                     MAKE_GL_SCOPE_TIMER(createRenderList);
                     Matrix4f myEyeSpaceTransform = myCamera->get<InverseGlobalMatrixTag>();
                     asl::Box2f myScissorBox;
                     myScissorBox.makeFull();
-                    createRenderList(myWorldFacade, myWorld, myBodyParts, myCamera,
+                    createRenderList(myWorldFacade, myWorld, myRenderParts, myCamera,
                             myEyeSpaceTransform, theViewport, true, std::vector<asl::Planef>(),
                             myScissorBox);
                     DB(AC_TRACE << "created Renderlist, size = "<< myBodyParts.size());
@@ -1383,7 +1425,7 @@ namespace y60 {
                 CHECK_OGL_ERROR;
 
                 // (7) render bodies
-                if (! myBodyParts.empty()) {
+                if (!myRenderParts.empty()) {
 
                     DBP2(START_TIMER(render_renderBodyParts));
                     MAKE_GL_SCOPE_TIMER(renderBodyParts);
@@ -1397,7 +1439,7 @@ namespace y60 {
                     bool currentMaterialHasAlpha = false;
                     DBP2(START_TIMER(render_renderBodyParts_Iterator));
 
-                    for (BodyPartMap::const_iterator it = myBodyParts.begin(); it != myBodyParts.end(); ++it) {
+                    for (RenderMap::const_iterator it = myRenderParts.begin(); it != myRenderParts.end(); ++it) {
                         if (theViewport->get<ViewportAlphaTestTag>()
                             && !currentMaterialHasAlpha && it->first.getTransparencyFlag())
                         {
@@ -1407,12 +1449,28 @@ namespace y60 {
                             DBP2(STOP_TIMER(render_renderBodyParts_enableAlpha));
                         }
                         DBP2(START_TIMER(render_renderBodyParts_renderBodyPart));
-                        renderBodyPart(it->second, *theViewport, *myCamera);
+                        BodyPartPtr myBodyPart = dynamic_cast_Ptr<BodyPart>(it->second);
+                        if (myBodyPart) {
+                            renderBodyPart(myBodyPart, *theViewport, *myCamera);
+                        } else {
+                            renderExternal(dynamic_cast_Ptr<ExternalPart>(it->second), *theViewport, *myCamera);    
+                        }
                         DBP2(STOP_TIMER(render_renderBodyParts_renderBodyPart));
 
-                    }
+                    }                    
                     DBP2(STOP_TIMER(render_renderBodyParts_Iterator));
-                    glPopMatrix();
+                    // render externals (means call js bound callback)
+                    /*for (ExternalMap::const_iterator it = myExternalParts.begin(); it != myExternalParts.end(); ++it) {
+                        if (theViewport->get<ViewportAlphaTestTag>()
+                            && !currentMaterialHasAlpha && it->first.getTransparencyFlag())
+                        {
+                            glEnable(GL_ALPHA_TEST);
+                            currentMaterialHasAlpha = true;
+                        }
+                        renderExternal(it->second, *theViewport, *myCamera);
+
+                    } */
+                   glPopMatrix();
                     CHECK_OGL_ERROR;
 
                     _myState->setScissorTest(false);

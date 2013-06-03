@@ -77,6 +77,7 @@ namespace y60 {
     const char * const WORLD_LIST_NAME           = "worlds";
     const char * const WORLD_NODE_NAME           = "world";
     const char * const TRANSFORM_NODE_NAME       = "transform";
+    const char * const EXTERNAL_NODE_NAME        = "external";
     const char * const INCLUDE_NODE_NAME         = "include";
     const char * const INCLUDE_SRC_ATTRIB        = "src";
     const char * const LOD_NODE_NAME             = "lod";

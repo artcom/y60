@@ -35,6 +35,7 @@
 #include "y60_glrender_settings.h"
 
 #include <y60/scene/Body.h>
+#include <y60/scene/External.h>
 #include <y60/scene/MaterialBase.h>
 #include <y60/scene/World.h>
 #include <y60/base/NodeNames.h>
@@ -47,7 +48,44 @@ namespace y60 {
 
     class Primitive;
 
-    class BodyPart {
+    //typedef asl::Ptr<RenderKey> RenderKeyPtr;
+
+    class RenderPart {
+        public:
+            RenderPart() {}
+            virtual ~RenderPart() {}
+            struct RenderKey{
+                RenderKey(asl::Unsigned16 theAlphaBit_ZDepth, int theRenderOrder, const MaterialBase * theMaterial, void* thePtr) : 
+                      alphaBit_ZDepth(theAlphaBit_ZDepth), renderorder(theRenderOrder), material(theMaterial) , objectPtr(thePtr)
+                {}
+                virtual ~RenderKey() {}
+                bool getTransparencyFlag() const {
+                    return 0 != (alphaBit_ZDepth >> 15);
+                }
+                bool operator <(const RenderKey & second) const {
+                    if (this->renderorder != second.renderorder) {
+                        return this->renderorder < second.renderorder;
+                    } else if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
+                        return true;
+                    } else if (this->alphaBit_ZDepth == second.alphaBit_ZDepth) {
+                        if (this->material < second.material) {
+                            return true;
+                        } else if (this->material == second.material) {
+                            return objectPtr < second.objectPtr;
+                        }
+                    }
+                    return false;
+                }
+                asl::Unsigned16      alphaBit_ZDepth;
+                int                  renderorder;
+                const MaterialBase * material;
+                void *               objectPtr; 
+
+            };
+    };
+    typedef asl::Ptr<RenderPart> RenderPartPtr;
+
+    class BodyPart : public RenderPart{
         public:
 
             // key structure
@@ -59,51 +97,6 @@ namespace y60 {
             // material * = the material pointer
             // body *     = the body pointer
 
-            struct Key {
-                Key(const MaterialBase * theMaterial, const Body * theBody, asl::Unsigned16 theAlphaBit_ZDepth) :
-                        alphaBit_ZDepth(theAlphaBit_ZDepth),
-                            material(theMaterial),
-                            body(theBody)
-                        {}
-#if 1
-                        bool operator <(const Key & second) const {
-                            if (this->body->get<RenderOrderTag>() != second.body->get<RenderOrderTag>()) {
-                                return this->body->get<RenderOrderTag>() < second.body->get<RenderOrderTag>();
-                            } else if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
-                                return true;
-                            } else if (this->alphaBit_ZDepth == second.alphaBit_ZDepth) {
-                                if (this->material < second.material) {
-                                    return true;
-                                } else if (this->material == second.material) {
-                                    return (this->body < second.body);
-                                }
-                            }
-                            return false;
-                        }
-#else
-                        // slower, but deterministic rendering order by id
-                        bool operator <(const Key & second) const {
-                            if (this->alphaBit_ZDepth < second.alphaBit_ZDepth) {
-                                return true;
-                            } else if (this->alphaBit_ZDepth == second.alphaBit_ZDepth) {
-                                if (this->material->get<IdTag>() < second.material->get<IdTag>()) {
-                                    return true;
-                                } else if (this->material->get<IdTag>() == second.material->get<IdTag>()) {
-                                    return (this->body->get<IdTag>() < second.body->get<IdTag>());
-                                }
-                            }
-                            return false;
-                        }
-#endif
-
-                bool getTransparencyFlag() const {
-                    return 0 != (alphaBit_ZDepth >> 15);
-                }
-
-                asl::Unsigned16      alphaBit_ZDepth;
-                const MaterialBase * material;
-                const Body         * body;
-            };
 
             BodyPart(const World & theWorldPtr, const Body & theBodyPtr, const Shape & theShape,
                      const Primitive & thePrimitive,
@@ -148,7 +141,40 @@ namespace y60 {
             std::vector<asl::Planef> _myClippingPlanes;
             asl::Box2f               _myScissorBox;
     };
+    typedef asl::Ptr<BodyPart> BodyPartPtr;
 
+    class ExternalPart  : public RenderPart{
+        public:
+            ExternalPart(const World & theWorldPtr, const External & theExternalPtr,                    
+                         const std::vector<asl::Planef> & theClippingPlanes, const asl::Box2f & theScissorBox) :
+                _myWorld(theWorldPtr),
+                _myExternal(theExternalPtr),
+                _myClippingPlanes(theClippingPlanes),
+                _myScissorBox(theScissorBox)
+            {}
+
+            const y60::World & getWorld() const {
+                return _myWorld;
+            }
+
+            const y60::External & getExternal() const {
+                return _myExternal;
+            }
+            const std::vector<asl::Planef> & getClippingPlanes() const {
+                return _myClippingPlanes;
+            }
+
+            const asl::Box2f & getScissorBox() const {
+                return _myScissorBox;
+            }            
+        private:
+            const World &            _myWorld;
+            const External &         _myExternal;
+            std::vector<asl::Planef> _myClippingPlanes;
+            asl::Box2f               _myScissorBox;
+
+    };
+    typedef asl::Ptr<ExternalPart> ExternalPartPtr;
     inline
     asl::Unsigned16
     makeBodyKey(const y60::MaterialBase & theMaterial, const Shape & theShape,
@@ -172,8 +198,9 @@ namespace y60 {
         return myKey;
     }
 
-    // Body Parts sorted by material key
-    typedef std::multimap<BodyPart::Key, BodyPart> BodyPartMap;
+    // Body and External Parts sorted by material key
+    typedef std::multimap<RenderPart::RenderKey, RenderPartPtr> RenderMap;
+    
 }
 
 #endif

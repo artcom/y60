@@ -179,6 +179,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
             myRequestManager.handleRequests();
             Async.onFrame();
         }
+        
         obj.myServer = null;
     };
 

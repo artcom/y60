@@ -148,14 +148,17 @@ namespace y60 {
 
             void createRenderList(const WorldPtr & theWorld,
                                   const dom::NodePtr & theNode,
-                                  BodyPartMap & theBodyParts,
+                                  RenderMap & theRenderParts,
                                   const y60::CameraPtr theCamera,
                                   const asl::Matrix4f & theEyeSpaceTransform,
                                   ViewportPtr theViewport,
                                   bool theOverlapFrustumFlag,
                                   std::vector<asl::Planef> theClippingPlanes,
                                   asl::Box2f theScissorBox);
-            void renderBodyPart(const BodyPart & theBodyPart,
+            void renderExternal(const ExternalPartPtr & theExternalPart, 
+                                const Viewport & theViewport, 
+                                const Camera & theCamera);          
+            void renderBodyPart(const BodyPartPtr & theBodyPart,
                                 const Viewport & theViewport,
                                 const Camera & theCamera);
             void renderPrimitives(const BodyPart & theBodyPart,

@@ -40,6 +40,7 @@
 #include <y60/scene/ShapeBuilder.h>
 #include <y60/scene/ElementBuilder.h>
 #include <y60/scene/MaterialBuilder.h>
+#include <y60/scene/ExternalBuilder.h>
 
 #include <asl/dom/Nodes.h>
 #include <asl/math/Vector234.h>
@@ -110,6 +111,10 @@ Y60_MODELLING_DECL void ensureShapesQuadCount(dom::NodePtr theShapeNode,
 
 Y60_MODELLING_DECL dom::NodePtr createTransform(dom::NodePtr theParentNode,
                              const std::string & theTransformName = "Transform");
+
+Y60_MODELLING_DECL dom::NodePtr createExternal(ScenePtr theScene, dom::NodePtr theParentNode,                            
+                             const std::string & theExternalName = "External",                             
+                             const  std::string & theMaterialId = "");
 
 Y60_MODELLING_DECL dom::NodePtr createBody(dom::NodePtr theParentNode, const std::string & theShapeId);
 

@@ -15,6 +15,7 @@ CanvasBuilder.cpp
 CharacterBuilder.cpp
 ClipBuilder.cpp
 ElementBuilder.cpp
+ExternalBuilder.cpp
 Geometry.cpp
 ImageBuilder.cpp
 JointBuilder.cpp
@@ -62,6 +63,7 @@ Canvas.h
 CanvasBuilder.h
 CharacterBuilder.h
 ClipBuilder.h
+ElementBuilder.h
 ElementBuilder.h
 Facades.h
 Geometry.h

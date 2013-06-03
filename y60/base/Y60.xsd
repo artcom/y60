@@ -1047,7 +1047,7 @@ This element can contain any number of record elements.</xs:documentation>
             <xs:documentation>The world is the toplevel node for the scenegraph.
 It contains a hierachy of scenegraph object.
 Currently the following scenegraph nodes are supported:
-body, camera, light, transform, lod, joint</xs:documentation>
+body, camera, light, transform, external, lod, joint</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:complexContent>
@@ -3292,6 +3292,7 @@ Possible values are:
 Current subnodes include:
 - Body
 - Transform
+- External
 - Include
 - Camera
 - Light
@@ -3576,6 +3577,23 @@ Attributes of the transform node, such as scale, position and orientation are in
         <xs:complexType>
             <xs:complexContent>
                 <xs:extension base="SceneGraphNodeType"/>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="external" substitutionGroup="SceneGraphNode">
+        <xs:annotation>
+            <xs:documentation>External nodes are used integrate external computation. The OpenGL state will be all default, so external rendercomponents, line particles can be integrated into the transform hierarchy. A JS-Function will be called.
+Attributes of the external node, such as scale, position and orientation are inherited by all child nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="SceneGraphNodeType">
+                    <xs:attribute name="material" type="xs:IDREF">
+                        <xs:annotation>
+                            <xs:documentation>The ID of a material that will be used to render the list of elements.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
+                </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
