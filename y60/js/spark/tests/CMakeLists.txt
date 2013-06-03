@@ -10,6 +10,7 @@ Atlas
 
 set(NOCG_TESTS
 testCanvas
+testExternal
 testAtlasRenderTest
 testStretchyAtlasRenderTest
 )

@@ -15,13 +15,11 @@ try {
 
     var myFrameCounter = 0;
 
-        
-    ourShow.getScene().save("external.x60", false);
     Base.onFrame = ourShow.onFrame;
     ourShow.onFrame = function (theTime) {
         Base.onFrame(theTime);
     };
-
+    ourShow.getChildByName("external_4").registerCallback(function() {ourShow.getChildByName("rect").color = new Vector3f(1,1,0)})
     ourShow.setTestDurationInFrames(30);
     ourShow.go();
 } catch (ex) {

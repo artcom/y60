@@ -74,22 +74,17 @@ namespace y60 {
             throw asl::Exception("createExternal:: theParentNode is null!");
         }
         std::string myMaterialId = theMaterialId;
-        AC_PRINT << "5";
         if (theMaterialId == "") {
             MaterialBuilder myMaterialBuilder("m_"+ theExternalName, false);
             theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
             //appendUnlitProperties(myMaterialBuilder, theColor);
             myMaterialBuilder.computeRequirements();
             myMaterialId = myMaterialBuilder.getNode()->getAttributeString("id");
-            AC_PRINT << "create Material : " << *(myMaterialBuilder.getNode()) << "id : " << myMaterialId;
-        } else {
-            AC_PRINT << "use materialid :" << myMaterialId;
         }
         WorldBuilderBase myParent(theParentNode);
         ExternalBuilder myExternal(theExternalName, myMaterialId);
         myParent.appendObject(myExternal);
 
-        AC_PRINT << "7";
         /*dom::NodePtr myEternalNode = myExternal.getNode();
         AC_PRINT << "8: "<< *(myEternalNode);*/
         return myExternal.getNode();

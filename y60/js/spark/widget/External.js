@@ -25,7 +25,6 @@ spark.External.Constructor = function (Protected) {
     	if (_d.renderCallBack) {
     		_d.renderCallBack();
     	}
-        //print("JS::render external: ", theEvent.target)
     }
     Public.registerCallback = function(theCB) {
     	_d.renderCallBack = theCB;
