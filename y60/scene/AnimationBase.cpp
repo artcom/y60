@@ -169,8 +169,11 @@ namespace y60 {
             DB(AC_DEBUG << "--------------------- nothing to do " << endl);
             return 0;
         }
-
-        _myEffectiveRuntime = theTime - _myBegin;
+        /*dom::NodePtr myAttribute = _myNode->getAttribute(ANIM_PAUSE_ATTRIB);
+        if (myAttribute) {
+            _myPause = myAttribute->dom::Node::nodeValueRef<float>();
+        }*/
+        _myEffectiveRuntime = theTime - _myBegin - _myPause;
         double myAnimationTime =_myEffectiveRuntime;
         double myAnimationEndTime = calcEndTime();
 
@@ -233,7 +236,7 @@ namespace y60 {
 
 
         // calc the real indicies
-        double myValuePosition = myAnimationTime / _myDuration * (theValueSize - 1);
+        double myValuePosition = myAnimationTime / (_myDuration) * (theValueSize - 1);
         theLowerIndex = int(myValuePosition);
         theUpperIndex = theLowerIndex + 1;
         if (theUpperIndex >= theValueSize) {

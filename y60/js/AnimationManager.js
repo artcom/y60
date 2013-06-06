@@ -40,7 +40,7 @@ function Animation(theAnimationName, theSceneViewer) {
 Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer) {
     var _mySceneViewer   = theSceneViewer;
     var _myName  = theAnimationName;
-
+    var _myPauseFlag = false;
     var _myAnimationNode = window.scene.animations.find(".//*[@name = '" + theAnimationName + "']");
     if (!_myAnimationNode) {
         throw new Exception("Could not find animation: " + theAnimationName, fileline());
@@ -48,11 +48,15 @@ Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer
     obj.getName = function() {
         return _myName;
     };
+    obj.pause = function() {
+        _myPauseFlag = !_myPauseFlag;
+    };
     obj.start = function(theOffset, theLoops) {
         var myCurrentTime = _mySceneViewer.getCurrentTime();
         _myAnimationNode.begin = myCurrentTime + theOffset;
         _myAnimationNode.enabled = true;
         _myAnimationNode.count   = theLoops;
+        _myAnimationNode.pause = 0.0;
     };
     obj.setInOutAndStart = function(theBeginTime, theEndTime, theOffset, theLoops) {
         var myCurrentTime = _mySceneViewer.getCurrentTime();
@@ -70,6 +74,15 @@ Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer
     };
     obj.getAnimationNode = function() {
         return _myAnimationNode;
+    };
+    obj.onFrame = function(theDeltaT) {
+        if (_myPauseFlag) {
+            _myAnimationNode.pause = _myAnimationNode.pause + theDeltaT;
+        }
+    };
+    obj.isRunning = function() {
+        var myCurrentTime = _mySceneViewer.getCurrentTime();
+        return _myAnimationNode.enabled && myCurrentTime >= _myAnimationNode.begin  &&  myCurrentTime <= _myAnimationNode.begin + _myAnimationNode.duration;
     };
 };
 
@@ -250,7 +263,7 @@ AnimationManager.prototype.Constructor = function(obj, theSceneViewer) {
         } else if (_myEnabled) {
             var myDiff = theTime - _myLastTime;
             if (myDiff > 0.05) {
-                //print("Animation timestep > 0.05: " + myDiff.toFixed(4));
+               // print("Animation timestep > 0.05: " + myDiff.toFixed(4));
             } else if (myDiff > 0.1) {
                 Logger.warning("Animation timestep > 0.1: " + myDiff.toFixed(4));
             }
