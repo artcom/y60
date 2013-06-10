@@ -129,7 +129,7 @@ namespace y60 {
                     _onFirstRenderEventEnabled = true;
                     someEventEnabled = true;
                 } else {
-                    AC_WARNING << "unknown event trigger:" << myEvents[i];
+                    AC_TRACE << "unknown or not builtin event trigger:" << myEvents[i];
                 }
             }
             if (someEventEnabled) {

@@ -1,0 +1,16 @@
+<SparkSceneTesterWindow name="externalTutorial"
+        title="externalTutorial"
+        decorations="true"
+        mouseCursor="true"
+        width="900"
+        height="600"
+        swapInterval="1"
+        i18nContext="global-i18n">
+        
+    <Rectangle name="rect" x="0" renderorder="3" y="0" width="200" height="200" color="[0.2,0.5,0.7]"/>
+    <External name="external_0" renderorder="6"/>    
+    <External name="external_1" renderorder="5"/>    
+    <External name="external_2" renderorder="4"/>    
+    <External name="external_3" renderorder="2"/>    
+    <External name="external_4" renderorder="1"/>    
+</SparkSceneTesterWindow>

@@ -101,6 +101,52 @@ EnsureShapesQuadCount(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, j
 }
 
 JS_STATIC_DLL_CALLBACK(JSBool)
+CreateExternal(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
+    try {
+        DOC_BEGIN("Creates a new external node and its material and adds it to a given parent");
+        DOC_PARAM("theScene", "The scene to create the externals material inside", DOC_TYPE_SCENE);
+        DOC_PARAM("theParentNode", "A node in the world", DOC_TYPE_NODE);
+        DOC_PARAM("theName", "Name of the external", DOC_TYPE_STRING);
+        DOC_PARAM("theMaterialId", "(optional) Name of the external material", DOC_TYPE_STRING);
+        DOC_RVAL("The new external node", DOC_TYPE_NODE);
+        DOC_END;
+
+        ensureParamCount(argc, 2, 4);
+
+        y60::ScenePtr mySceneNode;
+        if (!convertFrom(cx, argv[0], mySceneNode)) {
+            JS_ReportError(cx,"CreateExternal: argument 1 is not a scene");
+            return JS_FALSE;
+        }
+
+        dom::NodePtr  myParentNode;
+        if (!convertFrom(cx, argv[1], myParentNode)) {
+            JS_ReportError(cx,"CreateExternal: argument 2 is not a node");
+            return JS_FALSE;
+        }
+
+        
+        dom::NodePtr myResult;
+        if (argc == 2) {
+            myResult = createExternal(mySceneNode, myParentNode);
+        } else if (argc > 2) {
+
+            string myExternalName;
+            convertFrom(cx, argv[2], myExternalName);
+
+            string myMaterialId("");
+            if (argc  == 4) {
+                convertFrom(cx, argv[3], myMaterialId);
+            }
+            myResult = createExternal(mySceneNode, myParentNode, myExternalName, myMaterialId);
+        }
+        *rval = as_jsval(cx, myResult);
+
+        return JS_TRUE;
+
+    } HANDLE_CPP_EXCEPTION;
+}
+JS_STATIC_DLL_CALLBACK(JSBool)
 CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval) {
     try {
         DOC_BEGIN("Creates a new transform node and adds it to a given parent");
@@ -1358,6 +1404,7 @@ JSModellingFunctions::StaticFunctions() {
     static JSFunctionSpec myFunctions[] = {
         // name                         native                       nargs
         {"createTransform",             CreateTransform,             2},
+        {"createExternal",              CreateExternal,             2},
         {"createSurface2DFromContour",  CreateSurface2DFromContour,  5},
         {"createBody",                  CreateBody,                  2},
         {"createCanvas",                CreateCanvas,                2},

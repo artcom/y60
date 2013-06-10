@@ -92,6 +92,7 @@ if (!("disableSparkWidgets" in this)) {
     use("spark/widgets.js");
     // concrete classes (inheritance-ordered)
     use("spark/widget/Transform.js");
+    use("spark/widget/External.js");
     use("spark/widget/Switch.js");
     use("spark/widget/Stage.js");
     use("spark/widget/OffscreenStage.js");

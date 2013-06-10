@@ -53,6 +53,7 @@
 #include "Record.h"
 #include "Primitive.h"
 #include "Transform.h"
+#include "External.h"
 #include "World.h"
 #include "Joint.h"
 
@@ -70,6 +71,7 @@ namespace y60 {
         theFactory->registerPrototype(WORLD_NODE_NAME, dom::FacadePtr(new World(dom::Node::Prototype)));
         theFactory->registerPrototype(BODY_NODE_NAME, dom::FacadePtr(new Body(dom::Node::Prototype)));
         theFactory->registerPrototype(TRANSFORM_NODE_NAME, dom::FacadePtr(new TransformFacade(dom::Node::Prototype)));
+        theFactory->registerPrototype(EXTERNAL_NODE_NAME, dom::FacadePtr(new External(dom::Node::Prototype)));
         theFactory->registerPrototype(LOD_NODE_NAME, dom::FacadePtr(new LodFacade(dom::Node::Prototype)));
         theFactory->registerPrototype(LIGHT_NODE_NAME, dom::FacadePtr(new Light(dom::Node::Prototype)));
         theFactory->registerPrototype(LIGHTSOURCE_NODE_NAME, dom::FacadePtr(new LightSource(dom::Node::Prototype)));

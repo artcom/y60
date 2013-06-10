@@ -36,6 +36,7 @@
 #include "SimpleTesselator.h"
 
 #include <y60/scene/TransformBuilder.h>
+#include <y60/scene/ExternalBuilder.h>
 #include <y60/scene/SceneBuilder.h>
 #include <y60/scene/ShapeBuilder.h>
 #include <y60/scene/ElementBuilder.h>
@@ -64,6 +65,29 @@ namespace y60 {
         TransformBuilder myTransform(theTransformName);
         myParent.appendObject(myTransform);
         return myTransform.getNode();
+    }
+    dom::NodePtr
+    createExternal(ScenePtr theScene, dom::NodePtr theParentNode,                    
+                   const std::string & theExternalName,                   
+                   const std::string & theMaterialId ) {
+        if (!theParentNode) {
+            throw asl::Exception("createExternal:: theParentNode is null!");
+        }
+        std::string myMaterialId = theMaterialId;
+        if (theMaterialId == "") {
+            MaterialBuilder myMaterialBuilder("m_"+ theExternalName, false);
+            theScene->getSceneBuilder()->appendMaterial(myMaterialBuilder);
+            //appendUnlitProperties(myMaterialBuilder, theColor);
+            myMaterialBuilder.computeRequirements();
+            myMaterialId = myMaterialBuilder.getNode()->getAttributeString("id");
+        }
+        WorldBuilderBase myParent(theParentNode);
+        ExternalBuilder myExternal(theExternalName, myMaterialId);
+        myParent.appendObject(myExternal);
+
+        /*dom::NodePtr myEternalNode = myExternal.getNode();
+        AC_PRINT << "8: "<< *(myEternalNode);*/
+        return myExternal.getNode();
     }
 
     dom::NodePtr
