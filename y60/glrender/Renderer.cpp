@@ -190,7 +190,6 @@ namespace y60 {
         }
         DBP(MAKE_GL_SCOPE_TIMER(switchMaterial));
         COUNT(materialChange);
-
         IShaderPtr myShader = theMaterial.getShader();
         deactivatePreviousMaterial();
         CHECK_OGL_ERROR;
@@ -1491,6 +1490,7 @@ namespace y60 {
         }
 
 
+
         {
             MAKE_GL_SCOPE_TIMER(renderOverlays);
             renderOverlays(*theViewport, OVERLAY_LIST_NAME);
@@ -1902,6 +1902,9 @@ namespace y60 {
             return;
         }
 
+        deactivatePreviousMaterial();
+        _myPreviousMaterial = 0;
+
         glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
         //glPushAttrib(GL_ALL_ATTRIB_BITS);
 
@@ -2004,7 +2007,6 @@ namespace y60 {
                 }
 
                 COUNT(Overlays);
-
                 bool myMaterialHasChanged = switchMaterial(theViewport, *myMaterial, true);
                 if (myMaterialHasChanged) {
                     IShaderPtr myShader = myMaterial->getShader();
