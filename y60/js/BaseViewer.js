@@ -30,7 +30,7 @@
 */
 
 /*jslint white:false, nomen:false, bitwise:false, plusplus:false*/
-/*globals use, Renderer, glow, window, Logger, Glow, AutoClicker, Vector2f,
+/*globals use, Renderer, glow, window, Logger, Glow, Vector2f,
           Exception, fileline, Picking, fileExists, revision, Node,
           createUniqueId, almostEqual, Vector2i, Modelling, print,
           LightManager, GLResourceManager, SwitchNodeHandler,
@@ -50,7 +50,6 @@ use("HeartbeatThrober.js");
 use("Playlist.js");
 use("Glow.js");
 use("SwitchNodeHandler.js");
-use("AutoClicker.js");
 
 function BaseViewer(theArguments) {
     this.Constructor(this, theArguments);
@@ -94,7 +93,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
     var _myHeartbeatThrober = null;
     var _myNagiosPlugin     = null;
     var _myPicking          = null;
-    var _myAutoClicker      = null;
 
     var _mySwitchNodes  = [];
     var _myMSwitchNodes = [];
@@ -124,13 +122,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         }
         _activeViewport.glow = theMode;
         _myGlow.setEnabled(theMode);
-    });
-    
-    self.__defineGetter__("autoClicker", function () {
-        if (!_myAutoClicker) {
-            _myAutoClicker = new AutoClicker(self);
-        }
-        return _myAutoClicker;
     });
     
     /*function getViewportId(theViewport) {
@@ -737,10 +728,6 @@ BaseViewer.prototype.Constructor = function(self, theArguments) {
         if (_myHeartbeatThrober !== null) {
             _myHeartbeatThrober.throb(theTime);
         }
-        if (_myAutoClicker !== null) {
-            _myAutoClicker.onFrame();
-        }
-        
         var myCanvas = self.getActiveViewport().parentNode; //self.getRenderWindow().canvas;
         if (myCanvas) {
             for (var i=0; i < myCanvas.childNodesLength('viewport'); ++i) {

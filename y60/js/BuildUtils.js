@@ -30,6 +30,7 @@
 */
 
 use("Y60JSSL.js");
+use("ShapeBuilder.js");
 use("Playlist.js");
 
 // build a <transform> node

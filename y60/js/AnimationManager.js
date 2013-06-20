@@ -51,6 +51,9 @@ Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer
     obj.pause = function() {
         _myPauseFlag = !_myPauseFlag;
     };
+    obj.stop = function() {
+        _myAnimationNode.enabled = false;
+    };
     obj.start = function(theOffset, theLoops) {
         var myCurrentTime = _mySceneViewer.getCurrentTime();
         _myAnimationNode.begin = myCurrentTime + theOffset;
