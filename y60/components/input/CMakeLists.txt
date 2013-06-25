@@ -1,6 +1,7 @@
 add_subdirectory(Gesture)
 add_subdirectory(ASSDriver)
 add_subdirectory(DSADriver)
+add_subdirectory(Proximatrix2)
 
 if(TUIO_FOUND)
     add_subdirectory(TUIO)
