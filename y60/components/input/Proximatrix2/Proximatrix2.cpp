@@ -6,6 +6,8 @@
 
 #include <asl/dom/Nodes.h>
 #include <asl/base/Time.h>
+#include <asl/math/numeric_functions.h>
+#include <asl/math/linearAlgebra.h>
 
 #include <asl/net/UDPConnection.h>
 #include <asl/net/UDPSocket.h>
@@ -43,6 +45,8 @@ struct touch_info {
     double lastAppeared;
 };
 
+typedef asl::Ptr<inet::UDPSocket> UDPSocketPtr;
+
 class Proximatrix2 : public PlugInBase,
                    public y60::IEventSource,
                    public jslib::IScriptablePlugin,
@@ -52,11 +56,13 @@ class Proximatrix2 : public PlugInBase,
 private:
     asl::Ptr<dom::ValueFactory> _myEventValueFactory;
     asl::Vector2f _myTouchArea;
-    inet::UDPSocket *_mySocket;
-    unsigned int _myPort;
+    UDPSocketPtr _mySocket;
     NodePtr _myEventSchemaDocument;
     std::map<int, touch_info> _myIdMap;
     unsigned long long _myTouchUpTimeout;
+    std::vector<asl::Vector2f> _myReferencePoints;
+    std::vector<asl::Vector2f> _myCalibrationPoints;
+    unsigned short _myPort; 
 
 public:
     Proximatrix2(DLHandle myDLHandle)
@@ -65,9 +71,11 @@ public:
           _myEventValueFactory(new ValueFactory()),
           _myTouchArea(-1.0, -1.0),
           _myEventSchemaDocument(new Document(y60::ourproximatrix2toucheventxsd)),          
-          _myPort(10000),
           _myIdMap(),
-          _myTouchUpTimeout(100)
+          _myTouchUpTimeout(100),
+          _myCalibrationPoints(),
+          _myReferencePoints(),
+          _myPort(10000)
     {
         registerStandardTypes(*_myEventValueFactory);
         registerSomTypes(*_myEventValueFactory);
@@ -87,33 +95,58 @@ public:
     }
 
     virtual void onUpdateSettings(dom::NodePtr theSettings) {
-        // dom::NodePtr mySettings = getTUIOSettings(theSettings);
-        // int myFilterFlag = 0;
-        // getConfigSetting( mySettings, "FilterMultipleMovePerCursor", myFilterFlag, 0);
-        // _myFilterMultipleMovePerCursorFlag = (myFilterFlag == 1 ? true : false);
-        // getConfigSetting( mySettings, "MaxCursorPositionsForAverage", _myMaxCursorPositionsInHistory, static_cast<unsigned int>(1));
-        // int myMaxCursorCount = -1;
-        // getConfigSetting( mySettings, "MaxCursorCount", myMaxCursorCount, -1);
-        // setMaxCursorCount(myMaxCursorCount);
-        // getConfigSetting( mySettings, "TouchArea", _myTouchArea, asl::Vector2f(-1.0,-1.0));
+        AC_PRINT << "update settings : " << theSettings;
+        _myCalibrationPoints.clear();
+        _myReferencePoints.clear();
+
+        int myFilterFlag = 0;
+        asl::Vector2f screen0, screen1, screen2;
+        getConfigSetting( theSettings, "Screen0", screen0, asl::Vector2f(0.0f, 0.0f));
+        getConfigSetting( theSettings, "Screen1", screen1, asl::Vector2f(1.0f, 0.0f));
+        getConfigSetting( theSettings, "Screen2", screen2, asl::Vector2f(0.0f, 1.0f));
+        
+        _myReferencePoints.push_back(screen0); 
+        _myReferencePoints.push_back(screen1); 
+        _myReferencePoints.push_back(screen2); 
+
+        asl::Vector2f touch0, touch1, touch2;
+        getConfigSetting( theSettings, "Touch0", touch0, asl::Vector2f(0.0f, 0.0f));
+        getConfigSetting( theSettings, "Touch1", touch1, asl::Vector2f(1.0f, 0.0f));
+        getConfigSetting( theSettings, "Touch2", touch2, asl::Vector2f(0.0f, 1.0f));
+        
+        _myCalibrationPoints.push_back(touch0); 
+        _myCalibrationPoints.push_back(touch1); 
+        _myCalibrationPoints.push_back(touch2); 
+    
+        // network receiver port
+        int myPort;
+        getConfigSetting( theSettings, "Port", myPort, 10000);
+        _myPort = static_cast<unsigned short>(myPort);
+        ensureSocket();
     }
 
 // IEventSource
 
-    void init() {
-        AC_PRINT << "init";
-        try {
-            _mySocket = new inet::UDPSocket(INADDR_ANY, _myPort);
+    void ensureSocket() {
+        if (!_mySocket || _mySocket->getLocalPort() != _myPort) {
+            
+            try {
+                _mySocket = UDPSocketPtr(new inet::UDPSocket(INADDR_ANY, _myPort));
 
-            // if(_mySocket->isValid()) {
-            //     char trashBuffer[1024];
-            //     size_t bytesReceived = sizeof(trashBuffer);
-            //     _mySocket->receiveFrom(0, 0, trashBuffer, bytesReceived);
-            // }
-        } catch(SocketException &e) {
-            AC_WARNING << "Error creating the UDP socket: " << e.where();
-            _mySocket = 0;
+                // if(_mySocket->isValid()) {
+                //     char trashBuffer[1024];
+                //     size_t bytesReceived = sizeof(trashBuffer);
+                //     _mySocket->receiveFrom(0, 0, trashBuffer, bytesReceived);
+                // }
+            } catch(SocketException &e) {
+                AC_WARNING << "Error creating the UDP socket: " << e.where();
+                _mySocket = UDPSocketPtr(0);
+            }
         }
+    }
+
+    void init() {
+        ensureSocket();
     }
    
     template<typename T>
@@ -128,13 +161,48 @@ public:
         return value;
     }
 
+    asl::Vector2f projection(asl::Vector2f v1, asl::Vector2f v2) {
+        asl::Vector2f v3 = normalized(v2);
+        return dot(v1, v3) * v3;    
+    }
+
+    asl::Vector2f transformPosition(float x, float y) {
+        if (_myCalibrationPoints.size() < 3 || _myReferencePoints.size() < 3) {
+            AC_ERROR << "calibration incomplete";
+            return asl::Vector2f(0.0f, 0.0f);
+        }
+        
+        asl::Vector2f result;
+        asl::Vector2f input = asl::Vector2f(x,y);
+
+        asl::Vector2f base1 = _myReferencePoints[1] - _myReferencePoints[0];
+        asl::Vector2f base2 = _myReferencePoints[2] - _myReferencePoints[0];
+    
+        asl::Vector2f cal1 = _myCalibrationPoints[1] - _myCalibrationPoints[0];
+        asl::Vector2f cal2 = _myCalibrationPoints[2] - _myCalibrationPoints[0];
+   
+        asl::Vector2f p1 = projection(input - _myCalibrationPoints[0], cal1);  
+        asl::Vector2f p2 = projection(input - _myCalibrationPoints[0], cal2);  
+   
+        p1 = p1 / magnitude(cal1);
+        p2 = p2 / magnitude(cal2);
+
+        float l1 = magnitude(p1);
+        float l2 = magnitude(p2);
+            
+        result = (l1 * base1 + l2 * base2) + _myReferencePoints[0]; 
+
+        return result;
+    }
+
     GenericEventPtr createEvent(touch_info & info) {
-        GenericEventPtr myEvent(new GenericEvent("onTouch", _myEventSchemaDocument, _myEventValueFactory));
+        GenericEventPtr myEvent(new GenericEvent("onProximatrix2Event", _myEventSchemaDocument, _myEventValueFactory));
         NodePtr myNode = myEvent->getNode();
 
-        asl::Vector2f position(static_cast<float>(info.x), static_cast<float>(info.y));
         myNode->appendAttribute<int>("id", info.id);
-        myNode->appendAttribute<Vector2f>("position", Vector2f(info.x, info.y));
+
+        asl::Vector2f position = transformPosition(static_cast<float>(info.x), static_cast<float>(info.y));
+        myNode->appendAttribute<Vector2f>("position", position);
         myNode->appendAttribute<Vector2f>("raw_position", Vector2f(info.x, info.y));
         myNode->appendAttribute<int>("pressure", info.pressure);
         
@@ -148,7 +216,7 @@ public:
         unsigned char receiveBuffer[buffersize];
 
         EventPtrList events;
-        
+       
         if (_mySocket->isValid()) {
             while (_mySocket->peek(buffersize)) {
                 
@@ -180,11 +248,11 @@ public:
                         GenericEventPtr myEvent = createEvent(ti);
                         
                         if (_myIdMap.find(ti.id) == _myIdMap.end()) { 
-                            myEvent->getNode()->appendAttribute<DOMString>("type", "down");
+                            myEvent->getNode()->appendAttribute<DOMString>("type", "add");
                         } else {
                             myEvent->getNode()->appendAttribute<DOMString>("type", "move");
                         }
-
+                        
                         events.push_back(myEvent);
                         _myIdMap[ti.id] = ti;
                     }
@@ -199,7 +267,7 @@ public:
 
             if ( asl::Time().millis() - it->second.lastAppeared > _myTouchUpTimeout) {
                 GenericEventPtr myEvent = createEvent(it->second);
-                myEvent->getNode()->appendAttribute("type", "up");
+                myEvent->getNode()->appendAttribute("type", "remove");
                 events.push_back(myEvent);
                 
                 _myIdMap.erase(it);

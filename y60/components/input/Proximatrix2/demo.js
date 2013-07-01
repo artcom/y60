@@ -66,7 +66,7 @@ Proximatrix2Demo.prototype.Constructor = function(self, theArguments) {
 
         Base.setup(theWidth, theHeight, theFullscreen, theTitle);
 
-        self.registerSettingsListener(_myProximatrix2, "EdgeBlender");
+        // self.registerSettingsListener(_myProximatrix2, "Proximatrix2");
 
         window.camera.frustum.hfov = 0;
         window.camera.frustum.width = theWidth;
@@ -85,10 +85,7 @@ Proximatrix2Demo.prototype.Constructor = function(self, theArguments) {
 
     Base.onKey = self.onKey;
     self.onKey = function(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag) {
-        if (theCtrlFlag) {
-            Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
-            return;
-        }
+        Base.onKey(theKey, theState, theX, theY, theShiftFlag, theCtrlFlag, theAltFlag);
     }
 
     self.onTouch = function(theEvent) {
@@ -98,7 +95,9 @@ Proximatrix2Demo.prototype.Constructor = function(self, theArguments) {
                     Math.random(), Math.random(), 1);
         }
 
+        print(theEvent.position);
         _touches[theEvent.id] = theEvent;
+        _myProximatrix2.onUpdateSettings( new Node("<blaschnabel/>") );
     }
 
     Base.onFrame = self.onFrame;
