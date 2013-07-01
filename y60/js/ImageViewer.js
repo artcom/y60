@@ -31,15 +31,9 @@
 if (__main__ == undefined) var __main__ = "ImageViewer";
 
 use("SceneViewer.js");
-use("FrameRateLimiter.js");
-//use("AudioController.js");
 use("SoundController.js");
 use("Playlist.js");
 use("BuildUtils.js");
-
-const MINZOOMFACTOR = 0.001;
-const FRAME_RATE    = 100;
-const OS = operatingSystem();
 
 
 function ImageViewerApp(theArguments) {
@@ -47,6 +41,9 @@ function ImageViewerApp(theArguments) {
 }
 
 ImageViewerApp.prototype.Constructor = function(self, theArguments) {
+
+    var MINZOOMFACTOR    = 0.001;
+    var OS = operatingSystem();
 
     var _myPlaylist      = new Playlist();
     var _myFileIndex     = 0;
@@ -63,7 +60,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
 
     var _myZoomCenter       = {image: new Vector2f(0,0), screen: new Vector2f(0,0)};
     var _myDragStart        = null;
-    var _myFrameRateLimiter = new FrameRateLimiter(FRAME_RATE);
 
     var _myCurrentMediaType = -1;
     var _mySoundId          = -1;
@@ -238,7 +234,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             print("miss: " + window.fps + " / " + millisec());
         }*/
         if (_myMovieNode && _myMovieOverlay && _myMovieOverlay.visible) {            
-            //_myFrameRateLimiter.onFrame(theTime);
             var myFrameDiff = _myMovieNode.currentframe - _myLastFrame;
             if (myFrameDiff > 1) {
                 var myMissedFrameDiff = myFrameDiff-1;
@@ -255,7 +250,6 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myLastFrame = _myMovieNode.currentframe;
         }
         if (_myCaptureNode && _myMovieOverlay && _myMovieOverlay.visible) {
-            //_myFrameRateLimiter.onFrame(theTime);
             window.scene.loadCaptureFrame(_myCaptureNode);
         }
         if (_mySoundId != -1 && !isPlaying(_mySoundId)) {

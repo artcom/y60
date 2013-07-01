@@ -36,7 +36,7 @@
           getFocalLength, WalkMover, FlyMover, TrackballMover,
           ClassicTrackballMover, CenteredTrackballMover, RenderWindow,
           ImageOverlay, Vector2f, Vector4f, Configurator, Shutter,
-          ImageManager, AnimationManager, DebugVisual, MemoryMeter,
+          AnimationManager, MemoryMeter,
           TextureAtlasManager*/
 
 // use this idiom in each level of inheritance and
@@ -46,18 +46,14 @@ var __main__ = __main__ || "SceneViewer";
 
 use("BaseViewer.js");
 
+use("BuildUtils.js");
 use("ClassicTrackballMover.js");
 use("TrackballMover.js");
 use("WalkMover.js");
 use("FlyMover.js");
 use("KeyMover.js");
-use("Cursor.js");
-use("LightManager.js");
-use("DebugVisual.js");
 use("AnimationManager.js");
-use("ImageManager.js");
 use("TextureAtlasManager.js");
-use("Timer.js");
 use("shutter.js");
 use("OnScreenDisplay.js");
 use("MemoryMeter.js");
@@ -83,12 +79,10 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
 
     var _myFullscreen             = false;
     var _myConfigurator           = null;
-    var _myDebugVisual            = null;
     var _myAnimationManager       = null;
     var _myImageManager           = null;
     var _myScreenshotCount        = 0;
     var _myCurrentTime            = 0;
-    //var _myTimer                  = new AutoTimer("SceneViewer Timer");
     var _mySplashScreen           = null;
     var _mySplashScreenFlag       = false;
     var _myShutter                = null;
@@ -233,7 +227,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
     self.textureAtlasManager = new TextureAtlasManager();
 
     self.setCursor = function (theImageString, theSize) {
-        setCursor(theImageString, theSize);
+        etCursor(theImageString, theSize);
     };
 
     self.resetCursor = function () {
@@ -303,11 +297,6 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         return _myAnimationManager;
     };
 
-    self.getImageManager = function () {
-        Logger.warning("ImageManager is deprecated.");
-        return _myImageManager;
-    };
-    
     self.getPerfMeter = function () {
         if (!_myPerfMeter) {
             _myPerfMeter = new PerfMeter(self);
@@ -403,7 +392,6 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
                 _myConfigurator.onKey(theKey, theKeyState, theShiftFlag, theCtrlFlag, theAltFlag);
             }
             if (theCtrlFlag) {
-                _myDebugVisual.onKey(theKey, theKeyState, theShiftFlag);
                 _myAnimationManager.onKey(theKey, theKeyState, theShiftFlag);
             }
         }
@@ -744,13 +732,8 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
         self.setMover(ClassicTrackballMover, myViewport);
         self.setActiveCamera(window.scene.dom.getElementById(myViewport.camera), myViewport);
 
-        _myDebugVisual = new DebugVisual(myScene.world, self);
-
         _myAnimationManager = new AnimationManager(self);
         _myRuler            = new Ruler(self);
-
-        // [CH]: Deprecated, should be removed someday
-        _myImageManager = new ImageManager(self);
 
         var myOptionsString = ("settings" in self['arguments']) ? self['arguments'].settings : undefined;
         

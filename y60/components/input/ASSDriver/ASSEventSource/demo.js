@@ -32,7 +32,6 @@
 if (__main__ == undefined) var __main__ = "ASSDriverTest";
 
 use("SceneViewer.js");
-use("ASSOSD.js");
 use("BuildUtils.js");
 use("SoundController.js");
 
