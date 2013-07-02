@@ -32,6 +32,7 @@
 #include "NetAsync.h"
 #include "JSHttpServer.h"
 #include "JSHttpClient.h"
+#include "JSWebSocketClient.h"
 #include <y60/jsbase/JSScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
 
@@ -82,6 +83,7 @@ NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     JSA_AddFunctions(theContext, asyncNamespace, Functions());
     JSHttpServer::initClass(theContext, asyncNamespace);
     JSHttpClient::initClass(theContext, asyncNamespace);
+    JSWebSocketClient::initClass(theContext, asyncNamespace);
 };
 
 void

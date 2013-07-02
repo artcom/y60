@@ -4,9 +4,11 @@ HttpServer.cpp
 curl/Client.cpp
 JSHttpClient.cpp
 JSHttpServer.cpp
+JSWebSocketClient.cpp
 NetAsync.cpp
 curl/SocketAdapter.cpp
 curl/MultiAdapter.cpp
+websocket/Client.cpp
 MimeTypes.cpp
 Reply.cpp
 RequestParser.cpp
@@ -19,6 +21,7 @@ HttpHeader.h
 HttpServer.h
 curl/Client.h
 JSHttpClient.h
+# JSWebSocketClient.h
 JSHttpServer.h
 MimeTypes.h
 NetAsync.h
