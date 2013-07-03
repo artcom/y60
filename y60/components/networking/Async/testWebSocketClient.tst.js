@@ -49,11 +49,12 @@ WebSocketUnitTest.prototype.Constructor = function (obj, theName) {
 
     function testWebSocket() {
 
-        var done = true;
+        var done = false;
         Logger.info("creating client");
-        var websocket = new Async.WebSocket("ws://echo.websocket.org");
+        // var websocket = new Async.WebSocket("ws://echo.websocket.org");
+        var websocket = new Async.WebSocket("ws://localhost:1234/timeinfo");
         websocket.onopen = function(evt) {};
-        websocket.onclose = function(evt) {};
+        websocket.onclose = function(evt) { done = true; };
         websocket.onmessage = function(evt) {};
         websocket.onerror = function(evt) {};
 

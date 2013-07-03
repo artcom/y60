@@ -33,10 +33,12 @@ RequestParser.h
 y60_netasync_settings.h
 )
 
-list ( APPEND EXTERNALS )
+find_package(OpenSSL)
+list( APPEND EXTERNALS OPENSSL )
+
 
 if(NOT WIN32)
-    find_package(Boost COMPONENTS thread system)
+    find_package(Boost COMPONENTS thread system regex)
 endif(NOT WIN32)
 
 if(WIN32)
@@ -48,7 +50,7 @@ y60_add_component(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS asldom aslnet spidermonkey y60jsbase y60jslib
-    EXTERNS ${EXTERNALS} Boost 
+    EXTERNS ${EXTERNALS} 
 )
 
 y60_add_jstest(HttpServer mod_Async)

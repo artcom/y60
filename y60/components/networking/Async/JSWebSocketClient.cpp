@@ -129,13 +129,21 @@ JSWebSocketClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *
         JS_ReportError(cx,"Constructor for %s bad object; did you forget a 'new'?", ClassName());
         return JS_FALSE;
     }
+    ensureParamCount(argc, 1);
 
     JSObject* optsObject;
-    if (!JSVAL_IS_OBJECT(argv[0])) {
+    string theURL;
+    if (JSVAL_IS_STRING(argv[0])) {
+        // construnctor was called with a string (uri) argument. We will transform this to a options-hash 
+        // and then continue
+        optsObject = JS_NewObject(cx, NULL, NULL, NULL);
+        JS_SetProperty(cx, optsObject, "url", &argv[0]);
+    } else if (JSVAL_IS_OBJECT(argv[0]) && !JSVAL_IS_NULL(argv[0])) {
+        JS_ValueToObject(cx,argv[0],&optsObject);
+    } else {
         JS_ReportError(cx, "WebSocketClient::Construct: argument #1 is not an object");
         return JS_FALSE;
     } 
-    JS_ValueToObject(cx,argv[0],&optsObject);
     
     JSWebSocketClient * myNewObject = 0;
     OWNERPTR myWebSocketClient = OWNERPTR(new async::websocket::Client(cx, optsObject));

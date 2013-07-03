@@ -68,10 +68,24 @@ namespace websocket {
 
     class Client : public boost::enable_shared_from_this<Client> {
         public:
+            static const unsigned short CONNECTING = 0;
+            static const unsigned short OPEN = 1;
+            static const unsigned short CLOSING = 2;
+            static const unsigned short CLOSED = 3;
         private:
             JSContext * _jsContext;
             JSObject * _jsWrapper;
             JSObject * _jsOptsObject;
+            unsigned short _readyState;
+            std::string _host;
+            std::string _port;
+            std::string _path;
+            boost::asio::ip::tcp::resolver _resolver;
+            boost::asio::ip::tcp::socket _socket;
+            boost::asio::streambuf _recv_buffer;
+            boost::asio::streambuf _send_buffer;
+            std::map<std::string, std::string> _replyHeaders;
+            std::string _secWebSocketKey;
         public:
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts);
@@ -81,6 +95,12 @@ namespace websocket {
             
         private:
             Client();
+            void onResolved(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator);
+            void onTCPConnection(const boost::system::error_code& error);
+            void onHeadersSent(const boost::system::error_code& error);
+            void onHeadersRead(const boost::system::error_code& error);
+            void onFrameHeaderRead(const boost::system::error_code& error, std::size_t bytes_transferred);
+            void onPayloadRead(const boost::system::error_code& error, std::size_t bytes_transferred);
 
             bool hasCallback(const char * theName);
 
