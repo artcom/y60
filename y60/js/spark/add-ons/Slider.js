@@ -241,6 +241,21 @@ spark.Slider.Constructor = function (Protected) {
         
     };
 
+    Public.reset = function() {
+        _rasterIndex = 0;
+        if (_initValue != -1) {
+            if (_rasterValues.length > 1) {
+                for (var i= 0; i<_rasterValues.length; i++) {
+                    if (_initValue == _rasterValues[i]) {
+                        _rasterIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+        Public.setRelativeCursorPosition(_rasterPositions[_rasterIndex]);
+    }
+
     Public.onSlideStart = function (theEvent) {
         var currentTime = millisec();
         if(Math.abs(currentTime - _stopTime) < 3) {
