@@ -64,7 +64,7 @@ SocketAdapter::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
             // so it can be reused by later clients
             break;
         default:
-            throw asl::Exception("Unknown Socket State "+s->readyState); 
+            throw asl::Exception("Unknown Socket State "+asl::as_string(s->readyState)); 
     };
 }
 

@@ -9,6 +9,7 @@ NetAsync.cpp
 curl/SocketAdapter.cpp
 curl/MultiAdapter.cpp
 websocket/Client.cpp
+websocket/Manager.cpp
 MimeTypes.cpp
 Reply.cpp
 RequestParser.cpp

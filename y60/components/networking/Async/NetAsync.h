@@ -38,6 +38,7 @@
 
 #include "y60_netasync_settings.h" 
 #include "curl/MultiAdapter.h"
+#include "websocket/Manager.h"
 
 #include <asl/base/PlugInBase.h>
 #include <y60/jsbase/IScriptablePlugin.h>
@@ -85,6 +86,7 @@ namespace y60 {
             }
         }
         async::http::curl::MultiAdapter & getCurlAdapater() { return _curlAdapter; };
+        async::websocket::Manager & getWSManager() { return _websocketManager; };
 
     private:
         std::map<const void*, onFrameHandler> _onFrameHandlers;  
@@ -94,7 +96,7 @@ namespace y60 {
         // fictional work item to prevent our io_service from being out of work and terminating
         boost::shared_ptr<boost::asio::io_service::work> keep_busy;
         async::http::curl::MultiAdapter _curlAdapter;
-
+        async::websocket::Manager _websocketManager;
 
     private:
         AsioThreadPtr _myAsioThread;

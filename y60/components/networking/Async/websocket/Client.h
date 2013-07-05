@@ -47,6 +47,7 @@
 #include <map>
 
 #include <boost/thread.hpp>
+#include <boost/function.hpp>
 #include <boost/asio.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
@@ -65,6 +66,52 @@ namespace websocket {
     };
     */
 
+    struct Event {
+        virtual JSObject * newJSObject(JSContext * cx, JSObject * theWrapper) {
+            JSObject *obj = JS_NewObject(cx, NULL, NULL, NULL);
+            jsval v = OBJECT_TO_JSVAL(theWrapper); 
+            JS_SetProperty(cx, obj, "target", &v);
+            return obj;
+        };
+        virtual ~Event() {} // ensure polymorphism
+    };
+    typedef boost::shared_ptr<Event> EventPtr; 
+
+    struct CloseEvent : public Event {
+        CloseEvent(bool theCleanFlag, unsigned short theCode, const std::string & theReason) :
+            wasClean(theCleanFlag), code(theCode), reason(theReason) {};
+        bool wasClean;
+        unsigned short code;
+        std::string reason;
+        virtual JSObject * newJSObject(JSContext * cx, JSObject * theWrapper) {
+            JSObject *obj = Event::newJSObject(cx, theWrapper);
+            jsval v = jslib::as_jsval(cx, "close");
+            JS_SetProperty(cx, obj, "type", &v);
+            return obj;
+        };
+    };
+
+    struct Frame {
+        static const unsigned char CONTINUATION = 0x00; 
+        static const unsigned char TEXT = 0x01; 
+        static const unsigned char BINARY = 0x02; 
+        static const unsigned char CONNECTION_CLOSE = 0x08; 
+        static const unsigned char PING = 0x09; 
+        static const unsigned char PONG = 0x0A;
+
+        Frame(unsigned char theOpCode, bool theFinalFlag = true) :
+            opcode(theOpCode), final(theFinalFlag)
+        {};
+        bool final;
+        unsigned char opcode;
+        bool masked;
+        unsigned char masking_key[4];
+        uint64_t payloadLength;
+
+        std::vector<asl::Unsigned8> payload; 
+    };
+    typedef boost::shared_ptr<Frame> FramePtr; 
+        
 
     class Client : public boost::enable_shared_from_this<Client> {
         public:
@@ -79,6 +126,7 @@ namespace websocket {
             unsigned short _readyState;
             std::string _host;
             std::string _port;
+            std::string _hostport;
             std::string _path;
             boost::asio::ip::tcp::resolver _resolver;
             boost::asio::ip::tcp::socket _socket;
@@ -86,15 +134,29 @@ namespace websocket {
             boost::asio::streambuf _send_buffer;
             std::map<std::string, std::string> _replyHeaders;
             std::string _secWebSocketKey;
+
+            // current fragment data
+            FramePtr _incomingFrame;
+            std::deque<FramePtr> _sendQueue;
+            FramePtr _outgoingFrame;
+
+            // JS interface
+            asl::ReadWriteLock _lockEventQueue; // lock for _eventQueue;
+            std::deque<EventPtr> _eventQueue;
+            
         public:
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts);
             virtual ~Client();
             std::string debugIdentifier;
             void setWrapper(JSObject * theWrapper);
+            jsval getJSOption(const char * theName) const;
+            JSBool setJSOption(const char * theName, jsval * vp);
+            void processCallbacks();
             
         private:
             Client();
+            void async_read_if_needed(std::size_t needed, void (Client::*contfunc)(const boost::system::error_code &, std::size_t)); 
             void onResolved(const boost::system::error_code& err, boost::asio::ip::tcp::resolver::iterator endpoint_iterator);
             void onTCPConnection(const boost::system::error_code& error);
             void onHeadersSent(const boost::system::error_code& error);
@@ -102,6 +164,12 @@ namespace websocket {
             void onFrameHeaderRead(const boost::system::error_code& error, std::size_t bytes_transferred);
             void onPayloadRead(const boost::system::error_code& error, std::size_t bytes_transferred);
 
+            void processCloseFrame();
+            void sendControlFrame(unsigned char opcode);
+            void sendNextFrame();
+            void onFrameSent(const boost::system::error_code& error);
+
+            void failTheWebSocketConnection();
             bool hasCallback(const char * theName);
 
     };

@@ -56,8 +56,10 @@ class JSWebSocketClient : public jslib::JSWrapper<y60::async::websocket::Client,
         static JSFunctionSpec * Functions();
         
         enum PropertyNumbers {
-            PROP_responseString = -100,
-            PROP_responseBlock,
+            PROP_onopen = -100,
+            PROP_onclose,
+            PROP_onmessage,
+            PROP_onerror,
             PROP_END
         };
 

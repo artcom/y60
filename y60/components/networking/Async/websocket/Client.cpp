@@ -77,7 +77,7 @@ namespace websocket {
         s << " '" << theURL << "'";
         debugIdentifier = s.str();
         AC_TRACE << "creating client " << debugIdentifier;
-
+       
         /*
         if(!JS_AddNamedRoot(_jsContext, &_jsOptsObject, debugIdentifier.c_str())) {
             AC_WARNING << "failed to root request object!";
@@ -94,13 +94,14 @@ namespace websocket {
         if (myCredentialServerDelimiter != string::npos) {
             throw asl::NotYetImplemented("Authetification not yet supported for websockets", PLUS_FILE_LINE);
         };
-        string::size_type myHostPortDelimiter = myLogin.find(":");
+        _hostport = myLogin;
+        string::size_type myHostPortDelimiter = _hostport.find(":");
         if (myHostPortDelimiter == string::npos) {
-            _host = myLogin;
+            _host = _hostport;
             _port = "80";
         } else {
-            _host = myLogin.substr(0, myHostPortDelimiter);
-            _port = myLogin.substr(myHostPortDelimiter+1);
+            _host = _hostport.substr(0, myHostPortDelimiter);
+            _port = _hostport.substr(myHostPortDelimiter+1);
         }
 
         AC_TRACE << "Resolving " << _host << " on Port " << _port << "...";
@@ -122,7 +123,7 @@ namespace websocket {
                 boost::asio::placeholders::error));
             // prepare the secure key
             //
-            unsigned char nonce[16]; 
+            Unsigned8 nonce[16]; 
             RAND_bytes(nonce, sizeof(nonce));
             binToBase64(nonce, sizeof(nonce), _secWebSocketKey, cb64);
         } else {
@@ -137,7 +138,7 @@ namespace websocket {
             AC_TRACE << "TCP connection established. Sending WS Handshake...";
             std::ostream request_stream(&_send_buffer);
             request_stream << "GET " << _path << " HTTP/1.1\r\n";
-            request_stream << "Host: " << _host << "\r\n";
+            request_stream << "Host: " << _hostport << "\r\n";
             request_stream << "Upgrade: websocket\r\n";
             request_stream << "Connection: Upgrade\r\n";
             request_stream << "Sec-WebSocket-Key: " << _secWebSocketKey << "\r\n";
@@ -168,6 +169,16 @@ namespace websocket {
         }
     }
 
+    void 
+    Client::async_read_if_needed(std::size_t needed, void (Client::*contfunc)(const boost::system::error_code &, std::size_t)) { 
+        if (_recv_buffer.size() < needed) {
+            boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(needed - _recv_buffer.size()), 
+                  boost::bind(contfunc, this,
+                  boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+        } else {
+            (this->*contfunc)(boost::system::error_code(), 0);
+        }
+    }
 
     void 
     Client::onHeadersRead(const boost::system::error_code& error) {
@@ -176,7 +187,13 @@ namespace websocket {
             std::istream response_stream(&_recv_buffer);
             std::string header;
             int statusCode = -1;
-            while (std::getline(response_stream, header)) {
+            while (std::getline(response_stream, header) && header != "\x0d" && header != "\x0d\x0a") {
+                /* enable this for hex dump
+                for (int i = 0; i < header.size(); i++) {
+                    std::cerr << hex << static_cast<unsigned int>(header[i]) << " ";
+                }
+                std::cerr << std::endl;
+                */
                 // first line should be status line
                 if (statusCode == -1) {
                     boost::regex expr("HTTP/([^\\s]*)\\s([^\\s]*)\\s([\\w\\s]+)[\r\n]+");
@@ -200,8 +217,8 @@ namespace websocket {
                 // TODO: call onError, close connection
             }
             string concatenatedKey = _secWebSocketKey + Magic_UUID;
-            unsigned char sha1_digest[SHA_DIGEST_LENGTH];
-            SHA1(reinterpret_cast<const unsigned char*>(concatenatedKey.c_str()),concatenatedKey.size(),sha1_digest);
+            Unsigned8 sha1_digest[SHA_DIGEST_LENGTH];
+            SHA1(reinterpret_cast<const Unsigned8*>(concatenatedKey.c_str()),concatenatedKey.size(),sha1_digest);
             string expectedValue;
             binToBase64(sha1_digest, sizeof(sha1_digest), expectedValue, cb64);
             if (expectedValue != _replyHeaders["Sec-WebSocket-Accept"]) {
@@ -209,13 +226,13 @@ namespace websocket {
             }
             _readyState = OPEN;
             AC_DEBUG << "WebSocket connection OPEN to " << debugIdentifier;
+            AC_TRACE << _recv_buffer.size() << " bytes left in buffer after reading header";
 
             // wait for incoming frame. The header will be at least 2 bytes, possibly more.
             // We won't know how long the header will be until we have the first two bytes. 
-            // boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(2), 
-            boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(2), 
-                boost::bind(&Client::onFrameHeaderRead, this,
-                boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+            // boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(2),
+           
+            async_read_if_needed(2, &Client::onFrameHeaderRead);
 
         } else {
              AC_ERROR << error.message();
@@ -253,41 +270,39 @@ namespace websocket {
 
             boost::asio::buffers_iterator<boost::asio::streambuf::const_buffers_type> header = boost::asio::buffers_begin(bufs);
             Unsigned8 firstByte = *header;
+            _incomingFrame = FramePtr(new Frame(firstByte & 0x0f, firstByte & 0x80)); 
             Unsigned8 secondByte = header[1];
             Unsigned8 tempPayloadLength = (secondByte & 0x7f);
-            int payloadLength;
             
-            bool payloadMask = (secondByte & 0x80);
-            int frameHeaderSize = 2 + (tempPayloadLength == 126? 2 : 0) + (tempPayloadLength == 127? 6 : 0) + (payloadMask? 4 : 0);
+            _incomingFrame->masked = (secondByte & 0x80);
+            int frameHeaderSize = 2 + (tempPayloadLength == 126? 2 : 0) + (tempPayloadLength == 127? 6 : 0) + (_incomingFrame->masked? 4 : 0);
             if (_recv_buffer.size() < frameHeaderSize) {
                 AC_TRACE << "Need " << frameHeaderSize << " bytes, waiting for more.";
-                boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(frameHeaderSize-_recv_buffer.size()), 
-                        boost::bind(&Client::onFrameHeaderRead, this,
-                        boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+                async_read_if_needed(frameHeaderSize, &Client::onFrameHeaderRead);
                 return;
             }
             // now calculate payload length
             int i;
             if (tempPayloadLength < 126) {
-                payloadLength = tempPayloadLength;
+                _incomingFrame->payloadLength = tempPayloadLength;
                 i = 2;
             }
             else if (tempPayloadLength == 126) {
-                payloadLength = 0;
-                payloadLength |= ((uint64_t) header[2]) << 8;
-                payloadLength |= ((uint64_t) header[3]) << 0;
+                _incomingFrame->payloadLength = 0;
+                _incomingFrame->payloadLength |= ((uint64_t) header[2]) << 8;
+                _incomingFrame->payloadLength |= ((uint64_t) header[3]) << 0;
                 i = 4;
             }
             else if (tempPayloadLength == 127) {
-                payloadLength = 0;
-                payloadLength |= ((uint64_t) header[2]) << 56;
-                payloadLength |= ((uint64_t) header[3]) << 48;
-                payloadLength |= ((uint64_t) header[4]) << 40;
-                payloadLength |= ((uint64_t) header[5]) << 32;
-                payloadLength |= ((uint64_t) header[6]) << 24;
-                payloadLength |= ((uint64_t) header[7]) << 16;
-                payloadLength |= ((uint64_t) header[8]) << 8;
-                payloadLength |= ((uint64_t) header[9]) << 0;
+                _incomingFrame->payloadLength = 0;
+                _incomingFrame->payloadLength |= ((uint64_t) header[2]) << 56;
+                _incomingFrame->payloadLength |= ((uint64_t) header[3]) << 48;
+                _incomingFrame->payloadLength |= ((uint64_t) header[4]) << 40;
+                _incomingFrame->payloadLength |= ((uint64_t) header[5]) << 32;
+                _incomingFrame->payloadLength |= ((uint64_t) header[6]) << 24;
+                _incomingFrame->payloadLength |= ((uint64_t) header[7]) << 16;
+                _incomingFrame->payloadLength |= ((uint64_t) header[8]) << 8;
+                _incomingFrame->payloadLength |= ((uint64_t) header[9]) << 0;
                 i = 10;
             }
             /*
@@ -303,16 +318,22 @@ namespace websocket {
                 ws.masking_key[2] = 0;
                 ws.masking_key[3] = 0;
             */
-            AC_DEBUG << "Payload length is " << static_cast<unsigned int>(payloadLength) << " i=" << i;
+            AC_DEBUG << "Payload FIN=" << _incomingFrame->final << ", opcode=" << static_cast<int>(_incomingFrame->opcode) << ", payloadLen=" << _incomingFrame->payloadLength << " i=" << i;
             _recv_buffer.consume(frameHeaderSize);
             AC_TRACE << _recv_buffer.size() << " bytes left in buffer after reading header";
-            boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(payloadLength-_recv_buffer.size()), 
-                    boost::bind(&Client::onPayloadRead, this,
-                        boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+            async_read_if_needed(_incomingFrame->payloadLength, &Client::onPayloadRead);
 
         } else {
-             AC_ERROR << error.message();
-             // TODO: call onError, close connection
+            if (error == boost::asio::error::connection_reset && _readyState == CLOSING) {
+                // this is not an error but a proper (clean) close
+                AC_DEBUG << "Server closed connection";
+                ScopeLocker L(_lockEventQueue, true);
+                _readyState = CLOSED;
+                _eventQueue.push_back(EventPtr(new CloseEvent(true, 1000, "TODO")));
+            } else {
+                AC_ERROR << error.message() << " transferred:" << bytes_transferred;
+                // TODO: call onError, close connection
+            }
         }
     }
 
@@ -321,10 +342,127 @@ namespace websocket {
         if (!error) {
             AC_TRACE << "Transferred " << bytes_transferred << " bytes";
             AC_TRACE << "Payload Buffer contains " << _recv_buffer.size() << " bytes";
+            // TODO do something with the frame
+            switch (_incomingFrame->opcode) {
+                case Frame::CONNECTION_CLOSE:
+                    processCloseFrame();
+                    break;
+                default:
+                    AC_WARNING << "Unsupported Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
+                    _recv_buffer.consume(_incomingFrame->payloadLength);
+            };
+            // ...
+            //
+            //
+            _incomingFrame.reset();
+            if (_readyState != CLOSED) {
+                // now wait for next frame header
+                boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(2-_recv_buffer.size()), 
+                        boost::bind(&Client::onFrameHeaderRead, this,
+                            boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+            }
         } else {
              AC_ERROR << error.message();
              // TODO: call onError, close connection
         }
+    }
+
+    void
+    Client::processCloseFrame() {
+        if (_readyState != CLOSING) {
+            // clear any queued frames
+            _sendQueue.empty();
+            sendControlFrame(Frame::CONNECTION_CLOSE);
+            _readyState = CLOSING;
+        }
+    }
+    void
+    Client::sendControlFrame(Unsigned8 opcode) {
+        _sendQueue.push_front(FramePtr(new Frame(opcode, true)));
+        AC_TRACE << "queuing control frame, queue length now " << _sendQueue.size();
+        if (!_outgoingFrame) {
+            AC_TRACE << "starting to send front frame";
+            sendNextFrame();
+        }
+    }
+
+    void
+    Client::sendNextFrame() {
+        if (_outgoingFrame) {
+            throw asl::Exception("trying to start sending while previous send operation still in progress");
+        }
+        _outgoingFrame = _sendQueue.front();
+        _sendQueue.pop_front();
+        // prepare outgoing frame for transmission
+        
+        // RFC: turn on masking for outgoing frames
+        _outgoingFrame->masked = true;
+        RAND_bytes(_outgoingFrame->masking_key, sizeof(_outgoingFrame->masking_key));
+
+        std::ostream request_stream(&_send_buffer);
+        // construct the header
+        request_stream << static_cast<Unsigned8>((_outgoingFrame->final? 0x80 : 0) + _outgoingFrame->opcode); 
+        // variable length payload size field
+        if (_outgoingFrame->payloadLength < 126) {
+            request_stream << static_cast<Unsigned8>((_outgoingFrame->masked? 0x80 : 0) + _outgoingFrame->payloadLength); 
+        } else if (_outgoingFrame->payloadLength < 0x10000) {
+            request_stream << static_cast<Unsigned8>(126) << static_cast<Unsigned16>(_outgoingFrame->payloadLength); 
+        } else {
+            request_stream << static_cast<Unsigned8>(127) << static_cast<Unsigned64>(_outgoingFrame->payloadLength); 
+        }
+        if (_outgoingFrame->masked) {
+            request_stream << _outgoingFrame->masking_key; 
+        }
+        for (size_t i = 0; i < _outgoingFrame->payload.size(); ++i) {
+            request_stream << (_outgoingFrame->payload[i] ^ _outgoingFrame->masking_key[i % 4]);  
+        }
+        
+        // send the request
+        boost::asio::async_write(_socket, _send_buffer,
+                boost::bind(&Client::onFrameSent, this,
+                    boost::asio::placeholders::error));
+    }
+    
+    void 
+    Client::onFrameSent(const boost::system::error_code& error) {
+        if (!error) {
+            AC_TRACE << "Frame " << _outgoingFrame->opcode << " sent.";
+            _outgoingFrame.reset();
+            if (!_sendQueue.empty()) {
+                sendNextFrame();
+            }
+        } else {
+             AC_ERROR << error.message();
+             // TODO: call onError
+        }
+    }
+
+    void
+    Client::processCallbacks() {
+        EventPtr nextEvent;
+        do {
+            {
+                ScopeLocker L(_lockEventQueue, true);
+                if (_eventQueue.empty()) {
+                    nextEvent.reset();
+                } else {
+                    nextEvent = _eventQueue.front();
+                    _eventQueue.pop_front();
+                }
+            }
+            if (nextEvent) {
+                if (boost::shared_ptr<CloseEvent> e = boost::dynamic_pointer_cast<CloseEvent>(nextEvent)) {
+                    AC_TRACE << "invoke CLOSE JS Callback here";
+                    if (hasCallback("onclose")) {
+                        jsval argv[1], rval;
+                        argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
+                        JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "onclose", 1, argv, &rval);
+                    }
+                } else {
+                    AC_WARNING << "Unknown event type - invoke JS Callback here";
+                }
+            }
+        } while (nextEvent);
     }
 
     void 
@@ -334,32 +472,20 @@ namespace websocket {
         if(!JS_AddNamedRoot(_jsContext, &_jsWrapper, debugIdentifier.c_str())) {
             AC_WARNING << "failed to root request object!";
         }
+        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+        parentPlugin->getWSManager().addClient(shared_from_this());
+    }
+
+    void
+    Client::failTheWebSocketConnection() {
+        // TODO: SHOULD send close frame if connected
+        _socket.close();
     }
 
     Client::~Client()
     {
         AC_TRACE << "~Client " << this;
     }
-   
-JSBool
-JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObject, const char * theName, uintN argc, jsval argv[], jsval *rval) {
-    jsval myValue;
-    if (JS_GetProperty(cx, theObject, theName, &myValue)) {
-        if (JS_TypeOfValue(cx, myValue) != JSTYPE_FUNCTION) {
-            AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(cx, myValue);
-            return false;
-        }
-    }
-    try {
-        AC_TRACE << "cx:" << cx << ", this:" << theThisObject << ", obj:" << theObject << ", theName:" << theName << ", argc:" << argc << ", argv:" << argv << ", rval:" << rval;
-        JSBool ok = JS_CallFunctionValue(cx, theThisObject, myValue, argc, argv, rval);
-        if (!ok) {
-            AC_DEBUG << "Exception while calling js function '" << theName << "'" << endl;
-        }
-        return ok;
-    } HANDLE_CPP_EXCEPTION;
-};
-
 
     bool
     Client::hasCallback(const char * theName) {
@@ -372,6 +498,17 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
         return false;
     }
 
+    jsval
+    Client::getJSOption(const char * theName) const {
+        jsval myValue;
+        JS_GetProperty(_jsContext, _jsOptsObject, theName, &myValue);
+        return myValue;
+    }
+
+    JSBool
+    Client::setJSOption(const char * theName, jsval * vp) {
+        return JS_SetProperty(_jsContext, _jsOptsObject, theName, vp); 
+    };
 }
 }
 }

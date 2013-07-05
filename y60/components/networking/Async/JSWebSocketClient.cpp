@@ -74,6 +74,10 @@ JSWebSocketClient::Functions() {
 JSPropertySpec *
 JSWebSocketClient::Properties() {
     static JSPropertySpec myProperties[] = {
+        {"onopen", PROP_onopen, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"onclose", PROP_onclose, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"onmessage", PROP_onmessage, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"onerror", PROP_onerror, JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
     };
     return myProperties;
@@ -107,6 +111,18 @@ JSWebSocketClient::ConstIntProperties() {
 JSBool
 JSWebSocketClient::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
     switch (theID) {
+            case PROP_onopen:
+                *vp = getNative().getJSOption("onopen");
+                return JS_TRUE;
+            case PROP_onclose:
+                *vp = getNative().getJSOption("onclose");
+                return JS_TRUE;
+            case PROP_onmessage:
+                *vp = getNative().getJSOption("onmessage");
+                return JS_TRUE;
+            case PROP_onerror:
+                *vp = getNative().getJSOption("onerror");
+                return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSRequestWrapper::getProperty: index %d out of range", theID);
                 return JS_FALSE;
@@ -117,6 +133,25 @@ JSWebSocketClient::getPropertySwitch(unsigned long theID, JSContext *cx, JSObjec
 // setproperty handling
 JSBool
 JSWebSocketClient::setPropertySwitch(unsigned long theID, JSContext *cx, JSObject *obj, jsval id, jsval *vp) {
+    JSClassTraits<NATIVE>::ScopedNativeRef myObj(cx, obj);
+    switch (theID) {
+        case PROP_onopen:
+            {
+                return myObj.getNative().setJSOption("onopen", vp); 
+            }
+        case PROP_onclose:
+            {
+                return myObj.getNative().setJSOption("onclose", vp); 
+            }
+        case PROP_onmessage:
+            {
+                return myObj.getNative().setJSOption("onmessage", vp); 
+            }
+        case PROP_onerror:
+            {
+                return myObj.getNative().setJSOption("onerror", vp); 
+            }
+    }
     return JS_TRUE;
 }
 
