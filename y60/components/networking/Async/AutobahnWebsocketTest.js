@@ -35,7 +35,7 @@
 
 
 plug("NetAsync");
-use("vendor/json_parse.js");
+use("JSON.js");
 
 var wsuri = "ws://localhost:9001";
 var webSocket = null;
@@ -60,7 +60,7 @@ function getCaseCount(cont)
   webSocket.onmessage =
     function(e)
     {
-      caseCount = json_parse(e.data);
+      caseCount = JSON.parse(e.data);
       updateStatus("Will run " + caseCount + " cases ..");
     };
   webSocket.onclose =

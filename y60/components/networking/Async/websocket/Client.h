@@ -129,7 +129,6 @@ namespace websocket {
         unsigned char opcode;
         bool masked;
         unsigned char masking_key[4];
-        uint64_t payloadLength;
 
         std::vector<asl::Unsigned8> payload; 
     };
@@ -154,13 +153,12 @@ namespace websocket {
             boost::asio::ip::tcp::socket _socket;
             boost::asio::streambuf _recv_buffer;
             boost::asio::streambuf _send_buffer;
+            boost::asio::io_service::strand _writeStrand;
             std::map<std::string, std::string> _replyHeaders;
             std::string _secWebSocketKey;
 
             // current fragment data
             FramePtr _incomingFrame;
-            std::deque<FramePtr> _sendQueue;
-            FramePtr _outgoingFrame;
             MessagePtr _incomingMessage;
 
             // JS interface
@@ -169,13 +167,15 @@ namespace websocket {
             
         public:
             /// creates a new HttpClient
-            Client(JSContext * cx, JSObject * theOpts);
+            Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io);
             virtual ~Client();
             std::string debugIdentifier;
             void setWrapper(JSObject * theWrapper);
             jsval getJSOption(const char * theName) const;
             JSBool setJSOption(const char * theName, jsval * vp);
             void processCallbacks();
+
+            void send(const std::string& data);
             
         private:
             Client();
@@ -190,9 +190,17 @@ namespace websocket {
             void processMessageFrame();
             void processFinalFragment();
             void processCloseFrame();
-            void sendControlFrame(unsigned char opcode);
-            void sendNextFrame();
-            void onFrameSent(const boost::system::error_code& error);
+
+            // we use a boost::strand to prevent interleaving write calls
+            // all members prefixed with _w_ should only be called/accessed from the
+            // _writeStrand.
+            std::deque<FramePtr> _w_sendQueue;
+            FramePtr _w_outgoingFrame;
+            void _w_sendNextFrame();
+            void _w_confirmClose();
+            void _w_onFrameSent(const boost::system::error_code& error, std::size_t bytes_transferred);
+            void _w_injectFrame(FramePtr f);
+            void _w_queueFrame(FramePtr f);
 
             void failTheWebSocketConnection();
             bool hasCallback(const char * theName);

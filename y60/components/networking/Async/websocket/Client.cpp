@@ -57,11 +57,11 @@ namespace async {
 namespace websocket {
 
 #define Magic_UUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11" 
-
-    Client::Client(JSContext * cx, JSObject * theOpts) :
+    Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io) :
         _jsContext(cx),
-        _resolver(dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName))->io_service()),
-        _socket(dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName))->io_service()),
+        _resolver(io),
+        _socket(io),
+        _writeStrand(io),
         _jsOptsObject(theOpts),
         _readyState(CONNECTING)
     {
@@ -145,7 +145,8 @@ namespace websocket {
             request_stream << "Sec-WebSocket-Version: 13\r\n";
             request_stream << "\r\n";
 
-            // send the request
+            // send the request. Note: since we are still in half-duplex (http) mode,
+            // we don't yet have to worry abound synchronization issues and strands.
             boost::asio::async_write(_socket, _send_buffer,
                 boost::bind(&Client::onHeadersSent, this,
                 boost::asio::placeholders::error));
@@ -228,10 +229,12 @@ namespace websocket {
             AC_DEBUG << "WebSocket connection OPEN to " << debugIdentifier;
             AC_TRACE << _recv_buffer.size() << " bytes left in buffer after reading header";
 
+
+            // Upgrade has now completed. Sending operations will be now be protected by the _writeStrand
+
             // wait for incoming frame. The header will be at least 2 bytes, possibly more.
             // We won't know how long the header will be until we have the first two bytes. 
             // boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(2),
-           
             async_read_if_needed(2, &Client::onFrameHeaderRead);
 
         } else {
@@ -275,7 +278,7 @@ namespace websocket {
             Unsigned8 tempPayloadLength = (secondByte & 0x7f);
             
             _incomingFrame->masked = (secondByte & 0x80);
-            int frameHeaderSize = 2 + (tempPayloadLength == 126? 2 : 0) + (tempPayloadLength == 127? 6 : 0) + (_incomingFrame->masked? 4 : 0);
+            int frameHeaderSize = 2 + (tempPayloadLength == 126? 2 : 0) + (tempPayloadLength == 127? 8 : 0) + (_incomingFrame->masked? 4 : 0);
             if (_recv_buffer.size() < frameHeaderSize) {
                 AC_TRACE << "Need " << frameHeaderSize << " bytes, waiting for more.";
                 async_read_if_needed(frameHeaderSize, &Client::onFrameHeaderRead);
@@ -283,26 +286,27 @@ namespace websocket {
             }
             // now calculate payload length
             int i;
+            uint64_t payloadLength;
             if (tempPayloadLength < 126) {
-                _incomingFrame->payloadLength = tempPayloadLength;
+                payloadLength = tempPayloadLength;
                 i = 2;
             }
             else if (tempPayloadLength == 126) {
-                _incomingFrame->payloadLength = 0;
-                _incomingFrame->payloadLength |= ((uint64_t) header[2]) << 8;
-                _incomingFrame->payloadLength |= ((uint64_t) header[3]) << 0;
+                payloadLength = 0;
+                payloadLength |= ((uint64_t) (uint8_t)(header[2]) << 8);
+                payloadLength |= ((uint64_t) (uint8_t)(header[3]) << 0);
                 i = 4;
             }
             else if (tempPayloadLength == 127) {
-                _incomingFrame->payloadLength = 0;
-                _incomingFrame->payloadLength |= ((uint64_t) header[2]) << 56;
-                _incomingFrame->payloadLength |= ((uint64_t) header[3]) << 48;
-                _incomingFrame->payloadLength |= ((uint64_t) header[4]) << 40;
-                _incomingFrame->payloadLength |= ((uint64_t) header[5]) << 32;
-                _incomingFrame->payloadLength |= ((uint64_t) header[6]) << 24;
-                _incomingFrame->payloadLength |= ((uint64_t) header[7]) << 16;
-                _incomingFrame->payloadLength |= ((uint64_t) header[8]) << 8;
-                _incomingFrame->payloadLength |= ((uint64_t) header[9]) << 0;
+                payloadLength = 0;
+                payloadLength |= ((uint64_t) (uint8_t)(header[2]) << 56);
+                payloadLength |= ((uint64_t) (uint8_t)(header[3]) << 48);
+                payloadLength |= ((uint64_t) (uint8_t)(header[4]) << 40);
+                payloadLength |= ((uint64_t) (uint8_t)(header[5]) << 32);
+                payloadLength |= ((uint64_t) (uint8_t)(header[6]) << 24);
+                payloadLength |= ((uint64_t) (uint8_t)(header[7]) << 16);
+                payloadLength |= ((uint64_t) (uint8_t)(header[8]) << 8);
+                payloadLength |= ((uint64_t) (uint8_t)(header[9]) << 0);
                 i = 10;
             }
             /*
@@ -318,10 +322,11 @@ namespace websocket {
                 ws.masking_key[2] = 0;
                 ws.masking_key[3] = 0;
             */
-            AC_DEBUG << "Payload FIN=" << _incomingFrame->final << ", opcode=" << static_cast<int>(_incomingFrame->opcode) << ", payloadLen=" << _incomingFrame->payloadLength << " i=" << i;
+            AC_DEBUG << "Payload FIN=" << _incomingFrame->final << ", opcode=" << static_cast<int>(_incomingFrame->opcode) << ", payloadLen=" << payloadLength << " i=" << i;
             _recv_buffer.consume(frameHeaderSize);
             AC_TRACE << _recv_buffer.size() << " bytes left in buffer after reading header";
-            async_read_if_needed(_incomingFrame->payloadLength, &Client::onPayloadRead);
+            _incomingFrame->payload.resize(payloadLength);
+            async_read_if_needed(payloadLength, &Client::onPayloadRead);
 
         } else {
             if (error == boost::asio::error::connection_reset && _readyState == CLOSING) {
@@ -353,7 +358,7 @@ namespace websocket {
                 default:
                     AC_WARNING << "Unsupported Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
             };
-            _recv_buffer.consume(_incomingFrame->payloadLength);
+            _recv_buffer.consume(_incomingFrame->payload.size());
             // ...
             //
             //
@@ -376,7 +381,7 @@ namespace websocket {
             return;
         }
         boost::asio::streambuf::const_buffers_type bufs = _recv_buffer.data();
-        _incomingMessage = MessagePtr(new TextMessage(boost::asio::buffers_begin(bufs), _incomingFrame->payloadLength));
+        _incomingMessage = MessagePtr(new TextMessage(boost::asio::buffers_begin(bufs), _incomingFrame->payload.size()));
         if (_incomingFrame->final) {
             processFinalFragment(); 
         }
@@ -384,6 +389,7 @@ namespace websocket {
 
     void
     Client::processFinalFragment() {
+        AC_DEBUG << "incoming Text Message " << boost::dynamic_pointer_cast<TextMessage>(_incomingMessage)->data.size() << " bytes";
         _eventQueue.push_back(EventPtr(new MessageEvent(_incomingMessage)));
         _incomingMessage.reset();
     }
@@ -391,66 +397,94 @@ namespace websocket {
     void
     Client::processCloseFrame() {
         if (_readyState != CLOSING) {
+            _writeStrand.post(boost::bind(&Client::_w_confirmClose, this));
             // clear any queued frames
-            _sendQueue.empty();
-            sendControlFrame(Frame::CONNECTION_CLOSE);
             _readyState = CLOSING;
         }
     }
+    
     void
-    Client::sendControlFrame(Unsigned8 opcode) {
-        _sendQueue.push_front(FramePtr(new Frame(opcode, true)));
-        AC_TRACE << "queuing control frame, queue length now " << _sendQueue.size();
-        if (!_outgoingFrame) {
+    Client::_w_confirmClose() {
+        // clear any queued frames
+        _w_sendQueue.empty();
+        _w_injectFrame(FramePtr(new Frame(Frame::CONNECTION_CLOSE, true)));
+    }
+
+    void
+    Client::_w_injectFrame(FramePtr f) {
+        _w_sendQueue.push_front(f);
+        AC_TRACE << "injecting control frame, queue length now " << _w_sendQueue.size();
+        if (!_w_outgoingFrame) {
             AC_TRACE << "starting to send front frame";
-            sendNextFrame();
+            _w_sendNextFrame();
         }
     }
 
     void
-    Client::sendNextFrame() {
-        if (_outgoingFrame) {
+    Client::_w_queueFrame(FramePtr f) {
+        // TODO: message fragmentation
+        _w_sendQueue.push_back(f);
+        AC_TRACE << "queuing message frame, queue length now " << _w_sendQueue.size();
+        if (!_w_outgoingFrame) {
+            AC_TRACE << "starting to send front frame";
+            _w_sendNextFrame();
+        }
+    }
+
+    void
+    Client::_w_sendNextFrame() {
+        if (_w_outgoingFrame) {
             throw asl::Exception("trying to start sending while previous send operation still in progress");
         }
-        _outgoingFrame = _sendQueue.front();
-        _sendQueue.pop_front();
+        _w_outgoingFrame = _w_sendQueue.front();
+        _w_sendQueue.pop_front();
         // prepare outgoing frame for transmission
         
         // RFC: turn on masking for outgoing frames
-        _outgoingFrame->masked = true;
-        RAND_bytes(_outgoingFrame->masking_key, sizeof(_outgoingFrame->masking_key));
+        _w_outgoingFrame->masked = true;
+        RAND_bytes(_w_outgoingFrame->masking_key, sizeof(_w_outgoingFrame->masking_key));
 
         std::ostream request_stream(&_send_buffer);
         // construct the header
-        request_stream << static_cast<Unsigned8>((_outgoingFrame->final? 0x80 : 0) + _outgoingFrame->opcode); 
+        request_stream.put((_w_outgoingFrame->final? 0x80 : 0) + _w_outgoingFrame->opcode); 
         // variable length payload size field
-        if (_outgoingFrame->payloadLength < 126) {
-            request_stream << static_cast<Unsigned8>((_outgoingFrame->masked? 0x80 : 0) + _outgoingFrame->payloadLength); 
-        } else if (_outgoingFrame->payloadLength < 0x10000) {
-            request_stream << static_cast<Unsigned8>(126) << static_cast<Unsigned16>(_outgoingFrame->payloadLength); 
+        AC_DEBUG << "Frame Payload is " << _w_outgoingFrame->payload.size() << " bytes.";
+        if (_w_outgoingFrame->payload.size() < 126ul) {
+            request_stream.put((_w_outgoingFrame->masked? 0x80 : 0) + _w_outgoingFrame->payload.size()); 
+        } else if (_w_outgoingFrame->payload.size() < 0x10000ul) {
+            request_stream.put((_w_outgoingFrame->masked? 0x80 : 0) + 126);
+            request_stream.put(_w_outgoingFrame->payload.size() >> 8); 
+            request_stream.put(_w_outgoingFrame->payload.size() ); 
         } else {
-            request_stream << static_cast<Unsigned8>(127) << static_cast<Unsigned64>(_outgoingFrame->payloadLength); 
+            request_stream.put((_w_outgoingFrame->masked? 0x80 : 0) + 127);
+            request_stream.put(_w_outgoingFrame->payload.size() >> 56); 
+            request_stream.put(_w_outgoingFrame->payload.size() >> 48); 
+            request_stream.put(_w_outgoingFrame->payload.size() >> 40); 
+            request_stream.put(_w_outgoingFrame->payload.size() >> 32); 
+            request_stream.put(_w_outgoingFrame->payload.size() >> 24); 
+            request_stream.put(_w_outgoingFrame->payload.size() >> 16); 
+            request_stream.put(_w_outgoingFrame->payload.size() >> 8); 
+            request_stream.put(_w_outgoingFrame->payload.size() ); 
         }
-        if (_outgoingFrame->masked) {
-            request_stream << _outgoingFrame->masking_key; 
+        if (_w_outgoingFrame->masked) {
+            request_stream.write(reinterpret_cast<const char*>(_w_outgoingFrame->masking_key), sizeof(_w_outgoingFrame->masking_key));
         }
-        for (size_t i = 0; i < _outgoingFrame->payload.size(); ++i) {
-            request_stream << (_outgoingFrame->payload[i] ^ _outgoingFrame->masking_key[i % 4]);  
+        for (size_t i = 0; i < _w_outgoingFrame->payload.size(); ++i) {
+            request_stream.put(_w_outgoingFrame->payload[i] ^ _w_outgoingFrame->masking_key[i % 4]);  
         }
         
         // send the request
         boost::asio::async_write(_socket, _send_buffer,
-                boost::bind(&Client::onFrameSent, this,
-                    boost::asio::placeholders::error));
+                _writeStrand.wrap(boost::bind(&Client::_w_onFrameSent, this,
+                    boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)));
     }
     
     void 
-    Client::onFrameSent(const boost::system::error_code& error) {
+    Client::_w_onFrameSent(const boost::system::error_code& error, size_t bytes_transferred) {
         if (!error) {
-            AC_TRACE << "Frame " << _outgoingFrame->opcode << " sent.";
-            _outgoingFrame.reset();
-            if (!_sendQueue.empty()) {
-                sendNextFrame();
+            _w_outgoingFrame.reset();
+            if (!_w_sendQueue.empty()) {
+                _w_sendNextFrame();
             }
         } else {
              AC_ERROR << error.message();
@@ -473,14 +507,12 @@ namespace websocket {
             }
             if (nextEvent) {
                 if (boost::shared_ptr<CloseEvent> e = boost::dynamic_pointer_cast<CloseEvent>(nextEvent)) {
-                    AC_TRACE << "invoke CLOSE JS Callback here";
                     if (hasCallback("onclose")) {
                         jsval argv[1], rval;
                         argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
                         JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "onclose", 1, argv, &rval);
                     }
                 } else if (boost::shared_ptr<MessageEvent> e = boost::dynamic_pointer_cast<MessageEvent>(nextEvent)) {
-                    AC_TRACE << "invoke Message JS Callback here";
                     if (hasCallback("onmessage")) {
                         jsval argv[1], rval;
                         argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
@@ -491,6 +523,15 @@ namespace websocket {
                 }
             }
         } while (nextEvent);
+    }
+
+    void
+    Client::send(const std::string& data) {
+        // TODO: implement fragmention
+        FramePtr f = FramePtr(new Frame(Frame::TEXT, true));
+        f->payload.resize(data.length());
+        std::copy(data.begin(), data.end(), f->payload.begin());
+        _writeStrand.post(boost::bind(&Client::_w_queueFrame, this, f));
     }
 
     void 

@@ -30,6 +30,7 @@
 */
 
 #include "JSWebSocketClient.h"
+#include "NetAsync.h"
 
 #include <y60/jsbase/JSWrapper.impl>
 #include <y60/jsbase/JSBlock.h>
@@ -57,6 +58,24 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+send(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sends a string or a block to the server."); DOC_END;
+    ensureParamCount(argc, 1);
+    JSWebSocketClient::OWNERPTR nativePtr = JSClassTraits<JSWebSocketClient::NATIVE>::getNativeOwner(cx,obj);
+
+    std::string stringData;
+
+    if (JSVAL_IS_STRING(argv[0]) && convertFrom(cx, argv[0], stringData)) {
+        nativePtr->send(stringData);
+    } else {
+        JS_ReportError(cx, "WebSocketClient::send: argument #1 is not a string");
+        return JS_FALSE;
+    }
+    *rval = JSVAL_VOID;
+    return JS_TRUE;
+}
+
 JSWebSocketClient::~JSWebSocketClient() {
 }
 
@@ -66,6 +85,8 @@ JSWebSocketClient::Functions() {
     static JSFunctionSpec myFunctions[] = {
         // name                  native                   nargs
         {"toString",             toString,                0},
+        {"send",                 send,                    1},
+//        {"close",                close,                   1},
         {0}
     };
     return myFunctions;
@@ -181,7 +202,8 @@ JSWebSocketClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *
     } 
     
     JSWebSocketClient * myNewObject = 0;
-    OWNERPTR myWebSocketClient = OWNERPTR(new async::websocket::Client(cx, optsObject));
+    boost::asio::io_service & io = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName))->io_service();
+    OWNERPTR myWebSocketClient = OWNERPTR(new async::websocket::Client(cx, optsObject, io));
     myNewObject = new JSWebSocketClient(myWebSocketClient, myWebSocketClient.get());
     JS_SetPrivate(cx, obj, myNewObject);
     myWebSocketClient->setWrapper(obj);
