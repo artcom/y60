@@ -212,7 +212,7 @@ public:
     EventPtrList poll() {
         AC_TRACE << "Listening for Proximatrix2 messages on UDP port " << _myPort;
          
-        unsigned int buffersize = UDP_HDR + PROXY_HDR + TOUCHSIZE + FRAMESIZE + 6600;
+        const unsigned int buffersize = UDP_HDR + PROXY_HDR + TOUCHSIZE + FRAMESIZE + 6600;
         unsigned char receiveBuffer[buffersize];
 
         EventPtrList events;
