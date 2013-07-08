@@ -203,7 +203,7 @@ public:
 
         asl::Vector2f position = transformPosition(static_cast<float>(info.x), static_cast<float>(info.y));
         myNode->appendAttribute<Vector2f>("position", position);
-        myNode->appendAttribute<Vector2f>("raw_position", Vector2f(info.x, info.y));
+        myNode->appendAttribute<Vector2f>("raw_position", Vector2f(static_cast<float>(info.x), static_cast<float>(info.y)));
         myNode->appendAttribute<int>("pressure", info.pressure);
         
         return myEvent;
