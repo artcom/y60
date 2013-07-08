@@ -42,7 +42,7 @@ struct touch_info {
     int y;
     int pressure;
     int id;
-    double lastAppeared;
+    unsigned long long lastAppeared;
 };
 
 typedef asl::Ptr<inet::UDPSocket> UDPSocketPtr;
