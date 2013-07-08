@@ -33,10 +33,11 @@ spark.Slider.Constructor = function (Protected) {
 
     var DAMPENING_HISTORY   = 5;
 
-    var _rasterValues       = [];
-    var _rasterIndex        = null;
-    var _rasterPositions      = [];
-    var _initValue          = null;
+    var _rasterValues             = [];
+    var _rasterIndex              = null;
+    var _relativeRasterPositions  = [];
+    var _initValue                = null;
+    var _initIndex                = null;
     
     
     /////////////////////
@@ -74,10 +75,10 @@ spark.Slider.Constructor = function (Protected) {
         }
         if (_mySliderBackground.height === _myActiveCursor.height) {
             return 0;
-        } else if (_rasterPositions.length > 0) {
+        } else if (_relativeRasterPositions.length > 0) {
             var myRelativeY = _myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height);
             setRasterIndex(myRelativeY);
-            return _rasterPositions[_rasterIndex];
+            return _relativeRasterPositions[_rasterIndex];
         } else {
             var myRelativeY = _myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height);
             return (_precision === 0) ? myRelativeY : myRelativeY.toFixed(_precision);
@@ -90,10 +91,10 @@ spark.Slider.Constructor = function (Protected) {
         }
         if (_mySliderBackground.width === _myActiveCursor.width) {
             return 0;
-        } else if (_rasterPositions.length > 0) {
+        } else if (_relativeRasterPositions.length > 0) {
             var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
             setRasterIndex(myRelativeX);
-            return _rasterPositions[_rasterIndex];
+            return _relativeRasterPositions[_rasterIndex];
         } else {
             var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
             return (_precision === 0) ? myRelativeX : myRelativeX.toFixed(_precision);
@@ -104,8 +105,8 @@ spark.Slider.Constructor = function (Protected) {
         
         var myDistance = 0;
         var mySnapPos = 1;
-        for (var i = 0; i < _rasterPositions.length; i++) {
-            myDistance = Math.abs(_rasterPositions[i] - thePos);
+        for (var i = 0; i < _relativeRasterPositions.length; i++) {
+            myDistance = Math.abs(_relativeRasterPositions[i] - thePos);
             if (myDistance < mySnapPos) {
                 mySnapPos = myDistance;
                 _rasterIndex = i;
@@ -184,10 +185,27 @@ spark.Slider.Constructor = function (Protected) {
     });
 
     Public.__defineGetter__("value", function () { 
+        if(_verticalLock) {
+            return getRelativeX();
+        } else {
+            return getRelativeY();
+        }
+        
+    });
+
+    Public.__defineGetter__("rasterValue", function () { 
         if (_rasterValues.length > 0) {
             return _rasterValues[_rasterIndex];
-        }
-        return getRelativeX();
+        } 
+        return null;
+    });
+
+    Public.__defineGetter__("initIndex", function () {
+        return _initIndex;
+    });
+
+    Public.__defineGetter__("relativeRasterPositions", function () {
+        return _relativeRasterPositions;
     });
 
     Base.realize = Public.realize;
@@ -222,39 +240,49 @@ spark.Slider.Constructor = function (Protected) {
         if (_rasterValues.length > 0) {
             var myDistance = 1/(_rasterValues.length-1);
             for (var i= 0; i<_rasterValues.length; i++) {
-                _rasterPositions.push(i*myDistance);
+                _relativeRasterPositions.push(i*myDistance);
             }
         }
-        _initValue = Protected.getNumber("initValue", -1);
+        _initValue = Protected.getNumber("initValue", 0);
         _rasterIndex = 0;
-        if (_initValue != -1) {
-            if (_rasterValues.length > 1) {
-                for (i= 0; i<_rasterValues.length; i++) {
-                    if (_initValue == _rasterValues[i]) {
-                        _rasterIndex = i;
-                        break;
-                    }
+       
+        if (_rasterValues.length > 0) {
+            for (i= 0; i<_rasterValues.length; i++) {
+                if (_initValue == _rasterValues[i]) {
+                    _rasterIndex = i;
+                    break;
                 }
             }
         }
-        Public.setRelativeCursorPosition(_rasterPositions[_rasterIndex]);
+        _initIndex = _rasterIndex;
+        
+        if (_rasterValues.length > 0) {
+            Public.setRelativeCursorPosition(_relativeRasterPositions[_rasterIndex]);
+        } else {
+            Public.setRelativeCursorPosition(_initValue);
+        }
+        
         
     };
 
     Public.reset = function() {
         _rasterIndex = 0;
-        if (_initValue != -1) {
-            if (_rasterValues.length > 1) {
-                for (var i= 0; i<_rasterValues.length; i++) {
-                    if (_initValue == _rasterValues[i]) {
-                        _rasterIndex = i;
-                        break;
-                    }
+        
+        if (_rasterValues.length > 1) {
+            for (var i= 0; i<_rasterValues.length; i++) {
+                if (_initValue == _rasterValues[i]) {
+                    _rasterIndex = i;
+                    break;
                 }
             }
         }
-        Public.setRelativeCursorPosition(_rasterPositions[_rasterIndex]);
-    }
+        
+        if (_rasterValues.length > 0) {
+            Public.setRelativeCursorPosition(_relativeRasterPositions[_rasterIndex]);
+        } else {
+            Public.setRelativeCursorPosition(_initValue);
+        } 
+    };
 
     Public.onSlideStart = function (theEvent) {
         var currentTime = millisec();
@@ -361,6 +389,9 @@ spark.Slider.Constructor = function (Protected) {
         _myIdleCursor.y   = _myCursorOrigin.y;
         _myActiveCursor.x = _myIdleCursor.x;
         _myActiveCursor.y = _myIdleCursor.y;
+        // to update rasterIndex
+        getRelativeX();
+        getRelativeY();
     };
 
     Public.setCursorPosition = function (theX, theY) {
@@ -372,6 +403,9 @@ spark.Slider.Constructor = function (Protected) {
         _myActiveCursor.y = myY;
         _myCursorOrigin.x = myX;
         _myCursorOrigin.y = myY;
+        // to update rasterIndex
+        getRelativeX();
+        getRelativeY();
     };
 
     Public.setRelativeCursorPosition = function (theX, theY) {
@@ -383,6 +417,9 @@ spark.Slider.Constructor = function (Protected) {
         _myActiveCursor.y = myY;
         _myCursorOrigin.x = myX;
         _myCursorOrigin.y = myY;
+        // to update rasterIndex
+        getRelativeX();
+        getRelativeY();
     };
 
 };
