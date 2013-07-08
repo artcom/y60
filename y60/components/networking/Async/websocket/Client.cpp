@@ -341,30 +341,51 @@ namespace websocket {
     Client::onPayloadRead(const boost::system::error_code& error, std::size_t bytes_transferred) {
         if (!error) {
             AC_TRACE << "Transferred " << bytes_transferred << " bytes";
-            AC_TRACE << "Payload Buffer contains " << _recv_buffer.size() << " bytes";
+            AC_TRACE << "Receive Buffer contains " << _recv_buffer.size() << " bytes";
             // TODO do something with the frame
             switch (_incomingFrame->opcode) {
+                case Frame::TEXT:
+                    processMessageFrame();
+                    break;
                 case Frame::CONNECTION_CLOSE:
                     processCloseFrame();
                     break;
                 default:
                     AC_WARNING << "Unsupported Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
-                    _recv_buffer.consume(_incomingFrame->payloadLength);
             };
+            _recv_buffer.consume(_incomingFrame->payloadLength);
             // ...
             //
             //
             _incomingFrame.reset();
             if (_readyState != CLOSED) {
                 // now wait for next frame header
-                boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(2-_recv_buffer.size()), 
-                        boost::bind(&Client::onFrameHeaderRead, this,
-                            boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+                AC_TRACE << "waiting for next frame header";
+                async_read_if_needed(2, &Client::onFrameHeaderRead);
             }
         } else {
              AC_ERROR << error.message();
              // TODO: call onError, close connection
         }
+    }
+
+    void
+    Client::processMessageFrame() {
+        if (_incomingMessage) {
+            AC_ERROR << "TODO handle protocol error: received new message while fragment still in buffer";
+            return;
+        }
+        boost::asio::streambuf::const_buffers_type bufs = _recv_buffer.data();
+        _incomingMessage = MessagePtr(new TextMessage(boost::asio::buffers_begin(bufs), _incomingFrame->payloadLength));
+        if (_incomingFrame->final) {
+            processFinalFragment(); 
+        }
+    }
+
+    void
+    Client::processFinalFragment() {
+        _eventQueue.push_back(EventPtr(new MessageEvent(_incomingMessage)));
+        _incomingMessage.reset();
     }
 
     void
@@ -457,6 +478,13 @@ namespace websocket {
                         jsval argv[1], rval;
                         argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
                         JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "onclose", 1, argv, &rval);
+                    }
+                } else if (boost::shared_ptr<MessageEvent> e = boost::dynamic_pointer_cast<MessageEvent>(nextEvent)) {
+                    AC_TRACE << "invoke Message JS Callback here";
+                    if (hasCallback("onmessage")) {
+                        jsval argv[1], rval;
+                        argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
+                        JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "onmessage", 1, argv, &rval);
                     }
                 } else {
                     AC_WARNING << "Unknown event type - invoke JS Callback here";

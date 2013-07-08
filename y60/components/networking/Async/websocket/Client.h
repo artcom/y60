@@ -56,16 +56,19 @@
 namespace y60 {
 namespace async {
 namespace websocket {
-    
-    /*
-    struct JSCallback {
-        JSContext*  context;
-        JSObject*   object;
-        jsval functionValue;
-        std::string contentType;
+    struct Message {
+        virtual ~Message() {};
     };
-    */
+    typedef boost::shared_ptr<Message> MessagePtr;
 
+    struct TextMessage : public Message {
+        template <class InputIterator>
+        TextMessage(InputIterator begin, size_t len) :
+            data(begin, begin+len) {};
+        std::string data;
+    };
+
+    
     struct Event {
         virtual JSObject * newJSObject(JSContext * cx, JSObject * theWrapper) {
             JSObject *obj = JS_NewObject(cx, NULL, NULL, NULL);
@@ -91,6 +94,26 @@ namespace websocket {
         };
     };
 
+    struct MessageEvent : public Event {
+        MessageEvent(MessagePtr theMessage) :
+            m(theMessage) {};
+        MessagePtr m;
+        virtual JSObject * newJSObject(JSContext * cx, JSObject * theWrapper) {
+            JSObject *obj = Event::newJSObject(cx, theWrapper);
+            jsval v = jslib::as_jsval(cx, "message");
+            JS_SetProperty(cx, obj, "type", &v);
+
+            if (boost::shared_ptr<TextMessage> t = boost::dynamic_pointer_cast<TextMessage>(m)) {
+                jsval v = jslib::as_jsval(cx, t->data);
+                JS_SetProperty(cx, obj, "data", &v);
+            } else {
+                AC_ERROR << "Unsupported Message type";
+            }
+
+            return obj;
+        };
+    };
+
     struct Frame {
         static const unsigned char CONTINUATION = 0x00; 
         static const unsigned char TEXT = 0x01; 
@@ -111,7 +134,6 @@ namespace websocket {
         std::vector<asl::Unsigned8> payload; 
     };
     typedef boost::shared_ptr<Frame> FramePtr; 
-        
 
     class Client : public boost::enable_shared_from_this<Client> {
         public:
@@ -139,6 +161,7 @@ namespace websocket {
             FramePtr _incomingFrame;
             std::deque<FramePtr> _sendQueue;
             FramePtr _outgoingFrame;
+            MessagePtr _incomingMessage;
 
             // JS interface
             asl::ReadWriteLock _lockEventQueue; // lock for _eventQueue;
@@ -164,6 +187,8 @@ namespace websocket {
             void onFrameHeaderRead(const boost::system::error_code& error, std::size_t bytes_transferred);
             void onPayloadRead(const boost::system::error_code& error, std::size_t bytes_transferred);
 
+            void processMessageFrame();
+            void processFinalFragment();
             void processCloseFrame();
             void sendControlFrame(unsigned char opcode);
             void sendNextFrame();
