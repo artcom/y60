@@ -38,11 +38,13 @@
 #include "../y60_netasync_settings.h" 
 
 #include <asl/dom/Nodes.h>
+#include <asl/base/Block.h>
 #include <asl/base/ReadWriteLock.h>
 
 #include <netsrc/spidermonkey/jsapi.h>
 
 #include <y60/jsbase/JSWrapper.h>
+#include <y60/jsbase/JSBlock.h>
 
 #include <map>
 
@@ -57,6 +59,7 @@ namespace y60 {
 namespace async {
 namespace websocket {
     struct Message {
+        virtual size_t size() = 0;
         virtual ~Message() {};
     };
     typedef boost::shared_ptr<Message> MessagePtr;
@@ -65,7 +68,15 @@ namespace websocket {
         template <class InputIterator>
         TextMessage(InputIterator begin, size_t len) :
             data(begin, begin+len) {};
+        virtual size_t size() { return data.size();} ;
         std::string data;
+    };
+    struct BinaryMessage : public Message {
+        template <class InputIterator>
+        BinaryMessage(InputIterator begin, size_t len) :
+            data(new asl::Block(reinterpret_cast<const unsigned char*>(&*begin), reinterpret_cast<const unsigned char*>(&*begin)+len)) {};
+        virtual size_t size() { return data->size();} ;
+        asl::Ptr<asl::Block> data;
     };
 
     
@@ -105,6 +116,9 @@ namespace websocket {
 
             if (boost::shared_ptr<TextMessage> t = boost::dynamic_pointer_cast<TextMessage>(m)) {
                 jsval v = jslib::as_jsval(cx, t->data);
+                JS_SetProperty(cx, obj, "data", &v);
+            } else if (boost::shared_ptr<BinaryMessage> b = boost::dynamic_pointer_cast<BinaryMessage>(m)) {
+                jsval v = jslib::as_jsval(cx, b->data);
                 JS_SetProperty(cx, obj, "data", &v);
             } else {
                 AC_ERROR << "Unsupported Message type";
@@ -176,6 +190,7 @@ namespace websocket {
             void processCallbacks();
 
             void send(const std::string& data);
+            void send(const asl::Block & data);
             
         private:
             Client();
@@ -187,7 +202,6 @@ namespace websocket {
             void onFrameHeaderRead(const boost::system::error_code& error, std::size_t bytes_transferred);
             void onPayloadRead(const boost::system::error_code& error, std::size_t bytes_transferred);
 
-            void processMessageFrame();
             void processFinalFragment();
             void processCloseFrame();
 

@@ -65,11 +65,14 @@ send(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     JSWebSocketClient::OWNERPTR nativePtr = JSClassTraits<JSWebSocketClient::NATIVE>::getNativeOwner(cx,obj);
 
     std::string stringData;
+    asl::Ptr<asl::Block> binaryData;
 
     if (JSVAL_IS_STRING(argv[0]) && convertFrom(cx, argv[0], stringData)) {
         nativePtr->send(stringData);
+    } else if (convertFrom(cx, argv[0], binaryData)) {
+        nativePtr->send(*binaryData);
     } else {
-        JS_ReportError(cx, "WebSocketClient::send: argument #1 is not a string");
+        JS_ReportError(cx, "WebSocketClient::send: argument #1 is not a string or block");
         return JS_FALSE;
     }
     *rval = JSVAL_VOID;

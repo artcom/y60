@@ -347,10 +347,19 @@ namespace websocket {
         if (!error) {
             AC_TRACE << "Transferred " << bytes_transferred << " bytes";
             AC_TRACE << "Receive Buffer contains " << _recv_buffer.size() << " bytes";
-            // TODO do something with the frame
+            boost::asio::streambuf::const_buffers_type bufs = _recv_buffer.data();
             switch (_incomingFrame->opcode) {
                 case Frame::TEXT:
-                    processMessageFrame();
+                    _incomingMessage = MessagePtr(new TextMessage(boost::asio::buffers_begin(bufs), _incomingFrame->payload.size()));
+                    if (_incomingFrame->final) {
+                      processFinalFragment(); 
+                    }
+                    break;
+                case Frame::BINARY:
+                    _incomingMessage = MessagePtr(new BinaryMessage(boost::asio::buffers_begin(bufs), _incomingFrame->payload.size()));
+                    if (_incomingFrame->final) {
+                      processFinalFragment(); 
+                    }
                     break;
                 case Frame::CONNECTION_CLOSE:
                     processCloseFrame();
@@ -375,21 +384,8 @@ namespace websocket {
     }
 
     void
-    Client::processMessageFrame() {
-        if (_incomingMessage) {
-            AC_ERROR << "TODO handle protocol error: received new message while fragment still in buffer";
-            return;
-        }
-        boost::asio::streambuf::const_buffers_type bufs = _recv_buffer.data();
-        _incomingMessage = MessagePtr(new TextMessage(boost::asio::buffers_begin(bufs), _incomingFrame->payload.size()));
-        if (_incomingFrame->final) {
-            processFinalFragment(); 
-        }
-    }
-
-    void
     Client::processFinalFragment() {
-        AC_DEBUG << "incoming Text Message " << boost::dynamic_pointer_cast<TextMessage>(_incomingMessage)->data.size() << " bytes";
+        AC_DEBUG << "incoming Text Message " << _incomingMessage->size() << " bytes";
         _eventQueue.push_back(EventPtr(new MessageEvent(_incomingMessage)));
         _incomingMessage.reset();
     }
@@ -530,6 +526,15 @@ namespace websocket {
         // TODO: implement fragmention
         FramePtr f = FramePtr(new Frame(Frame::TEXT, true));
         f->payload.resize(data.length());
+        std::copy(data.begin(), data.end(), f->payload.begin());
+        _writeStrand.post(boost::bind(&Client::_w_queueFrame, this, f));
+    }
+
+    void
+    Client::send(const asl::Block& data) {
+        // TODO: implement fragmention
+        FramePtr f = FramePtr(new Frame(Frame::BINARY, true));
+        f->payload.resize(data.size());
         std::copy(data.begin(), data.end(), f->payload.begin());
         _writeStrand.post(boost::bind(&Client::_w_queueFrame, this, f));
     }
