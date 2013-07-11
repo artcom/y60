@@ -60,9 +60,7 @@
 #include <js/jsdbgapi.h>
 #endif
 
-#ifndef _WIN32
 #include <boost/locale.hpp>
-#endif
 
 using namespace std;
 using namespace asl;
@@ -669,12 +667,31 @@ JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError)
 
     // NOTE: spidermonkey exceptions are always fatal because
     //       they indicate interpreter internal errors.
-    abort();
+    //abort();
 
-    return JS_TRUE;
+    return JS_FALSE;
 }
 #endif
 
+JSBool
+JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObject, const char * theName, uintN argc, jsval argv[], jsval *rval) {
+    jsval myValue;
+    if (JS_GetProperty(cx, theObject, theName, &myValue)) {
+        if (JS_TypeOfValue(cx, myValue) != JSTYPE_FUNCTION) {
+            AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(cx, myValue);
+            return JS_FALSE;
+        }
+    }
+    try {
+        AC_DEBUG << "cx:" << cx << ", this:" << theThisObject << ", obj:" << theObject << ", theName:" << theName << ", argc:" << argc << ", argv:" << argv << ", rval:" << rval;
+        JSBool ok = JS_CallFunctionValue(cx, theThisObject, myValue, argc, argv, rval);
+        if (!ok) {
+            AC_DEBUG << "Exception while calling js function '" << theName << "'" << endl;
+            JSA_reportUncaughtException(cx, cx->errorReporter);
+        }
+        return ok;
+    } HANDLE_CPP_EXCEPTION;
+};
 JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval) {
     try {

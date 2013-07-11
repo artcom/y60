@@ -77,11 +77,15 @@ set(TESTS
 GarbageCollection
 )
 
+if(NOT WIN32)
+    find_package(Boost COMPONENTS locale)
+endif(NOT WIN32)
+
 ac_add_library(
     y60jsbase y60/jsbase
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    EXTERNS ${JSEXTERN}
+    EXTERNS ${JSEXTERN} Boost
     DEPENDS aslbase aslmath asldom aslxpath
             y60base y60scene y60image ${JSDEPENDS} 
             paintlib
