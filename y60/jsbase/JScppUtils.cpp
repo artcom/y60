@@ -839,14 +839,14 @@ searchFileRelativeToJSInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *a
     int myLine;
     if (!getFileLine(cx, obj, argc, argv, myCurrentFile, myLine)) {
         JS_ReportError(cx, "Failed to determine current JS include file.");
-        return JS_FALSE;
+        return "";
     }
     std::string myIncludePath = asl::getDirectoryPart(myCurrentFile);
 
     std::string myFileWithPath = asl::searchFile(theFile, myIncludePath);
     if (myFileWithPath.empty()) {
           JS_ReportError(cx, "File '%s' not found in %s", theFile.c_str(), myIncludePath.c_str());
-          return JS_FALSE;
+          return "";
     }
     return myFileWithPath;
 }
