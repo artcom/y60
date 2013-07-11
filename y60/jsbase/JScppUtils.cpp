@@ -187,6 +187,19 @@ jsval as_jsval(JSContext *cx, int theValue) {
     return INT_TO_JSVAL(theValue);
 }
 
+bool
+isValidUTF8(const char * theU8String) {
+#ifdef _WIN32
+    AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
+    return myWCharSize != 0;
+#else
+    GError *error = NULL;
+    gunichar2 * myUTF16 = g_utf8_to_utf16(theU8String, -1,0,0,&error);
+    return myUTF16;
+
+#endif
+};
+
 jsval
 as_jsval(JSContext *cx, const char * theU8String) {
     // convert from UTF8 to WideChars/UTF16
