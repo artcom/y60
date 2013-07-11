@@ -167,6 +167,7 @@ namespace curl {
         }
     };
 
+/*
 JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObject, const char * theName, uintN argc, jsval argv[], jsval *rval) {
     jsval myValue;
@@ -185,7 +186,7 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
         return ok;
     } HANDLE_CPP_EXCEPTION;
 };
-
+*/
     void
     Client::onDone(CURLcode result) {
         {
