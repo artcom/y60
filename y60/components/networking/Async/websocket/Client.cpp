@@ -50,6 +50,7 @@
 using namespace std;
 using namespace asl;
 using namespace jslib;
+
 using boost::asio::ip::tcp;
 
 namespace y60 {
@@ -215,7 +216,8 @@ namespace websocket {
             // validate the connection
             if (statusCode != 101) {
                 AC_ERROR << "Unsupported status code received from server: " << statusCode;
-                // TODO: call onError, close connection
+                failTheWebSocketConnection(1002, "Unsupported status code from server.");
+                return;
             }
             string concatenatedKey = _secWebSocketKey + Magic_UUID;
             Unsigned8 sha1_digest[SHA_DIGEST_LENGTH];
@@ -224,19 +226,22 @@ namespace websocket {
             binToBase64(sha1_digest, sizeof(sha1_digest), expectedValue, cb64);
             if (expectedValue != _replyHeaders["Sec-WebSocket-Accept"]) {
                 AC_ERROR << "Expected " << expectedValue << " from Server, received " << _replyHeaders["Sec-WebSocket-Accept"];
+                failTheWebSocketConnection(1002, "Handshake failure.");
+                return;
             }
-            _readyState = OPEN;
+            {
+                ScopeLocker L(_lockEventQueue, true);
+                _readyState = OPEN;
+                _eventQueue.push_back(EventPtr(new OpenEvent()));
+            }
             AC_DEBUG << "WebSocket connection OPEN to " << debugIdentifier;
             AC_TRACE << _recv_buffer.size() << " bytes left in buffer after reading header";
-
-
             // Upgrade has now completed. Sending operations will be now be protected by the _writeStrand
 
             // wait for incoming frame. The header will be at least 2 bytes, possibly more.
             // We won't know how long the header will be until we have the first two bytes. 
             // boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(2),
             async_read_if_needed(2, &Client::onFrameHeaderRead);
-
         } else {
              AC_ERROR << error.message();
              // TODO: call onError, close connection
@@ -323,7 +328,7 @@ namespace websocket {
                 ws.masking_key[2] = 0;
                 ws.masking_key[3] = 0;
             */
-            AC_DEBUG << "Payload FIN=" << _incomingFrame->final << ", opcode=" << static_cast<int>(_incomingFrame->opcode) << ", payloadLen=" << payloadLength << " i=" << i;
+            AC_TRACE << "Payload FIN=" << _incomingFrame->final << ", opcode=" << static_cast<int>(_incomingFrame->opcode) << ", payloadLen=" << payloadLength << " i=" << i;
             _recv_buffer.consume(frameHeaderSize);
             AC_TRACE << _recv_buffer.size() << " bytes left in buffer after reading header";
             _incomingFrame->payload.resize(payloadLength);
@@ -336,8 +341,13 @@ namespace websocket {
                 ScopeLocker L(_lockEventQueue, true);
                 _readyState = CLOSED;
                 _eventQueue.push_back(EventPtr(new CloseEvent(true, closing_code, closing_reason.c_str())));
+            } else if (_readyState == CLOSED && 
+                    (error == boost::asio::error::eof || 
+                     error == boost::asio::error::operation_aborted)) 
+            {
+                AC_DEBUG << "Client closed connection";
             } else {
-                AC_ERROR << error.message() << " transferred:" << bytes_transferred;
+                AC_ERROR << error.message() << " transferred: " << bytes_transferred << ", readyState=" << _readyState;
                 // TODO: call onError, close connection
             }
         }
@@ -356,74 +366,16 @@ namespace websocket {
                 failTheWebSocketConnection(1002, "Reserved bits must be 0.");
                 return;
             };
-            
-            // now process message or control frames
-            if ((_incomingFrame->opcode & 0x08) == 0) {
-                // Message Frame
-                switch (_incomingFrame->opcode) {
-                    case Frame::CONTINUATION:
-                        if (_incomingMessage) {
-                            _incomingMessage->append(_incomingFrame->payload);
-                            if (_incomingFrame->final) {
-                                processFinalFragment(); 
-                            }
-                        } else {
-                            failTheWebSocketConnection(1002, "Continuation Frame received with no message to continue.");
-                            return;
-                        }
-                        break;
-                    case Frame::TEXT:
-                        if (_incomingMessage) {
-                            failTheWebSocketConnection(1002, "Message Frame received with incomplete message still waiting to be continued.");
-                            return;
-                        }
-                        _incomingMessage = MessagePtr(new TextMessage(_incomingFrame->payload));
-                        if (_incomingFrame->final) {
-                            processFinalFragment(); 
-                        }
-                        break;
-                    case Frame::BINARY:
-                        if (_incomingMessage) {
-                            failTheWebSocketConnection(1002, "Message Frame received with incomplete message still waiting to be continued.");
-                            return;
-                        }
-                        _incomingMessage = MessagePtr(new BinaryMessage(_incomingFrame->payload));
-                        if (_incomingFrame->final) {
-                            processFinalFragment(); 
-                        }
-                        break;
-                    default:
-                        AC_WARNING << "Unsupported Message Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
-                        failTheWebSocketConnection(1002, "Unsupported Non-Control Opcode received.");
-                        return;
-                };
+            if (_readyState == OPEN) {
+                if ((_incomingFrame->opcode & 0x08) == 0) {
+                    processMessageFrame();
+                } else {
+                    processControlFrame();
+                }
             } else {
-                // Sanity checks
-                if (_incomingFrame->payload.size() > 125) {
-                    failTheWebSocketConnection(1002, "Incoming control frame to long");
-                    return;
-                }
-                if (_incomingFrame->final == false) {
-                    failTheWebSocketConnection(1002, "Incoming control frame may not be fragmented.");
-                    return;
-                }
-                // Now processs the control frame
-                switch (_incomingFrame->opcode) {
-                    case Frame::PING:
-                        _writeStrand.post(boost::bind(&Client::_w_sendPong, this, _incomingFrame->payload));
-                        break;
-                    case Frame::PONG:
-                        // do nothing
-                        break;
-                    case Frame::CONNECTION_CLOSE:
-                        processCloseFrame(_incomingFrame->payload);
-                        break;
-                    default:
-                        AC_WARNING << "Unsupported Control Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
-                        failTheWebSocketConnection(1002, "Unsupported Control Opcode received.");
-                };
-            }
-            //
+                AC_WARNING << "Dropping frame since readyState is " << _readyState;
+            };
+
             _incomingFrame.reset();
             if (_readyState != CLOSED) {
                 // now wait for next frame header
@@ -433,6 +385,75 @@ namespace websocket {
         } else {
              AC_ERROR << error.message();
              // TODO: call onError, close connection
+        }
+    }
+
+    void
+    Client::processControlFrame() {
+        // Sanity checks
+        if (_incomingFrame->payload.size() > 125) {
+            failTheWebSocketConnection(1002, "Incoming control frame to long");
+            return;
+        }
+        if (_incomingFrame->final == false) {
+            failTheWebSocketConnection(1002, "Incoming control frame may not be fragmented.");
+            return;
+        }
+        // Now processs the control frame
+        switch (_incomingFrame->opcode) {
+            case Frame::PING:
+                _writeStrand.post(boost::bind(&Client::_w_sendPong, this, _incomingFrame->payload));
+                break;
+            case Frame::PONG:
+                // do nothing
+                break;
+            case Frame::CONNECTION_CLOSE:
+                processCloseFrame(_incomingFrame->payload);
+                break;
+            default:
+                AC_WARNING << "Unsupported Control Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
+                failTheWebSocketConnection(1002, "Unsupported Control Opcode received.");
+        };
+    }
+
+    void
+    Client::processMessageFrame() {
+        switch (_incomingFrame->opcode) {
+            case Frame::CONTINUATION:
+                if (_incomingMessage) {
+                    _incomingMessage->append(_incomingFrame->payload);
+                    if (_incomingFrame->final) {
+                        processFinalFragment(); 
+                    }
+                } else {
+                    failTheWebSocketConnection(1002, "Continuation Frame received with no message to continue.");
+                    return;
+                }
+                break;
+            case Frame::TEXT:
+                if (_incomingMessage) {
+                    failTheWebSocketConnection(1002, "Message Frame received with incomplete message still waiting to be continued.");
+                    return;
+                }
+                _incomingMessage = MessagePtr(new TextMessage(_incomingFrame->payload));
+                if (_incomingFrame->final) {
+                    processFinalFragment(); 
+                }
+                break;
+            case Frame::BINARY:
+                if (_incomingMessage) {
+                    failTheWebSocketConnection(1002, "Message Frame received with incomplete message still waiting to be continued.");
+                    return;
+                }
+                _incomingMessage = MessagePtr(new BinaryMessage(_incomingFrame->payload));
+                if (_incomingFrame->final) {
+                    processFinalFragment(); 
+                }
+                break;
+            default:
+                AC_WARNING << "Unsupported Message Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
+                failTheWebSocketConnection(1002, "Unsupported Non-Control Opcode received.");
+                return;
         }
     }
 
@@ -529,6 +550,11 @@ namespace websocket {
 
     void
     Client::_w_queueFrame(FramePtr f) {
+        if (_readyState != OPEN) {
+            //TODO create error event
+            AC_WARNING << "not sending message since connection is not open";
+            return;
+        }
         // TODO: message fragmentation
         _w_sendQueue.push_back(f);
         AC_TRACE << "queuing message frame, queue length now " << _w_sendQueue.size();
@@ -555,7 +581,7 @@ namespace websocket {
         // construct the header
         request_stream.put((_w_outgoingFrame->final? 0x80 : 0) + _w_outgoingFrame->opcode); 
         // variable length payload size field
-        AC_DEBUG << "Frame Payload is " << _w_outgoingFrame->payload.size() << " bytes.";
+        AC_TRACE << "Frame Payload is " << _w_outgoingFrame->payload.size() << " bytes.";
         if (_w_outgoingFrame->payload.size() < 126ul) {
             request_stream.put((_w_outgoingFrame->masked? 0x80 : 0) + _w_outgoingFrame->payload.size()); 
         } else if (_w_outgoingFrame->payload.size() < 0x10000ul) {
@@ -590,7 +616,7 @@ namespace websocket {
     Client::_w_onFrameSent(const boost::system::error_code& error, size_t bytes_transferred) {
         if (!error) {
             if (_w_outgoingFrame->disconnect_after_sending) {
-                AC_DEBUG << "closing connection";
+                AC_TRACE << "closing connection";
                 _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
                 _socket.close();
                 AC_DEBUG << "connection closed";
@@ -601,7 +627,7 @@ namespace websocket {
                 }
             }
         } else {
-             AC_ERROR << error.message();
+             AC_ERROR << error.message() << " on " << debugIdentifier;
              // TODO: call onError
         }
     }
@@ -627,6 +653,12 @@ namespace websocket {
                             jsval argv[1], rval;
                             argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
                             JSBool ok = JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onclose", 1, argv, &rval);
+                        }
+                    } else if (boost::shared_ptr<OpenEvent> e = boost::dynamic_pointer_cast<OpenEvent>(nextEvent)) {
+                        if (hasCallback("onopen")) {
+                            jsval argv[1], rval;
+                            argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
+                            JSBool ok = JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onopen", 1, argv, &rval);
                         }
                     } else if (boost::shared_ptr<MessageEvent> e = boost::dynamic_pointer_cast<MessageEvent>(nextEvent)) {
                         if (hasCallback("onmessage")) {

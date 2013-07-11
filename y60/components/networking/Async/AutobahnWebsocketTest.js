@@ -130,7 +130,7 @@ getCaseCount(runNextCase);
         while (true) {
             Async.onFrame();
             gc();
-            msleep(5);
+            msleep(1);
             if (done) {
                 break;
             }

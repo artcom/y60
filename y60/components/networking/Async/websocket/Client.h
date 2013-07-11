@@ -71,6 +71,14 @@ namespace websocket {
     };
     typedef boost::shared_ptr<Event> EventPtr; 
 
+    struct OpenEvent : public Event {
+        virtual JSObject * newJSObject(JSContext * cx, JSObject * theWrapper) {
+            JSObject *obj = Event::newJSObject(cx, theWrapper);
+            jsval v = jslib::as_jsval(cx, "open");
+            JS_SetProperty(cx, obj, "type", &v);
+            return obj;
+        };
+    };
     struct CloseEvent : public Event {
         CloseEvent(bool theCleanFlag, unsigned short theCode, const std::string & theReason) :
             wasClean(theCleanFlag), code(theCode), reason(theReason) {};
@@ -196,6 +204,8 @@ namespace websocket {
             void onPayloadRead(const boost::system::error_code& error, std::size_t bytes_transferred);
 
             void processFinalFragment();
+            void processMessageFrame();
+            void processControlFrame();
             void processCloseFrame(const std::vector<unsigned char> & payload);
 
             // we use a boost::strand to prevent interleaving write calls
