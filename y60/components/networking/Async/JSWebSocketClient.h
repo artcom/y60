@@ -38,15 +38,13 @@
 #include <y60/jsbase/JSWrapper.h>
 
 
-class JSWebSocketClient : public jslib::JSWrapper<y60::async::websocket::Client, boost::shared_ptr<y60::async::websocket::Client> , jslib::StaticAccessProtocol> { JSWebSocketClient() {}
+class JSWebSocketClient : public jslib::JSWrapper<y60::async::websocket::Client, boost::shared_ptr<y60::async::websocket::Client> , jslib::StaticAccessProtocol>, boost::noncopyable {
     public:
         typedef y60::async::websocket::Client NATIVE;
         typedef boost::shared_ptr<NATIVE> OWNERPTR;
         typedef jslib::JSWrapper<NATIVE,OWNERPTR, jslib::StaticAccessProtocol> Base;
 
-        JSWebSocketClient(OWNERPTR theOwner, NATIVE * theNative)
-            : Base(theOwner, theNative)
-        {}
+        JSWebSocketClient(OWNERPTR theOwner, NATIVE * theNative);
 
         virtual ~JSWebSocketClient();
 
