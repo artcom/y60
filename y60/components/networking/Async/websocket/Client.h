@@ -36,6 +36,8 @@
 #define _ac_y60_async_websocket_client_h
 
 #include "../y60_netasync_settings.h" 
+#include "Message.h"
+
 
 #include <asl/dom/Nodes.h>
 #include <asl/base/Block.h>
@@ -58,28 +60,6 @@
 namespace y60 {
 namespace async {
 namespace websocket {
-    struct Message {
-        virtual size_t size() = 0;
-        virtual ~Message() {};
-    };
-    typedef boost::shared_ptr<Message> MessagePtr;
-
-    struct TextMessage : public Message {
-        template <class InputIterator>
-        TextMessage(InputIterator begin, size_t len) :
-            data(begin, begin+len) {};
-        virtual size_t size() { return data.size();} ;
-        std::string data;
-    };
-    struct BinaryMessage : public Message {
-        template <class InputIterator>
-        BinaryMessage(InputIterator begin, size_t len) :
-            data(new asl::Block(reinterpret_cast<const unsigned char*>(&*begin), reinterpret_cast<const unsigned char*>(&*begin)+len)) {};
-        virtual size_t size() { return data->size();} ;
-        asl::Ptr<asl::Block> data;
-    };
-
-    
     struct Event {
         virtual JSObject * newJSObject(JSContext * cx, JSObject * theWrapper) {
             JSObject *obj = JS_NewObject(cx, NULL, NULL, NULL);
@@ -101,6 +81,11 @@ namespace websocket {
             JSObject *obj = Event::newJSObject(cx, theWrapper);
             jsval v = jslib::as_jsval(cx, "close");
             JS_SetProperty(cx, obj, "type", &v);
+
+            v = jslib::as_jsval(cx, code);
+            JS_SetProperty(cx, obj, "code", &v);
+            v = jslib::as_jsval(cx, reason);
+            JS_SetProperty(cx, obj, "reason", &v);
             return obj;
         };
     };
@@ -137,12 +122,17 @@ namespace websocket {
         static const unsigned char PONG = 0x0A;
 
         Frame(unsigned char theOpCode, bool theFinalFlag = true) :
-            opcode(theOpCode), final(theFinalFlag)
+            opcode(theOpCode), final(theFinalFlag),
+            disconnect_after_sending(false)
         {};
         bool final;
+        unsigned char rsv; 
         unsigned char opcode;
         bool masked;
         unsigned char masking_key[4];
+
+        // implementation flags
+        bool disconnect_after_sending;
 
         std::vector<asl::Unsigned8> payload; 
     };
@@ -170,6 +160,9 @@ namespace websocket {
             boost::asio::io_service::strand _writeStrand;
             std::map<std::string, std::string> _replyHeaders;
             std::string _secWebSocketKey;
+
+            std::string closing_reason;
+            unsigned int closing_code;
 
             // current fragment data
             FramePtr _incomingFrame;
@@ -203,7 +196,7 @@ namespace websocket {
             void onPayloadRead(const boost::system::error_code& error, std::size_t bytes_transferred);
 
             void processFinalFragment();
-            void processCloseFrame();
+            void processCloseFrame(const std::vector<unsigned char> & payload);
 
             // we use a boost::strand to prevent interleaving write calls
             // all members prefixed with _w_ should only be called/accessed from the
@@ -211,12 +204,13 @@ namespace websocket {
             std::deque<FramePtr> _w_sendQueue;
             FramePtr _w_outgoingFrame;
             void _w_sendNextFrame();
-            void _w_confirmClose();
+            void _w_sendCloseFrame(bool disconnect, int theCode = 0, const std::string & theReason = 0);
+            void _w_sendPong(const std::vector<unsigned char> & payload);
             void _w_onFrameSent(const boost::system::error_code& error, std::size_t bytes_transferred);
             void _w_injectFrame(FramePtr f);
             void _w_queueFrame(FramePtr f);
 
-            void failTheWebSocketConnection();
+            void failTheWebSocketConnection(unsigned int theCode, const char * theMessage = 0);
             bool hasCallback(const char * theName);
 
     };

@@ -93,16 +93,35 @@ function runNextCase()
       {
         updateStatus("All test cases executed.");
         done = true;
-        // updateReports();
+        updateReports();
       }
     };
-  //webSocket.onerror = webSocket.onclose;
+  webSocket.onerror = webSocket.onclose;
   webSocket.onmessage =
     function(e)
     {
       webSocket.send(e.data);
     };
 } 
+
+function updateReports()
+{
+    var ws_uri = wsuri + "/updateReports?agent=" + agent;
+    webSocket = openWebSocket(ws_uri);
+    webSocket.onopen =
+        function(e)
+        {
+            updateStatus("Updating reports ..");
+        }
+    webSocket.onclose =
+        function(e)
+        {
+            webSocket = null;
+            updateStatus("Reports updated.");
+            updateStatus("Test suite finished!");
+        }
+} 
+
 
 
 currentCaseId = 1;
@@ -111,7 +130,7 @@ getCaseCount(runNextCase);
         while (true) {
             Async.onFrame();
             gc();
-            msleep(50);
+            msleep(5);
             if (done) {
                 break;
             }

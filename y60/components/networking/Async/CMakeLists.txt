@@ -8,6 +8,7 @@ JSWebSocketClient.cpp
 NetAsync.cpp
 curl/SocketAdapter.cpp
 curl/MultiAdapter.cpp
+websocket/Message.cpp
 websocket/Client.cpp
 websocket/Manager.cpp
 MimeTypes.cpp
@@ -15,23 +16,8 @@ Reply.cpp
 RequestParser.cpp
 )
 
+# no public headers
 set(HEADERS
-ConcurrentQueue.h
-Connection.h
-HttpHeader.h
-HttpServer.h
-curl/Client.h
-JSHttpClient.h
-# JSWebSocketClient.h
-JSHttpServer.h
-MimeTypes.h
-NetAsync.h
-curl/SocketAdapter.h
-curl/MultiAdapter.h
-Reply.h
-Request.h
-RequestParser.h
-y60_netasync_settings.h
 )
 
 find_package(OpenSSL)

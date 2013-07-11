@@ -274,6 +274,7 @@ namespace websocket {
             boost::asio::buffers_iterator<boost::asio::streambuf::const_buffers_type> header = boost::asio::buffers_begin(bufs);
             Unsigned8 firstByte = *header;
             _incomingFrame = FramePtr(new Frame(firstByte & 0x0f, firstByte & 0x80)); 
+            _incomingFrame->rsv = firstByte & 0x70;
             Unsigned8 secondByte = header[1];
             Unsigned8 tempPayloadLength = (secondByte & 0x7f);
             
@@ -334,7 +335,7 @@ namespace websocket {
                 AC_DEBUG << "Server closed connection";
                 ScopeLocker L(_lockEventQueue, true);
                 _readyState = CLOSED;
-                _eventQueue.push_back(EventPtr(new CloseEvent(true, 1000, "TODO")));
+                _eventQueue.push_back(EventPtr(new CloseEvent(true, closing_code, closing_reason.c_str())));
             } else {
                 AC_ERROR << error.message() << " transferred:" << bytes_transferred;
                 // TODO: call onError, close connection
@@ -348,28 +349,80 @@ namespace websocket {
             AC_TRACE << "Transferred " << bytes_transferred << " bytes";
             AC_TRACE << "Receive Buffer contains " << _recv_buffer.size() << " bytes";
             boost::asio::streambuf::const_buffers_type bufs = _recv_buffer.data();
-            switch (_incomingFrame->opcode) {
-                case Frame::TEXT:
-                    _incomingMessage = MessagePtr(new TextMessage(boost::asio::buffers_begin(bufs), _incomingFrame->payload.size()));
-                    if (_incomingFrame->final) {
-                      processFinalFragment(); 
-                    }
-                    break;
-                case Frame::BINARY:
-                    _incomingMessage = MessagePtr(new BinaryMessage(boost::asio::buffers_begin(bufs), _incomingFrame->payload.size()));
-                    if (_incomingFrame->final) {
-                      processFinalFragment(); 
-                    }
-                    break;
-                case Frame::CONNECTION_CLOSE:
-                    processCloseFrame();
-                    break;
-                default:
-                    AC_WARNING << "Unsupported Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
-            };
+            _incomingFrame->payload.assign(boost::asio::buffers_begin(bufs), boost::asio::buffers_begin(bufs)+_incomingFrame->payload.size());
             _recv_buffer.consume(_incomingFrame->payload.size());
-            // ...
-            //
+            // general sanity checks
+            if (_incomingFrame->rsv != 0) {
+                failTheWebSocketConnection(1002, "Reserved bits must be 0.");
+                return;
+            };
+            
+            // now process message or control frames
+            if ((_incomingFrame->opcode & 0x08) == 0) {
+                // Message Frame
+                switch (_incomingFrame->opcode) {
+                    case Frame::CONTINUATION:
+                        if (_incomingMessage) {
+                            _incomingMessage->append(_incomingFrame->payload);
+                            if (_incomingFrame->final) {
+                                processFinalFragment(); 
+                            }
+                        } else {
+                            failTheWebSocketConnection(1002, "Continuation Frame received with no message to continue.");
+                            return;
+                        }
+                        break;
+                    case Frame::TEXT:
+                        if (_incomingMessage) {
+                            failTheWebSocketConnection(1002, "Message Frame received with incomplete message still waiting to be continued.");
+                            return;
+                        }
+                        _incomingMessage = MessagePtr(new TextMessage(_incomingFrame->payload));
+                        if (_incomingFrame->final) {
+                            processFinalFragment(); 
+                        }
+                        break;
+                    case Frame::BINARY:
+                        if (_incomingMessage) {
+                            failTheWebSocketConnection(1002, "Message Frame received with incomplete message still waiting to be continued.");
+                            return;
+                        }
+                        _incomingMessage = MessagePtr(new BinaryMessage(_incomingFrame->payload));
+                        if (_incomingFrame->final) {
+                            processFinalFragment(); 
+                        }
+                        break;
+                    default:
+                        AC_WARNING << "Unsupported Message Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
+                        failTheWebSocketConnection(1002, "Unsupported Non-Control Opcode received.");
+                        return;
+                };
+            } else {
+                // Sanity checks
+                if (_incomingFrame->payload.size() > 125) {
+                    failTheWebSocketConnection(1002, "Incoming control frame to long");
+                    return;
+                }
+                if (_incomingFrame->final == false) {
+                    failTheWebSocketConnection(1002, "Incoming control frame may not be fragmented.");
+                    return;
+                }
+                // Now processs the control frame
+                switch (_incomingFrame->opcode) {
+                    case Frame::PING:
+                        _writeStrand.post(boost::bind(&Client::_w_sendPong, this, _incomingFrame->payload));
+                        break;
+                    case Frame::PONG:
+                        // do nothing
+                        break;
+                    case Frame::CONNECTION_CLOSE:
+                        processCloseFrame(_incomingFrame->payload);
+                        break;
+                    default:
+                        AC_WARNING << "Unsupported Control Frame Type " << static_cast<unsigned int>(_incomingFrame->opcode); 
+                        failTheWebSocketConnection(1002, "Unsupported Control Opcode received.");
+                };
+            }
             //
             _incomingFrame.reset();
             if (_readyState != CLOSED) {
@@ -391,19 +444,77 @@ namespace websocket {
     }
 
     void
-    Client::processCloseFrame() {
+    Client::processCloseFrame(const std::vector<unsigned char> & payload) {
+        if (payload.size() == 1) {
+            failTheWebSocketConnection(1002, "Close frame with illegal payload size 1.");
+        } else if (payload.size() >= 2) {
+            closing_code = (payload[0] << 8) + payload[1];
+        } else {
+            closing_code = 1000;
+        }
+
+        if (payload.size() > 2) {
+            closing_reason.assign(payload.begin()+2, payload.end());
+        } else {
+            closing_reason = "";
+        }
+
+        AC_DEBUG << "received CLOSE frame " << closing_code;
+        
+        if (!isValidUTF8(closing_reason)) {
+            failTheWebSocketConnection(1002, "Illegal UTF8 in CLOSE payload");
+            return;
+        }
+
         if (_readyState != CLOSING) {
-            _writeStrand.post(boost::bind(&Client::_w_confirmClose, this));
-            // clear any queued frames
-            _readyState = CLOSING;
+            if (closing_code <  1000) {  // code out of range
+                failTheWebSocketConnection(1002, "CLOSE code out of range");
+            } else if (closing_code >= 1000 && closing_code <= 2999 &&  // reserved for use by protocol
+                    closing_code != 1000 && // normal closure
+                    closing_code != 1001 && // endpoint going away
+                    closing_code != 1002 && // protocol error
+                    closing_code != 1003 && // data type error (eg. binary vs text)
+                    closing_code != 1007 && // data value error(eg. non-utf8 in text message)
+                    closing_code != 1008 && // policy violation
+                    closing_code != 1009 && // message to big
+                    closing_code != 1010 && // handshake extension failure
+                    closing_code != 1011 ) // unexpected condition
+            {
+                failTheWebSocketConnection(1002, "Illegal CLOSE code in CLOSE payload");
+            } else if (closing_code > 4999) { // code of ouf range
+                failTheWebSocketConnection(1002, "CLOSE code out of range");
+            } else {
+                _writeStrand.post(boost::bind(&Client::_w_sendCloseFrame, this, false, closing_code, closing_reason));
+                _readyState = CLOSING;
+            }
         }
     }
     
     void
-    Client::_w_confirmClose() {
+    Client::_w_sendCloseFrame(bool disconnect, int theCode, const std::string & theReason) {
+        AC_TRACE << "Sending CLOSE frame with code " << theCode << ", disconnect=" << disconnect;
         // clear any queued frames
         _w_sendQueue.empty();
-        _w_injectFrame(FramePtr(new Frame(Frame::CONNECTION_CLOSE, true)));
+        FramePtr f = FramePtr(new Frame(Frame::CONNECTION_CLOSE, true));
+        if (theCode) {
+            f->payload.push_back((uint8_t)(theCode >> 8));
+            f->payload.push_back((uint8_t)theCode);
+        }
+
+        for (size_t i; i < theReason.size(); ++i) {
+            f->payload.push_back(theReason[i]);
+        }
+        f->disconnect_after_sending = disconnect;
+
+        _w_injectFrame(f);
+    }
+
+    void
+    Client::_w_sendPong(const std::vector<unsigned char> & payload) {
+        FramePtr pongFrame  = FramePtr(new Frame(Frame::PONG, true));
+        AC_TRACE << "Sending PONG with playoad " << payload.size();
+        pongFrame->payload = payload;
+        _w_injectFrame(pongFrame);
     }
 
     void
@@ -478,9 +589,16 @@ namespace websocket {
     void 
     Client::_w_onFrameSent(const boost::system::error_code& error, size_t bytes_transferred) {
         if (!error) {
-            _w_outgoingFrame.reset();
-            if (!_w_sendQueue.empty()) {
-                _w_sendNextFrame();
+            if (_w_outgoingFrame->disconnect_after_sending) {
+                AC_DEBUG << "closing connection";
+                _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+                _socket.close();
+                AC_DEBUG << "connection closed";
+            } else {
+                _w_outgoingFrame.reset();
+                if (!_w_sendQueue.empty()) {
+                    _w_sendNextFrame();
+                }
             }
         } else {
              AC_ERROR << error.message();
@@ -501,21 +619,27 @@ namespace websocket {
                     _eventQueue.pop_front();
                 }
             }
+
             if (nextEvent) {
-                if (boost::shared_ptr<CloseEvent> e = boost::dynamic_pointer_cast<CloseEvent>(nextEvent)) {
-                    if (hasCallback("onclose")) {
-                        jsval argv[1], rval;
-                        argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
-                        JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "onclose", 1, argv, &rval);
+                try {
+                    if (boost::shared_ptr<CloseEvent> e = boost::dynamic_pointer_cast<CloseEvent>(nextEvent)) {
+                        if (hasCallback("onclose")) {
+                            jsval argv[1], rval;
+                            argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
+                            JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "onclose", 1, argv, &rval);
+                        }
+                    } else if (boost::shared_ptr<MessageEvent> e = boost::dynamic_pointer_cast<MessageEvent>(nextEvent)) {
+                        if (hasCallback("onmessage")) {
+                            jsval argv[1], rval;
+                            argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
+                            JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "onmessage", 1, argv, &rval);
+                        }
+                    } else {
+                        AC_WARNING << "Unknown event type - invoke JS Callback here";
                     }
-                } else if (boost::shared_ptr<MessageEvent> e = boost::dynamic_pointer_cast<MessageEvent>(nextEvent)) {
-                    if (hasCallback("onmessage")) {
-                        jsval argv[1], rval;
-                        argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
-                        JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "onmessage", 1, argv, &rval);
-                    }
-                } else {
-                    AC_WARNING << "Unknown event type - invoke JS Callback here";
+                } catch (UnicodeException & ex) {
+                    AC_WARNING << ex;
+                    failTheWebSocketConnection(1007, "Invalid Unicode byte sequence.");
                 }
             }
         } while (nextEvent);
@@ -551,9 +675,10 @@ namespace websocket {
     }
 
     void
-    Client::failTheWebSocketConnection() {
-        // TODO: SHOULD send close frame if connected
-        _socket.close();
+    Client::failTheWebSocketConnection(unsigned int theCode, const char * theMessage) {
+        _writeStrand.post(boost::bind(&Client::_w_sendCloseFrame, this, true, theCode, theMessage));
+        _readyState = CLOSED;
+        _eventQueue.push_back(EventPtr(new CloseEvent(false, theCode, theMessage)));
     }
 
     Client::~Client()
