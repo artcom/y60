@@ -60,12 +60,11 @@
 #include <js/jsdbgapi.h>
 #endif
 
-#ifndef _WIN32
-#include <glib.h>
-#endif
+#include <boost/locale.hpp>
 
 using namespace std;
 using namespace asl;
+using namespace boost::locale::conv;
 
 #define DB(x) // x;
 
@@ -94,24 +93,18 @@ as_string(JSContext *cx, jsval theVal) {
     delete [] myUTF8Chars;
     return myResult;
 #else
+    std::string myResult;
     size_t srcLen = JS_GetStringLength(myJSStr);
 
     // get pointer to 16-bit chars
-    gunichar2 * myData = reinterpret_cast<gunichar2*>(JS_GetStringChars(myJSStr));
+    asl::Unsigned16 * myData = reinterpret_cast<asl::Unsigned16*>(JS_GetStringChars(myJSStr));
 
-    // now convert to utf-8 encoded c-string
-    glong targetLen;
-    gchar * myUTF8 = g_utf16_to_utf8(myData, srcLen * sizeof(gunichar2), 0, &targetLen, 0);
-
-    // now convert to std::string
-    if ( ! myUTF8) {
-        throw jslib::UnicodeException("Failed to convert UTF8 from UTF16.", PLUS_FILE_LINE);
+    try {
+        // now convert to utf-8 encoded string
+        myResult = utf_to_utf<char>(myData, myData+srcLen, stop);
+    } catch (boost::locale::conv::conversion_error & ex) {
+        throw jslib::UnicodeException(ex.what(), PLUS_FILE_LINE);
     }
-
-    std::string myResult = std::string(myUTF8);
-
-    // clean up
-    g_free(myUTF8);
     return myResult;
 #endif
 }
@@ -207,32 +200,40 @@ as_jsval(JSContext *cx, const char * theU8String) {
     delete [] myWChars;
     return STRING_TO_JSVAL(myString);
 #else
-    GError *error = NULL;
-    gunichar2 * myUTF16 = g_utf8_to_utf16(theU8String, -1,0,0,&error);
-    if ( ! myUTF16) {
+    JSString * myString;
+    try {
+        std::basic_string<asl::Unsigned16> utf16String = utf_to_utf<asl::Unsigned16>(theU8String, stop);
+        myString = JS_NewUCStringCopyN(cx,utf16String.c_str(), utf16String.size());
+    } catch (boost::locale::conv::conversion_error & ex) {
         ostringstream os;
-        os << "Failed to convert UTF8 to UTF16. '" << theU8String << "' hex:";
+        os << ex.what() << " '" << theU8String << "' hex:";
         for (unsigned i = 0; i < strlen(theU8String); ++i) {
             os << " " << std::hex << int(reinterpret_cast<const unsigned char*>(theU8String)[i]);
         }
-        os << ", reason: "<<error->message;
-        //g_clear_error(&error);
         throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE);
     }
-
-    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myUTF16));
-    g_free(myUTF16);
-
     return STRING_TO_JSVAL(myString);
 #endif
 }
 
 jsval as_jsval(JSContext *cx, const std::string & theValue) {
-    return as_jsval(cx, theValue.c_str());
+    JSString * myString;
+    try {
+        std::basic_string<asl::Unsigned16> utf16String = utf_to_utf<asl::Unsigned16>(theValue, stop);
+        myString = JS_NewUCStringCopyN(cx,utf16String.c_str(), utf16String.size());
+    } catch (boost::locale::conv::conversion_error & ex) {
+        ostringstream os;
+        os << ex.what() << " '" << theValue << "' hex:";
+        for (unsigned i = 0; i < theValue.size(); ++i) {
+            os << " " << std::hex << int(theValue[i]);
+        }
+        throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE);
+    }
+    return STRING_TO_JSVAL(myString);
 }
 
 jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String) {
-    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<const jschar*>(theUTF16String.c_str()));
+    JSString * myString = JS_NewUCStringCopyN(cx,reinterpret_cast<const jschar*>(theUTF16String.c_str()), theUTF16String.size());
     return STRING_TO_JSVAL(myString);
 }
 
@@ -649,12 +650,31 @@ JSA_reportUncaughtException(JSContext *cx, JSErrorReporter onError)
 
     // NOTE: spidermonkey exceptions are always fatal because
     //       they indicate interpreter internal errors.
-    abort();
+    //abort();
 
-    return JS_TRUE;
+    return JS_FALSE;
 }
 #endif
 
+JSBool
+JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObject, const char * theName, uintN argc, jsval argv[], jsval *rval) {
+    jsval myValue;
+    if (JS_GetProperty(cx, theObject, theName, &myValue)) {
+        if (JS_TypeOfValue(cx, myValue) != JSTYPE_FUNCTION) {
+            AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(cx, myValue);
+            return JS_FALSE;
+        }
+    }
+    try {
+        AC_DEBUG << "cx:" << cx << ", this:" << theThisObject << ", obj:" << theObject << ", theName:" << theName << ", argc:" << argc << ", argv:" << argv << ", rval:" << rval;
+        JSBool ok = JS_CallFunctionValue(cx, theThisObject, myValue, argc, argv, rval);
+        if (!ok) {
+            AC_DEBUG << "Exception while calling js function '" << theName << "'" << endl;
+            JSA_reportUncaughtException(cx, cx->errorReporter);
+        }
+        return ok;
+    } HANDLE_CPP_EXCEPTION;
+};
 JSBool
 JSA_CallFunctionName(JSContext * cx, JSObject * obj, const char * theName, int argc, jsval argv[], jsval* rval) {
     try {
