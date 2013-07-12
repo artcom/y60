@@ -369,8 +369,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
     void 
     Client::onPayloadRead(const boost::system::error_code& error, std::size_t bytes_transferred) {
         if (!error) {
-            AC_TRACE << "Transferred " << bytes_transferred << " bytes";
-            AC_TRACE << "Receive Buffer contains " << _recv_buffer.size() << " bytes";
+            AC_TRACE << "Received " << bytes_transferred << " bytes, buffer now contains " << _recv_buffer.size() << " bytes";
             boost::asio::streambuf::const_buffers_type bufs = _recv_buffer.data();
             _incomingFrame->payload.assign(boost::asio::buffers_begin(bufs), boost::asio::buffers_begin(bufs)+_incomingFrame->payload.size());
             _recv_buffer.consume(_incomingFrame->payload.size());
@@ -635,10 +634,14 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
     Client::_w_onFrameSent(const boost::system::error_code& error, size_t bytes_transferred) {
         if (!error) {
             if (_w_outgoingFrame->disconnect_after_sending) {
-                AC_TRACE << "closing connection";
-                _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-                _socket.close();
-                AC_DEBUG << "connection closed";
+                try {
+                    AC_TRACE << "closing connection";
+                    _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+                    _socket.close();
+                    AC_DEBUG << "connection closed";
+                } catch (boost::system::system_error & se) {
+                    AC_WARNING << "Unexpected exception " << se.what() << " on shutdown of " << debugIdentifier;
+                }
             } else {
                 _w_outgoingFrame.reset();
                 if (_w_controlQueue.empty() && _w_messageQueue.empty()) {
@@ -746,10 +749,14 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             _readyState = CLOSED;
             _eventQueue.push_back(EventPtr(new CloseEvent(false, theCode, theMessage)));
         } else {
-            AC_TRACE << "closing connection";
-            _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-            _socket.close();
-            AC_DEBUG << "connection closed";
+            try {
+                AC_TRACE << "closing connection";
+                _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+                _socket.close();
+                AC_DEBUG << "connection closed";
+            } catch (boost::system::system_error & se) {
+                AC_WARNING << "Unexpected exception " << se.what() << " on shutdown of " << debugIdentifier;
+            }
         }
     }
 
