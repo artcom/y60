@@ -213,7 +213,8 @@ namespace websocket {
             // we use a boost::strand to prevent interleaving write calls
             // all members prefixed with _w_ should only be called/accessed from the
             // _writeStrand.
-            std::deque<FramePtr> _w_sendQueue;
+            std::deque<FramePtr> _w_messageQueue;
+            std::deque<FramePtr> _w_controlQueue;
             FramePtr _w_outgoingFrame;
             void _w_sendNextFrame();
             void _w_sendCloseFrame(bool disconnect, int theCode = 0, const std::string & theReason = 0);

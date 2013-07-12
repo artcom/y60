@@ -284,7 +284,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
     void 
     Client::onFrameHeaderRead(const boost::system::error_code& error, std::size_t bytes_transferred) {
         if (!error) {
-            AC_TRACE << "Transferred " << bytes_transferred << " bytes";
+            AC_TRACE << "Read " << bytes_transferred << " bytes";
             AC_TRACE << "Buffer contains " << _recv_buffer.size() << " bytes";
             // assume we have at least two bytes. Calculate how long the header really is
             boost::asio::streambuf::const_buffers_type bufs = _recv_buffer.data();
@@ -354,7 +354,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 ScopeLocker L(_lockEventQueue, true);
                 _readyState = CLOSED;
                 _eventQueue.push_back(EventPtr(new CloseEvent(true, closing_code, closing_reason.c_str())));
-            } else if (_readyState == CLOSED && 
+            } else if (_readyState != OPEN && 
                     (error == boost::asio::error::eof || 
                      error == boost::asio::error::operation_aborted)) 
             {
@@ -528,7 +528,8 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
     Client::_w_sendCloseFrame(bool disconnect, int theCode, const std::string & theReason) {
         AC_TRACE << "Sending CLOSE frame with code " << theCode << ", disconnect=" << disconnect;
         // clear any queued frames
-        _w_sendQueue.empty();
+        _w_messageQueue.empty();
+        _w_controlQueue.empty();
         FramePtr f = FramePtr(new Frame(Frame::CONNECTION_CLOSE, true));
         if (theCode) {
             f->payload.push_back((uint8_t)(theCode >> 8));
@@ -546,15 +547,15 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
     void
     Client::_w_sendPong(const std::vector<unsigned char> & payload) {
         FramePtr pongFrame  = FramePtr(new Frame(Frame::PONG, true));
-        AC_TRACE << "Sending PONG with playoad " << payload.size();
+        AC_TRACE << "Sending PONG with payload " << payload.size();
         pongFrame->payload = payload;
         _w_injectFrame(pongFrame);
     }
 
     void
     Client::_w_injectFrame(FramePtr f) {
-        _w_sendQueue.push_front(f);
-        AC_TRACE << "injecting control frame, queue length now " << _w_sendQueue.size();
+        _w_controlQueue.push_back(f);
+        AC_TRACE << "injecting control frame, queue length now " << _w_controlQueue.size() << "/" <<  _w_messageQueue.size();
         if (!_w_outgoingFrame) {
             AC_TRACE << "starting to send front frame";
             _w_sendNextFrame();
@@ -569,8 +570,8 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             return;
         }
         // TODO: message fragmentation
-        _w_sendQueue.push_back(f);
-        AC_TRACE << "queuing message frame, queue length now " << _w_sendQueue.size();
+        _w_messageQueue.push_back(f);
+        AC_TRACE << "queuing message frame, queue length now " << _w_controlQueue.size() << "/" <<  _w_messageQueue.size();
         if (!_w_outgoingFrame) {
             AC_TRACE << "starting to send front frame";
             _w_sendNextFrame();
@@ -582,8 +583,13 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
         if (_w_outgoingFrame) {
             throw asl::Exception("trying to start sending while previous send operation still in progress");
         }
-        _w_outgoingFrame = _w_sendQueue.front();
-        _w_sendQueue.pop_front();
+        if (!_w_controlQueue.empty()) {
+            _w_outgoingFrame = _w_controlQueue.front();
+            _w_controlQueue.pop_front();
+        } else if (!_w_messageQueue.empty()) {
+            _w_outgoingFrame = _w_messageQueue.front();
+            _w_messageQueue.pop_front();
+        }
         // prepare outgoing frame for transmission
         
         // RFC: turn on masking for outgoing frames
@@ -594,7 +600,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
         // construct the header
         request_stream.put((_w_outgoingFrame->final? 0x80 : 0) + _w_outgoingFrame->opcode); 
         // variable length payload size field
-        AC_TRACE << "Frame Payload is " << _w_outgoingFrame->payload.size() << " bytes.";
+        AC_TRACE << "Outgoing frame payload is " << _w_outgoingFrame->payload.size() << " bytes.";
         if (_w_outgoingFrame->payload.size() < 126ul) {
             request_stream.put((_w_outgoingFrame->masked? 0x80 : 0) + _w_outgoingFrame->payload.size()); 
         } else if (_w_outgoingFrame->payload.size() < 0x10000ul) {
@@ -635,7 +641,10 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 AC_DEBUG << "connection closed";
             } else {
                 _w_outgoingFrame.reset();
-                if (!_w_sendQueue.empty()) {
+                if (_w_controlQueue.empty() && _w_messageQueue.empty()) {
+                    AC_TRACE << "Frame sent, queue is empty.";
+                } else {
+                    AC_TRACE << "Frame sent, " << _w_controlQueue.size() << "/" <<  _w_messageQueue.size() << " frames sill in queue, sending next frame..."; 
                     _w_sendNextFrame();
                 }
             }
