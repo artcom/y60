@@ -57,8 +57,18 @@ namespace y60 {
 namespace async {
 namespace websocket {
 
+// Lifecycle Debug
+//#define LIFECYCLE_DEBUG
+
+#ifdef LIFECYCLE_DEBUG
+#define LCDB(x) x
+size_t LC_COUNT = 0;
+#else
+#define LCDB(x) // x
+#endif
 #define Magic_UUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11" 
-    Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io) :
+
+Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io) :
         _jsContext(cx),
         _resolver(io),
         _socket(io),
@@ -104,12 +114,15 @@ namespace websocket {
             _host = _hostport.substr(0, myHostPortDelimiter);
             _port = _hostport.substr(myHostPortDelimiter+1);
         }
+        LCDB(AC_PRINT << "WebSocket::Client CTOR, Count is now " << ++LC_COUNT);
+    }
 
+    void
+    Client::connect() {
         AC_TRACE << "Resolving " << _host << " on Port " << _port << "...";
-        
         tcp::resolver::query query(_host, _port);
         _resolver.async_resolve(query,
-            boost::bind(&Client::onResolved, this, 
+            boost::bind(&Client::onResolved, shared_from_this(), 
                 boost::asio::placeholders::error, 
                     boost::asio::placeholders::iterator));
     }
@@ -120,7 +133,7 @@ namespace websocket {
             AC_TRACE << "resolved!" << endpoint_iterator->host_name() << ":" << endpoint_iterator->service_name();
             AC_TRACE << "now established TCP connection...";
             async_connect(_socket, endpoint_iterator,
-                boost::bind(&Client::onTCPConnection, this,
+                boost::bind(&Client::onTCPConnection, shared_from_this(),
                 boost::asio::placeholders::error));
             // prepare the secure key
             //
@@ -149,7 +162,7 @@ namespace websocket {
             // send the request. Note: since we are still in half-duplex (http) mode,
             // we don't yet have to worry abound synchronization issues and strands.
             boost::asio::async_write(_socket, _send_buffer,
-                boost::bind(&Client::onHeadersSent, this,
+                boost::bind(&Client::onHeadersSent, shared_from_this(),
                 boost::asio::placeholders::error));
         } else {
              AC_ERROR << error.message();
@@ -163,7 +176,7 @@ namespace websocket {
             AC_TRACE << "WS Handshake sent...waiting for response...";
             // Read the response headers, which are terminated by a blank line.
             boost::asio::async_read_until(_socket, _recv_buffer, "\r\n",
-                boost::bind(&Client::onHeadersRead, this,
+                boost::bind(&Client::onHeadersRead, shared_from_this(),
                 boost::asio::placeholders::error));
         } else {
              AC_ERROR << error.message();
@@ -175,7 +188,7 @@ namespace websocket {
     Client::async_read_if_needed(std::size_t needed, void (Client::*contfunc)(const boost::system::error_code &, std::size_t)) { 
         if (_recv_buffer.size() < needed) {
             boost::asio::async_read(_socket, _recv_buffer, boost::asio::transfer_at_least(needed - _recv_buffer.size()), 
-                  boost::bind(contfunc, this,
+                  boost::bind(contfunc, shared_from_this(),
                   boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
         } else {
             (this->*contfunc)(boost::system::error_code(), 0);
@@ -402,7 +415,7 @@ namespace websocket {
         // Now processs the control frame
         switch (_incomingFrame->opcode) {
             case Frame::PING:
-                _writeStrand.post(boost::bind(&Client::_w_sendPong, this, _incomingFrame->payload));
+                _writeStrand.post(boost::bind(&Client::_w_sendPong, shared_from_this(), _incomingFrame->payload));
                 break;
             case Frame::PONG:
                 // do nothing
@@ -505,7 +518,7 @@ namespace websocket {
             } else if (closing_code > 4999) { // code of ouf range
                 failTheWebSocketConnection(1002, "CLOSE code out of range");
             } else {
-                _writeStrand.post(boost::bind(&Client::_w_sendCloseFrame, this, false, closing_code, closing_reason));
+                _writeStrand.post(boost::bind(&Client::_w_sendCloseFrame, shared_from_this(), false, closing_code, closing_reason));
                 _readyState = CLOSING;
             }
         }
@@ -608,7 +621,7 @@ namespace websocket {
         
         // send the request
         boost::asio::async_write(_socket, _send_buffer,
-                _writeStrand.wrap(boost::bind(&Client::_w_onFrameSent, this,
+                _writeStrand.wrap(boost::bind(&Client::_w_onFrameSent, shared_from_this(),
                     boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)));
     }
     
@@ -652,13 +665,18 @@ namespace websocket {
                         if (hasCallback("onclose")) {
                             jsval argv[1], rval;
                             argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
+                            AC_TRACE << "Calling onClose for " << debugIdentifier;
                             JSBool ok = JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onclose", 1, argv, &rval);
+                            AC_TRACE << "Called onClose for " << debugIdentifier;
                         }
+                        releaseJSWrapper();
                     } else if (boost::shared_ptr<OpenEvent> e = boost::dynamic_pointer_cast<OpenEvent>(nextEvent)) {
                         if (hasCallback("onopen")) {
                             jsval argv[1], rval;
                             argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
+                            AC_TRACE << "Calling onOpen for " << debugIdentifier;
                             JSBool ok = JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onopen", 1, argv, &rval);
+                            AC_TRACE << "Called onOpen for " << debugIdentifier;
                         }
                     } else if (boost::shared_ptr<MessageEvent> e = boost::dynamic_pointer_cast<MessageEvent>(nextEvent)) {
                         if (hasCallback("onmessage")) {
@@ -683,7 +701,7 @@ namespace websocket {
         FramePtr f = FramePtr(new Frame(Frame::TEXT, true));
         f->payload.resize(data.length());
         std::copy(data.begin(), data.end(), f->payload.begin());
-        _writeStrand.post(boost::bind(&Client::_w_queueFrame, this, f));
+        _writeStrand.post(boost::bind(&Client::_w_queueFrame, shared_from_this(), f));
     }
 
     void
@@ -692,7 +710,7 @@ namespace websocket {
         FramePtr f = FramePtr(new Frame(Frame::BINARY, true));
         f->payload.resize(data.size());
         std::copy(data.begin(), data.end(), f->payload.begin());
-        _writeStrand.post(boost::bind(&Client::_w_queueFrame, this, f));
+        _writeStrand.post(boost::bind(&Client::_w_queueFrame, shared_from_this(), f));
     }
 
     void 
@@ -702,19 +720,34 @@ namespace websocket {
         if(!JS_AddNamedRoot(_jsContext, &_jsWrapper, debugIdentifier.c_str())) {
             AC_WARNING << "failed to root request object!";
         }
-        asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
-        parentPlugin->getWSManager().addClient(shared_from_this());
+    }
+
+    void
+    Client::releaseJSWrapper() {
+        if (_jsWrapper) {
+            JS_RemoveRoot(_jsContext, &_jsWrapper);
+            _jsWrapper = 0;
+        }
     }
 
     void
     Client::failTheWebSocketConnection(unsigned int theCode, const char * theMessage) {
-        _writeStrand.post(boost::bind(&Client::_w_sendCloseFrame, this, true, theCode, theMessage));
-        _readyState = CLOSED;
-        _eventQueue.push_back(EventPtr(new CloseEvent(false, theCode, theMessage)));
+        if (_readyState == OPEN) {
+            _writeStrand.post(boost::bind(&Client::_w_sendCloseFrame, shared_from_this(), true, theCode, theMessage));
+            _readyState = CLOSED;
+            _eventQueue.push_back(EventPtr(new CloseEvent(false, theCode, theMessage)));
+        } else {
+            AC_TRACE << "closing connection";
+            _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+            _socket.close();
+            AC_DEBUG << "connection closed";
+        }
     }
 
     Client::~Client()
     {
+        releaseJSWrapper();
+        LCDB(AC_PRINT << "WebSocket::Client DTOR, Count is now " << --LC_COUNT);
         AC_TRACE << "~Client " << this;
     }
 

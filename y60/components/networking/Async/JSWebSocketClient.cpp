@@ -46,9 +46,18 @@ using namespace jslib;
 using namespace y60;
 
 
-const unsigned READ_BUFFER_SIZE = 20000;
-
 #define DB(x) // x
+
+// Lifecycle Debug
+//#define LIFECYCLE_DEBUG
+
+#ifdef LIFECYCLE_DEBUG
+#define LCDB(x) x
+size_t LC_COUNT = 0;
+#else
+#define LCDB(x) // x
+#endif
+
 
 static JSBool
 toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
@@ -79,7 +88,18 @@ send(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+JSWebSocketClient::JSWebSocketClient(OWNERPTR theOwner, NATIVE * theNative)
+            : Base(theOwner, theNative)
+{
+    LCDB(AC_PRINT << "JSWebSocketClient CTOR, Count is now " << ++LC_COUNT);
+    asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+    parentPlugin->getWSManager().addClient(theOwner);
+};
+
 JSWebSocketClient::~JSWebSocketClient() {
+    asl::Ptr<NetAsync> parentPlugin = dynamic_cast_Ptr<NetAsync>(Singleton<PlugInManager>::get().getPlugIn(NetAsync::PluginName));
+    parentPlugin->getWSManager().removeClient(getOwner());
+    LCDB(AC_PRINT << "JSWebSocketClient DTOR, Count is now " << --LC_COUNT);
 }
 
 JSFunctionSpec *
@@ -214,6 +234,8 @@ JSWebSocketClient::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *
     jsval optsValue = OBJECT_TO_JSVAL(optsObject);
     JS_SetProperty(cx, obj, "_opts", &optsValue);
 
+    // initiate connection
+    myWebSocketClient->connect();
     return JS_TRUE;
 }
 

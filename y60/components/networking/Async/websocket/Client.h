@@ -60,7 +60,7 @@
 namespace y60 {
 namespace async {
 namespace websocket {
-    struct Event {
+    struct Event : public boost::noncopyable {
         virtual JSObject * newJSObject(JSContext * cx, JSObject * theWrapper) {
             JSObject *obj = JS_NewObject(cx, NULL, NULL, NULL);
             jsval v = OBJECT_TO_JSVAL(theWrapper); 
@@ -121,7 +121,7 @@ namespace websocket {
         };
     };
 
-    struct Frame {
+    struct Frame : public boost::noncopyable {
         static const unsigned char CONTINUATION = 0x00; 
         static const unsigned char TEXT = 0x01; 
         static const unsigned char BINARY = 0x02; 
@@ -146,7 +146,7 @@ namespace websocket {
     };
     typedef boost::shared_ptr<Frame> FramePtr; 
 
-    class Client : public boost::enable_shared_from_this<Client> {
+    class Client : public boost::enable_shared_from_this<Client>, boost::noncopyable {
         public:
             static const unsigned short CONNECTING = 0;
             static const unsigned short OPEN = 1;
@@ -184,8 +184,10 @@ namespace websocket {
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io);
             virtual ~Client();
+            void connect();
             std::string debugIdentifier;
             void setWrapper(JSObject * theWrapper);
+            void releaseJSWrapper();
             jsval getJSOption(const char * theName) const;
             JSBool setJSOption(const char * theName, jsval * vp);
             void processCallbacks();

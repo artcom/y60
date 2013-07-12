@@ -66,6 +66,7 @@ function getCaseCount(cont)
   webSocket.onclose =
     function(e)
     {
+      webSocket = null;
       cont();
     };
 } 
@@ -78,7 +79,7 @@ function runNextCase()
   webSocket.onopen =
     function(e)
     {
-      updateStatus("Executing test case " + currentCaseId + "/" + caseCount);
+      updateStatus("Executing test case " + currentCaseId + "/" + caseCount+ ": "+e.target);
     };
   webSocket.onclose =
     function(e)
@@ -92,11 +93,10 @@ function runNextCase()
       else
       {
         updateStatus("All test cases executed.");
-        done = true;
         updateReports();
       }
     };
-  webSocket.onerror = webSocket.onclose;
+  // webSocket.onerror = webSocket.onclose;
   webSocket.onmessage =
     function(e)
     {
@@ -116,6 +116,7 @@ function updateReports()
     webSocket.onclose =
         function(e)
         {
+            done = true;
             webSocket = null;
             updateStatus("Reports updated.");
             updateStatus("Test suite finished!");
@@ -135,3 +136,4 @@ getCaseCount(runNextCase);
                 break;
             }
         }
+print("done");
