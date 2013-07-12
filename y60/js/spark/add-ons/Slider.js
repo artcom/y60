@@ -38,6 +38,7 @@ spark.Slider.Constructor = function (Protected) {
     var _relativeRasterPositions  = [];
     var _initValue                = null;
     var _initIndex                = null;
+    var _rasterSnapCb             = null;
     
     
     /////////////////////
@@ -93,7 +94,11 @@ spark.Slider.Constructor = function (Protected) {
             return 0;
         } else if (_relativeRasterPositions.length > 0) {
             var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
+            var myOldRasterIndex = _rasterIndex;
             setRasterIndex(myRelativeX);
+            if (myOldRasterIndex != _rasterIndex && _rasterSnapCb) {
+                _rasterSnapCb();
+            }
             return _relativeRasterPositions[_rasterIndex];
         } else {
             var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
@@ -206,6 +211,10 @@ spark.Slider.Constructor = function (Protected) {
 
     Public.__defineGetter__("relativeRasterPositions", function () {
         return _relativeRasterPositions;
+    });
+
+    Public.__defineSetter__("rasterSnapCb", function (theCb) {
+        _rasterSnapCb = theCb;
     });
 
     Base.realize = Public.realize;
