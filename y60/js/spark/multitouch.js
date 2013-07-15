@@ -281,7 +281,7 @@ spark.CursorEvent.getMappedEvents = function (theEventType) {
     }
 };
 
-spark.CursorEvent.Constructor = function (Protected, theType, theCursor) {
+spark.CursorEvent.Constructor = function (Protected, theType, theCursor, theEvent) {
     var Public = this;
     this.Inherit(spark.Event, theType);
 
@@ -290,10 +290,18 @@ spark.CursorEvent.Constructor = function (Protected, theType, theCursor) {
     /////////////////////
 
     var _myCursor = theCursor;
+    var _myEventNode = theEvent;
 
     ////////////////////
     // Public Methods //
     ////////////////////
+    
+    /**
+     * Reference to the original event node. 
+     */
+    Public.__defineGetter__("eventNode", function () {
+        return _myEventNode;
+    });
 
     /**
      * Reference to the cursor this event concerns

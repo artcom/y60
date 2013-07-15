@@ -29,44 +29,33 @@
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
 
-#ifndef _Y60_JSSETTINGS_INCLUDED_
-#define _Y60_JSSETTINGS_INCLUDED_
-
-#include "y60_jsbase_settings.h"
-
-#ifdef Y60_WITH_TRACEMONKEY
-
-#define USE_TRACEMONKEY
-
-#else
-
-#undef JS_THREADSAFE
-
-#ifdef _WIN32
-    #ifndef XP_WIN
-    #define XP_WIN
-    #endif
-#endif
-
-#ifdef LINUX
-    #ifndef XP_UNIX
-    #define XP_UNIX
-    #endif
-#endif
-
-#ifdef OSX
-    #ifndef XP_UNIX
-    #define XP_UNIX
-    #endif
-#endif
-
-#define USE_LEGACY_SPIDERMONKEY
-#define USE_OLD_JS_ERROR_HANDLING
-#define USE_SPIDERMONKEY_INCREMENTAL_GC
-
-#endif
+/* Browser compatibiliy layer for JSON in Y60. Creates a global JSON object with
+ * parse and stringify functions.
+ *
+ * stringify: see script on https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON
+ * parse: see Crockford's eval-free descent-based json_parse.js on https://github.com/douglascrockford/JSON-js
+ */
 
 
+if (typeof(JSON) === "undefined") {
 
-#endif
+  use("vendor/json_parse.js");
+
+  var JSON = {
+    parse: json_parse,
+    stringify: function (vContent) {
+      if (vContent instanceof Object) {
+        var sOutput = "";
+        if (vContent.constructor === Array) {
+          for (var nId = 0; nId < vContent.length; sOutput += this.stringify(vContent[nId]) + ",", nId++);
+          return "[" + sOutput.substr(0, sOutput.length - 1) + "]";
+        }
+        if (vContent.toString !== Object.prototype.toString) { return "\"" + vContent.toString().replace(/"/g, "\\$&") + "\""; }
+        for (var sProp in vContent) { sOutput += "\"" + sProp.replace(/"/g, "\\$&") + "\":" + this.stringify(vContent[sProp]) + ","; }
+        return "{" + sOutput.substr(0, sOutput.length - 1) + "}";
+      }
+      return typeof vContent === "string" ? "\"" + vContent.replace(/"/g, "\\$&") + "\"" : String(vContent);
+    }
+  };
+}
 

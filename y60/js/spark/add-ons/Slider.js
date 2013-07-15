@@ -31,9 +31,14 @@ spark.Slider.Constructor = function (Protected) {
     var _stopTime           = 0;
     var _myCursorOffset     = null;
 
-    var DAMPENING_HISTORY = 5;
+    var DAMPENING_HISTORY   = 5;
 
-    var _snaps            = [];
+    var _rasterValues             = [];
+    var _rasterIndex              = null;
+    var _relativeRasterPositions  = [];
+    var _initValue                = null;
+    var _initIndex                = null;
+    var _rasterSnapCb             = null;
     
     
     /////////////////////
@@ -57,20 +62,24 @@ spark.Slider.Constructor = function (Protected) {
     }
 
     function ensurePrecision() {
-        if (_mySliderBackground.height !== _myActiveCursor.height) {
+        if (!_verticalLock && _mySliderBackground.height !== _myActiveCursor.height) {
             _myActiveCursor.y = getRelativeY() * (_mySliderBackground.height - _myActiveCursor.height);
         }
-        if (_mySliderBackground.width !== _myActiveCursor.width) {
+        if (!_horizontalLock && _mySliderBackground.width !== _myActiveCursor.width) {
             _myActiveCursor.x = getRelativeX() * (_mySliderBackground.width - _myActiveCursor.width);
         }
     }
     
     function getRelativeY() {
+        if (_verticalLock) {
+            return 0;
+        }
         if (_mySliderBackground.height === _myActiveCursor.height) {
             return 0;
-        } else if (_snaps.length > 0) {
+        } else if (_relativeRasterPositions.length > 0) {
             var myRelativeY = _myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height);
-            return setSnapsPos(myRelativeY);
+            setRasterIndex(myRelativeY);
+            return _relativeRasterPositions[_rasterIndex];
         } else {
             var myRelativeY = _myActiveCursor.y / (_mySliderBackground.height - _myActiveCursor.height);
             return (_precision === 0) ? myRelativeY : myRelativeY.toFixed(_precision);
@@ -78,29 +87,36 @@ spark.Slider.Constructor = function (Protected) {
     }
 
     function getRelativeX() {
+        if (_horizontalLock) {
+            return 0;
+        }
         if (_mySliderBackground.width === _myActiveCursor.width) {
             return 0;
-        } else if (_snaps.length > 0) {
+        } else if (_relativeRasterPositions.length > 0) {
             var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
-            return setSnapsPos(myRelativeX);
+            var myOldRasterIndex = _rasterIndex;
+            setRasterIndex(myRelativeX);
+            if (myOldRasterIndex != _rasterIndex && _rasterSnapCb) {
+                _rasterSnapCb();
+            }
+            return _relativeRasterPositions[_rasterIndex];
         } else {
             var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
             return (_precision === 0) ? myRelativeX : myRelativeX.toFixed(_precision);
         }
     }
 
-    function setSnapsPos(theYPos){
+    function setRasterIndex(thePos){
+        
         var myDistance = 0;
         var mySnapPos = 1;
-        for (var i = 0; i < _snaps.length; i++) {
-            myDistance = Math.abs(_snaps[i] - theYPos);
-
+        for (var i = 0; i < _relativeRasterPositions.length; i++) {
+            myDistance = Math.abs(_relativeRasterPositions[i] - thePos);
             if (myDistance < mySnapPos) {
                 mySnapPos = myDistance;
-                var mySnapPoint = i;
+                _rasterIndex = i;
             }                    
         };
-        return _snaps[mySnapPoint];
     }
 
     var centerCursor = function () {
@@ -173,6 +189,34 @@ spark.Slider.Constructor = function (Protected) {
         _verticalLock = theVerticalLock;
     });
 
+    Public.__defineGetter__("value", function () { 
+        if(_verticalLock) {
+            return getRelativeX();
+        } else {
+            return getRelativeY();
+        }
+        
+    });
+
+    Public.__defineGetter__("rasterValue", function () { 
+        if (_rasterValues.length > 0) {
+            return _rasterValues[_rasterIndex];
+        } 
+        return null;
+    });
+
+    Public.__defineGetter__("initIndex", function () {
+        return _initIndex;
+    });
+
+    Public.__defineGetter__("relativeRasterPositions", function () {
+        return _relativeRasterPositions;
+    });
+
+    Public.__defineSetter__("rasterSnapCb", function (theCb) {
+        _rasterSnapCb = theCb;
+    });
+
     Base.realize = Public.realize;
     Public.realize = function () {
         Base.realize();
@@ -194,7 +238,6 @@ spark.Slider.Constructor = function (Protected) {
         _sticky         = Protected.getBoolean("sticky", true);
         _snappy         = Protected.getBoolean("snappy", true);
         _precision      = Protected.getNumber("precision", _precision);
-        _snaps          = Protected.getArray("snaps", []);
         Public.addEventListener(spark.CursorEvent.APPEAR_ENTER, Public.onSlideStart, true);
         Public.addEventListener(spark.CursorEvent.MOVE, Public.onSlide, true);
         Public.addEventListener(spark.CursorEvent.VANISH_LEAVE, Public.onSlideStop, true);
@@ -202,6 +245,52 @@ spark.Slider.Constructor = function (Protected) {
         if (_centered) {
             centerCursor();
         }
+        _rasterValues = Protected.getArray("rasterValues", []);
+        if (_rasterValues.length > 0) {
+            var myDistance = 1/(_rasterValues.length-1);
+            for (var i= 0; i<_rasterValues.length; i++) {
+                _relativeRasterPositions.push(i*myDistance);
+            }
+        }
+        _initValue = Protected.getNumber("initValue", 0);
+        _rasterIndex = 0;
+       
+        if (_rasterValues.length > 0) {
+            for (i= 0; i<_rasterValues.length; i++) {
+                if (_initValue == _rasterValues[i]) {
+                    _rasterIndex = i;
+                    break;
+                }
+            }
+        }
+        _initIndex = _rasterIndex;
+        
+        if (_rasterValues.length > 0) {
+            Public.setRelativeCursorPosition(_relativeRasterPositions[_rasterIndex]);
+        } else {
+            Public.setRelativeCursorPosition(_initValue);
+        }
+        
+        
+    };
+
+    Public.reset = function() {
+        _rasterIndex = 0;
+        
+        if (_rasterValues.length > 1) {
+            for (var i= 0; i<_rasterValues.length; i++) {
+                if (_initValue == _rasterValues[i]) {
+                    _rasterIndex = i;
+                    break;
+                }
+            }
+        }
+        
+        if (_rasterValues.length > 0) {
+            Public.setRelativeCursorPosition(_relativeRasterPositions[_rasterIndex]);
+        } else {
+            Public.setRelativeCursorPosition(_initValue);
+        } 
     };
 
     Public.onSlideStart = function (theEvent) {
@@ -309,6 +398,9 @@ spark.Slider.Constructor = function (Protected) {
         _myIdleCursor.y   = _myCursorOrigin.y;
         _myActiveCursor.x = _myIdleCursor.x;
         _myActiveCursor.y = _myIdleCursor.y;
+        // to update rasterIndex
+        getRelativeX();
+        getRelativeY();
     };
 
     Public.setCursorPosition = function (theX, theY) {
@@ -320,6 +412,9 @@ spark.Slider.Constructor = function (Protected) {
         _myActiveCursor.y = myY;
         _myCursorOrigin.x = myX;
         _myCursorOrigin.y = myY;
+        // to update rasterIndex
+        getRelativeX();
+        getRelativeY();
     };
 
     Public.setRelativeCursorPosition = function (theX, theY) {
@@ -331,6 +426,9 @@ spark.Slider.Constructor = function (Protected) {
         _myActiveCursor.y = myY;
         _myCursorOrigin.x = myX;
         _myCursorOrigin.y = myY;
+        // to update rasterIndex
+        getRelativeX();
+        getRelativeY();
     };
 
 };
