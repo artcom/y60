@@ -73,8 +73,8 @@ public:
           _myEventSchemaDocument(new Document(y60::ourproximatrix2toucheventxsd)),          
           _myIdMap(),
           _myTouchUpTimeout(100),
-          _myCalibrationPoints(),
           _myReferencePoints(),
+          _myCalibrationPoints(),
           _myPort(10000)
     {
         registerStandardTypes(*_myEventValueFactory);
@@ -99,7 +99,6 @@ public:
         _myCalibrationPoints.clear();
         _myReferencePoints.clear();
 
-        int myFilterFlag = 0;
         asl::Vector2f screen0, screen1, screen2;
         getConfigSetting( theSettings, "Screen0", screen0, asl::Vector2f(0.0f, 0.0f));
         getConfigSetting( theSettings, "Screen1", screen1, asl::Vector2f(1.0f, 0.0f));
@@ -263,7 +262,7 @@ public:
         // trigger up events
         std::map<int, touch_info>::iterator it;
         for (it = _myIdMap.begin(); it != _myIdMap.end(); ++it) {
-            int id = it->first;
+            //int id = it->first;
 
             if ( asl::Time().millis() - it->second.lastAppeared > _myTouchUpTimeout) {
                 GenericEventPtr myEvent = createEvent(it->second);
