@@ -28,10 +28,20 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 
+
+NOTE: this script works with the http://autobahn.ws fuzzing server.
+
+Download & start the fuzzing server, then start this script:
+
+easy_install autobahntestsuite
+
+wstest -m fuzzingserver
+
+y60 AutobahnWebsocketTest.js
+
 */
 
-/*globals use, plug, UnitTest, millisec, msleep, Async, ENSURE, SUCCESS, FAILURE, gc, UnitTestSuite,
-          print, exit, RequestManager, Request, Logger */
+/*globals use, plug, UnitTest, Async, print, exit, Logger */
 
 
 plug("NetAsync");
@@ -48,10 +58,29 @@ function updateStatus(s) { print(s);}
 
 function openWebSocket(ws_uri)
 {
-    webSocket = new Async.WebSocket(ws_uri);
-    return webSocket;
+    return new Async.WebSocket(ws_uri);
 } 
 
+
+
+function updateReports()
+{
+    var ws_uri = wsuri + "/updateReports?agent=" + agent;
+    webSocket = openWebSocket(ws_uri);
+    webSocket.onopen =
+        function(e)
+        {
+            updateStatus("Updating reports ..");
+        }
+    webSocket.onopen =
+        function(e)
+        {
+            done = true;
+            webSocket = null;
+            updateStatus("Reports updated.");
+            updateStatus("Test suite finished!");
+        }
+} 
 
 function getCaseCount(cont)
 {
@@ -103,27 +132,6 @@ function runNextCase()
       webSocket.send(e.data);
     };
 } 
-
-function updateReports()
-{
-    var ws_uri = wsuri + "/updateReports?agent=" + agent;
-    webSocket = openWebSocket(ws_uri);
-    webSocket.onopen =
-        function(e)
-        {
-            updateStatus("Updating reports ..");
-        }
-    webSocket.onclose =
-        function(e)
-        {
-            done = true;
-            webSocket = null;
-            updateStatus("Reports updated.");
-            updateStatus("Test suite finished!");
-        }
-} 
-
-
 
 currentCaseId = 1;
 getCaseCount(runNextCase);

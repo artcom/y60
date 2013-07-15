@@ -47,20 +47,18 @@ WebSocketUnitTest.prototype.Constructor = function (obj, theName) {
 
     UnitTest.prototype.Constructor(obj, theName);
 
-    function testWebSocket() {
+    function performTest(opts) {
+        var done;
 
-        var done = false;
-        Logger.info("creating client");
-        // var websocket = new Async.WebSocket("ws://echo.websocket.org");
-        var websocket = new Async.WebSocket("ws://localhost:1234/timeinfo");
-        websocket.onopen = function(evt) {};
-        websocket.onclose = function(evt) { print(evt.code, " ", evt.reason); done = true; };
-        websocket.onmessage = function(evt) {};
-        // websocket.onerror = function(evt) { done = true; };
+        if ('onclose' in opts) {
+            var f = opts.onclose;
+            opts.onclose = function(evt) { f(evt); done = true; };
+        } else {
+            opts.onclose = function(evt) { done = true; };
+        }
 
-        websocket = null;
-        gc();
-
+        var websocket = new Async.WebSocket(opts);
+        done = false;
         while (true) {
             Async.onFrame();
             gc();
@@ -69,10 +67,39 @@ WebSocketUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
+
+    }
+
+    function testConnectionRefused() {
+
+        performTest( { url: "ws://localhost:1234/timeinfo" ,
+                       onclose: function(evt) { obj.code = evt.code; } 
+                   });
+        ENSURE("obj.code == 1006");
+
+    }
+
+    function testEcho() {
+        performTest( { url: "ws://echo.websocket.org" ,
+                       onopen: function(evt) { this.send("Hello World"); }, 
+                       onmessage: function(m) { obj.data = m.data; this.close(3000,"hello"); },
+                       onclose: function(evt) { obj.code = evt.code; } 
+                   });
+        ENSURE('obj.data == "Hello World"');
+        ENSURE('obj.code == 3000');
+        
+        performTest( { url: "ws://echo.websocket.org" ,
+                       onopen: function(evt) { this.send("Hello World"); }, 
+                       onmessage: function(m) { obj.data = m.data; this.close(); },
+                       onclose: function(evt) { obj.code = evt.code; } 
+                   });
+        ENSURE('obj.data == "Hello World"');
+        ENSURE('obj.code == 1000');
     }
 
     obj.run = function () {
-        testWebSocket();
+        testConnectionRefused();
+        testEcho();
         gc();
     };
 

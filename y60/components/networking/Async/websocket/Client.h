@@ -194,7 +194,7 @@ namespace websocket {
 
             void send(const std::string& data);
             void send(const asl::Block & data);
-            
+            void close(asl::Unsigned16 theCode = 1000, const std::string & theReason = ""); 
         private:
             Client();
             void async_read_if_needed(std::size_t needed, void (Client::*contfunc)(const boost::system::error_code &, std::size_t)); 

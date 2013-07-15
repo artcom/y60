@@ -88,6 +88,29 @@ send(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+close(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Sends a string or a block to the server."); DOC_END;
+    ensureParamCount(argc, 0, 2);
+    JSWebSocketClient::OWNERPTR nativePtr = JSClassTraits<JSWebSocketClient::NATIVE>::getNativeOwner(cx,obj);
+
+    asl::Unsigned16 theCode;
+    std::string theReason;
+
+    if (argc == 0) {
+        nativePtr->close();
+    } else if ((argc == 1) && convertFrom(cx, argv[0], theCode)) {
+        nativePtr->close(theCode);
+    } else if ((argc == 2) && convertFrom(cx, argv[0], theCode) && convertFrom(cx, argv[1], theReason)) {
+        nativePtr->close(theCode, theReason.c_str());
+    } else {
+        JS_ReportError(cx, "WebSocketClient::send: 1st argument (optional) must be unsigned int, 2nd argument (optional) must be a string.");
+        return JS_FALSE;
+    }
+    *rval = JSVAL_VOID;
+    return JS_TRUE;
+}
+
 JSWebSocketClient::JSWebSocketClient(OWNERPTR theOwner, NATIVE * theNative)
             : Base(theOwner, theNative)
 {
@@ -109,7 +132,7 @@ JSWebSocketClient::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"send",                 send,                    1},
-//        {"close",                close,                   1},
+        {"close",                close,                   2},
         {0}
     };
     return myFunctions;

@@ -347,7 +347,10 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             async_read_if_needed(payloadLength, &Client::onPayloadRead);
 
         } else {
-            if (error == boost::system::errc::connection_reset && _readyState == CLOSING) {
+            if (_readyState == CLOSING &&  
+                    (error == boost::system::errc::connection_reset
+                   ||error == boost::asio::error::eof 
+               )) {
                 // this is not an error but a proper (clean) close
                 AC_DEBUG << "Server closed connection";
                 ScopeLocker L(_lockEventQueue, true);
@@ -355,11 +358,11 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 _eventQueue.push_back(EventPtr(new CloseEvent(true, closing_code, closing_reason.c_str())));
             } else if (_readyState != OPEN && 
                     (error == boost::system::errc::bad_file_descriptor
-                      // || error == boost::asio::error::eof 
+                  || error == boost::asio::error::eof 
                   || error == boost::system::errc::operation_canceled
                   )) 
             {
-                AC_DEBUG << "Client closed connection";
+                AC_DEBUG << "Client closed connection " << error.message();
             } else {
                 AC_ERROR << error.message() << "(" << error.default_error_condition().value() << ") transferred: " << bytes_transferred << ", readyState=" << _readyState;
                 // TODO: call onError, close connection
@@ -379,15 +382,15 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 failTheWebSocketConnection(1002, "Reserved bits must be 0.");
                 return;
             };
-            if (_readyState == OPEN) {
-                if ((_incomingFrame->opcode & 0x08) == 0) {
+            if ((_incomingFrame->opcode & 0x08) == 0) {
+                if (_readyState == OPEN) {
                     processMessageFrame();
                 } else {
-                    processControlFrame();
+                    AC_WARNING << "Dropping frame since readyState is " << _readyState;
                 }
             } else {
-                AC_WARNING << "Dropping frame since readyState is " << _readyState;
-            };
+                processControlFrame();
+            }
 
             _incomingFrame.reset();
             if (_readyState != CLOSED) {
@@ -500,7 +503,9 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             return;
         }
 
-        if (_readyState != CLOSING) {
+        if (_readyState == CLOSING) {
+
+        } else {
             if (closing_code <  1000) {  // code out of range
                 failTheWebSocketConnection(1002, "CLOSE code out of range");
             } else if (closing_code >= 1000 && closing_code <= 2999 &&  // reserved for use by protocol
@@ -732,6 +737,15 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
         f->payload.resize(data.size());
         std::copy(data.begin(), data.end(), f->payload.begin());
         _writeStrand.post(boost::bind(&Client::_w_queueFrame, shared_from_this(), f));
+    }
+
+    void 
+    Client::close(asl::Unsigned16 theCode, const std::string & theReason) {
+        if (theCode != 1000 && (theCode < 3000 || theCode > 4999 )) {
+            throw asl::Exception("A parameter or an operation is not supported by the underlying object");
+        }
+        _readyState = CLOSING;
+        _writeStrand.post(boost::bind(&Client::_w_sendCloseFrame, shared_from_this(), false, theCode, theReason));
     }
 
     void 
