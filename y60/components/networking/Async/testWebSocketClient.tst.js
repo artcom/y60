@@ -54,9 +54,9 @@ WebSocketUnitTest.prototype.Constructor = function (obj, theName) {
         // var websocket = new Async.WebSocket("ws://echo.websocket.org");
         var websocket = new Async.WebSocket("ws://localhost:1234/timeinfo");
         websocket.onopen = function(evt) {};
-        websocket.onclose = function(evt) { done = true; };
+        websocket.onclose = function(evt) { print(evt.code, " ", evt.reason); done = true; };
         websocket.onmessage = function(evt) {};
-        websocket.onerror = function(evt) {};
+        // websocket.onerror = function(evt) { done = true; };
 
         websocket = null;
         gc();

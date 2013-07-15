@@ -165,8 +165,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 boost::bind(&Client::onHeadersSent, shared_from_this(),
                 boost::asio::placeholders::error));
         } else {
-             AC_ERROR << error.message();
-             // TODO: call onError
+            failTheWebSocketConnection(1006, error.message().c_str());
         }
     }
                 
@@ -348,19 +347,21 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             async_read_if_needed(payloadLength, &Client::onPayloadRead);
 
         } else {
-            if (error == boost::asio::error::connection_reset && _readyState == CLOSING) {
+            if (error == boost::system::errc::connection_reset && _readyState == CLOSING) {
                 // this is not an error but a proper (clean) close
                 AC_DEBUG << "Server closed connection";
                 ScopeLocker L(_lockEventQueue, true);
                 _readyState = CLOSED;
                 _eventQueue.push_back(EventPtr(new CloseEvent(true, closing_code, closing_reason.c_str())));
             } else if (_readyState != OPEN && 
-                    (error == boost::asio::error::eof || 
-                     error == boost::asio::error::operation_aborted)) 
+                    (error == boost::system::errc::bad_file_descriptor
+                      // || error == boost::asio::error::eof 
+                  || error == boost::system::errc::operation_canceled
+                  )) 
             {
                 AC_DEBUG << "Client closed connection";
             } else {
-                AC_ERROR << error.message() << " transferred: " << bytes_transferred << ", readyState=" << _readyState;
+                AC_ERROR << error.message() << "(" << error.default_error_condition().value() << ") transferred: " << bytes_transferred << ", readyState=" << _readyState;
                 // TODO: call onError, close connection
             }
         }
@@ -652,8 +653,16 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 }
             }
         } else {
-             AC_ERROR << error.message() << " on " << debugIdentifier;
-             // TODO: call onError
+            if (_readyState != OPEN && 
+                (error == boost::system::errc::bad_file_descriptor ||
+                 error == boost::system::errc::broken_pipe ) ) 
+            {
+                // it's ok, we're closing down anyway
+                AC_TRACE << "dropping outgoing frame while closing connection";
+            } else {
+                AC_ERROR << error.message() << " (" << error.default_error_condition().value() << ") on " << debugIdentifier;
+                // TODO: call onError
+            }
         }
     }
 
@@ -747,17 +756,25 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
         if (_readyState == OPEN) {
             _writeStrand.post(boost::bind(&Client::_w_sendCloseFrame, shared_from_this(), true, theCode, theMessage));
             _readyState = CLOSED;
-            _eventQueue.push_back(EventPtr(new CloseEvent(false, theCode, theMessage)));
-        } else {
+        } 
+        if (_socket.is_open()) {
             try {
                 AC_TRACE << "closing connection";
                 _socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
                 _socket.close();
                 AC_DEBUG << "connection closed";
             } catch (boost::system::system_error & se) {
-                AC_WARNING << "Unexpected exception " << se.what() << " on shutdown of " << debugIdentifier;
+                if (se.code() == boost::system::errc::not_connected) {
+                    AC_DEBUG << "Socket Not connected.";
+                } else {
+                    AC_WARNING << "Unexpected exception '"  << se.what() << "' on shutdown of " << debugIdentifier;
+                    AC_WARNING << " error_code: " << se.code().value() << " '" << se.code().message() << "' " <<
+                                  " error_category: '" << se.code().category().name() << "' " <<  
+                                  " error_condition: " << se.code().default_error_condition().value() << ": '" << se.code().default_error_condition().message() << "'"; 
+                }
             }
         }
+        _eventQueue.push_back(EventPtr(new CloseEvent(false, theCode, theMessage)));
     }
 
     Client::~Client()
