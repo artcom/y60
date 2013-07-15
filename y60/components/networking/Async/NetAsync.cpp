@@ -32,6 +32,7 @@
 #include "NetAsync.h"
 #include "JSHttpServer.h"
 #include "JSHttpClient.h"
+#include "JSWebSocketClient.h"
 #include <y60/jsbase/JSScriptablePlugin.h>
 #include <y60/jsbase/JSWrapper.h>
 
@@ -53,7 +54,7 @@ NetAsync::NetAsync(asl::DLHandle theDLHandle) :
                 asl::PlugInBase(theDLHandle),
                 IRendererExtension(ClassName()),
                 keep_busy(new boost::asio::io_service::work(io)),
-                _curlAdapter(io)
+                _curlAdapter(io), _websocketManager(io)
 {
     _myAsioThread = AsioThreadPtr(new boost::thread( boost::bind( &NetAsync::run, this, 10) ) );
 };
@@ -61,6 +62,7 @@ NetAsync::NetAsync(asl::DLHandle theDLHandle) :
 NetAsync::~NetAsync() {
     AC_TRACE << "~NetAsync - canceling all sockets";
     _curlAdapter.shutdown();
+    _websocketManager.shutdown();
     AC_TRACE << "~NetAsync - removing keep_busy";
     keep_busy.reset();
     AC_TRACE << "~NetAsync - waiting for ASIO thread";
@@ -82,6 +84,7 @@ NetAsync::initClasses(JSContext * theContext, JSObject *theGlobalObject) {
     JSA_AddFunctions(theContext, asyncNamespace, Functions());
     JSHttpServer::initClass(theContext, asyncNamespace);
     JSHttpClient::initClass(theContext, asyncNamespace);
+    JSWebSocketClient::initClass(theContext, asyncNamespace);
 };
 
 void
@@ -111,6 +114,8 @@ NetAsync::onFrame(jslib::AbstractRenderWindow * theWindow , double t) {
     }
     _curlAdapter.processCallbacks();
     _curlAdapter.processCompleted();    
+    _websocketManager.processCallbacks();
+    _websocketManager.processCompleted();    
 };
 
 static JSBool

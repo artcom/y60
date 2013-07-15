@@ -64,7 +64,7 @@
 
 using namespace std;
 using namespace asl;
-using namespace boost::locale::conv;
+using namespace boost::locale;
 
 #define DB(x) // x;
 
@@ -101,8 +101,8 @@ as_string(JSContext *cx, jsval theVal) {
 
     try {
         // now convert to utf-8 encoded string
-        myResult = utf_to_utf<char>(myData, myData+srcLen, stop);
-    } catch (boost::locale::conv::conversion_error & ex) {
+        myResult = conv::utf_to_utf<char>(myData, myData+srcLen, conv::stop);
+    } catch (conv::conversion_error & ex) {
         throw jslib::UnicodeException(ex.what(), PLUS_FILE_LINE);
     }
     return myResult;
@@ -180,6 +180,23 @@ jsval as_jsval(JSContext *cx, int theValue) {
     return INT_TO_JSVAL(theValue);
 }
 
+bool
+isValidUTF8(const std::string & theU8String) {
+#ifdef _WIN32
+    AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
+    return myWCharSize != 0;
+#else
+    std::string::const_iterator it = theU8String.begin();
+    while (it != theU8String.end()) {
+        utf::code_point cp = utf::utf_traits<char>::decode(it, theU8String.end());
+        if (!utf::is_valid_codepoint(cp)) {
+            break;
+        }
+    }
+    return it == theU8String.end();
+#endif
+};
+
 jsval
 as_jsval(JSContext *cx, const char * theU8String) {
     // convert from UTF8 to WideChars/UTF16
@@ -202,9 +219,9 @@ as_jsval(JSContext *cx, const char * theU8String) {
 #else
     JSString * myString;
     try {
-        std::basic_string<asl::Unsigned16> utf16String = utf_to_utf<asl::Unsigned16>(theU8String, stop);
+        std::basic_string<asl::Unsigned16> utf16String = conv::utf_to_utf<asl::Unsigned16>(theU8String, conv::stop);
         myString = JS_NewUCStringCopyN(cx,utf16String.c_str(), utf16String.size());
-    } catch (boost::locale::conv::conversion_error & ex) {
+    } catch (conv::conversion_error & ex) {
         ostringstream os;
         os << ex.what() << " '" << theU8String << "' hex:";
         for (unsigned i = 0; i < strlen(theU8String); ++i) {
@@ -219,9 +236,9 @@ as_jsval(JSContext *cx, const char * theU8String) {
 jsval as_jsval(JSContext *cx, const std::string & theValue) {
     JSString * myString;
     try {
-        std::basic_string<asl::Unsigned16> utf16String = utf_to_utf<asl::Unsigned16>(theValue, stop);
+        std::basic_string<asl::Unsigned16> utf16String = conv::utf_to_utf<asl::Unsigned16>(theValue, conv::stop);
         myString = JS_NewUCStringCopyN(cx,utf16String.c_str(), utf16String.size());
-    } catch (boost::locale::conv::conversion_error & ex) {
+    } catch (conv::conversion_error & ex) {
         ostringstream os;
         os << ex.what() << " '" << theValue << "' hex:";
         for (unsigned i = 0; i < theValue.size(); ++i) {
@@ -859,14 +876,14 @@ searchFileRelativeToJSInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *a
     int myLine;
     if (!getFileLine(cx, obj, argc, argv, myCurrentFile, myLine)) {
         JS_ReportError(cx, "Failed to determine current JS include file.");
-        return JS_FALSE;
+        return "";
     }
     std::string myIncludePath = asl::getDirectoryPart(myCurrentFile);
 
     std::string myFileWithPath = asl::searchFile(theFile, myIncludePath);
     if (myFileWithPath.empty()) {
           JS_ReportError(cx, "File '%s' not found in %s", theFile.c_str(), myIncludePath.c_str());
-          return JS_FALSE;
+          return "";
     }
     return myFileWithPath;
 }
