@@ -200,4 +200,15 @@ spark.PangoText.Constructor = function (Protected) {
         _myMaxHeight = h; 
         Protected.render();
     });
+    Public.__defineSetter__("textColor", function (theColorString) {
+        _myStyle.textColor = asColor(theColorString);
+        _myPangoLayout.setColor(new Vector4f(_myStyle.textColor[0],
+                                             _myStyle.textColor[1],
+                                             _myStyle.textColor[2],
+                                             _myStyle.textColor[3]));
+        Protected.render();
+    });
+    Public.__defineGetter__("textColor", function () {
+        return _myStyle.textColor;
+    });
 };
