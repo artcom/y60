@@ -135,7 +135,7 @@ spark.PangoText.Constructor = function (Protected) {
 
         Base.realize(myMaterial);
         _myPangoLayout = new Pango.Layout(_myImage);
-        var description = _myStyle.fontName + " " + _myStyle.fontSize;
+        var description = _myStyle.fontName + " " + _myStyle.fontSize + "px";
         var myFontDesc = new Pango.FontDescription(description);
         _myPangoLayout.font_description = myFontDesc;
         _myPangoLayout.setWidth(_myMaxWidth);
