@@ -138,12 +138,8 @@ spark.PangoText.Constructor = function (Protected) {
         var description = _myStyle.fontName + " " + _myStyle.fontSize;
         var myFontDesc = new Pango.FontDescription(description);
         _myPangoLayout.font_description = myFontDesc;
-        if (_myMaxWidth > -1) {
-            _myPangoLayout.setWidth(_myMaxWidth);
-        }
-        if (_myMaxHeight > -1) {
-            _myPangoLayout.setHeight(_myMaxHeight);
-        }
+        _myPangoLayout.setWidth(_myMaxWidth);
+        _myPangoLayout.setHeight(_myMaxHeight);
         _myPangoLayout.setColor(new Vector4f(_myStyle.textColor[0],
                                              _myStyle.textColor[1],
                                              _myStyle.textColor[2],
