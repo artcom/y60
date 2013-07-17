@@ -191,6 +191,7 @@ spark.PangoText.Constructor = function (Protected) {
     });
     Public.__defineSetter__("maxWidth", function (w) {
         _myMaxWidth = w;
+        _myPangoLayout.setWidth(_myMaxWidth);
         Protected.render();
     });
     Public.__defineGetter__("maxHeight", function () {
@@ -198,6 +199,7 @@ spark.PangoText.Constructor = function (Protected) {
     });
     Public.__defineSetter__("maxHeight", function (h) { 
         _myMaxHeight = h; 
+        _myPangoLayout.setHeight(_myMaxHeight);
         Protected.render();
     });
     Public.__defineSetter__("textColor", function (theColorString) {
