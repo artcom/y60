@@ -82,6 +82,12 @@ spark.PangoText.Constructor = function (Protected) {
         //TODO: make this configurable?
         dimensions[0] += 10;
         dimensions[1] += 10;
+        if (_myMaxWidth > -1) {
+            dimensions[0] = _myMaxWidth;
+        }
+        if (_myMaxHeight > -1) {
+            dimensions[1] = _myMaxHeight;
+        }
         applyImageFilter(_myImage, "crop", [0,0,dimensions[0],dimensions[1]]);
         Public.width = dimensions[0];
         Public.height = dimensions[1];
