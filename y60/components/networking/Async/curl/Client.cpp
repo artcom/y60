@@ -106,7 +106,6 @@ namespace curl {
                 } else if (nativeValue == "PUT") {
                     myStatus = curl_easy_setopt(_curlHandle, CURLOPT_PUT, 1); 
                     checkCurlStatus(myStatus, PLUS_FILE_LINE);
-                    _reqHeaders = curl_slist_append(_reqHeaders, "Expect:");
                     prepareRequestBody();
                 } else if (nativeValue == "HEAD") {
                     myStatus = curl_easy_setopt(_curlHandle, CURLOPT_NOBODY, 1); 
@@ -128,9 +127,7 @@ namespace curl {
 
             JS_GetProperty(_jsContext, _jsOptsObject, "contentType", &propValue);
             if (!JSVAL_IS_VOID(propValue) && jslib::convertFrom(_jsContext, propValue, nativeValue)) {
-                AC_WARNING << "adding contentType header '" << std::string("Content-Type: "+nativeValue) << "'";
                 _reqHeaders = curl_slist_append(_reqHeaders, std::string("Content-Type: "+nativeValue).c_str());
-                curl_easy_setopt(_curlHandle, CURLOPT_VERBOSE, 1); 
             }
         }
         
@@ -180,14 +177,17 @@ namespace curl {
         }
 
         AC_TRACE << "preparing request body " << _requestBody->size() << " bytes.";
-        CURLcode myStatus = curl_easy_setopt(_curlHandle, CURLOPT_POSTFIELDSIZE_LARGE, _requestBody->size());
+        CURLcode myStatus = curl_easy_setopt(_curlHandle, CURLOPT_POSTFIELDSIZE_LARGE, static_cast<curl_off_t>(_requestBody->size()));
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_INFILESIZE_LARGE, _requestBody->size());
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(_requestBody->size()));
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_READFUNCTION, &Client::_readFunction);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_READDATA, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
+        // turn off Expect: 100 behaviour
+        _reqHeaders = curl_slist_append(_reqHeaders, "Expect:");
     }
 
     Client::~Client()

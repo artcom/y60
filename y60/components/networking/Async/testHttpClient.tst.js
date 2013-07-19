@@ -284,6 +284,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/echo",
             type: "POST",
+            verbose: true,
             data: "Hello World!",
             contentType: "text/plain",
             success: function () {
@@ -316,6 +317,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             url: "http://127.0.0.1:3003/echo",
             type: "PUT",
             data: "Hello World!",
+            verbose: true,
             contentType: "text/plain",
             success: function () {
                 obj.responseString = this.responseString;

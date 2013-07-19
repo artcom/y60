@@ -295,7 +295,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             Unsigned8 secondByte = header[1];
             Unsigned8 tempPayloadLength = (secondByte & 0x7f);
             
-            _incomingFrame->masked = (secondByte & 0x80);
+            _incomingFrame->masked = (secondByte & 0x80) != 0;
             size_t frameHeaderSize = 2 + (tempPayloadLength == 126? 2 : 0) + (tempPayloadLength == 127? 8 : 0) + (_incomingFrame->masked? 4 : 0);
             if (_recv_buffer.size() < frameHeaderSize) {
                 AC_TRACE << "Need " << frameHeaderSize << " bytes, waiting for more.";
@@ -541,7 +541,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             f->payload.push_back((Unsigned8)theCode);
         }
 
-        for (size_t i; i < theReason.size(); ++i) {
+        for (size_t i=0; i < theReason.size(); ++i) {
             f->payload.push_back(theReason[i]);
         }
         f->disconnect_after_sending = disconnect;
