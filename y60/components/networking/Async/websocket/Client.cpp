@@ -244,7 +244,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             {
                 ScopeLocker L(_lockEventQueue, true);
                 _readyState = OPEN;
-                _eventQueue.push_back(EventPtr(new OpenEvent()));
+                _eventQueue.push(EventPtr(new OpenEvent()));
             }
             AC_DEBUG << "WebSocket connection OPEN to " << debugIdentifier;
             AC_TRACE << _recv_buffer.size() << " bytes left in buffer after reading header";
@@ -290,13 +290,13 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
 
             boost::asio::buffers_iterator<boost::asio::streambuf::const_buffers_type> header = boost::asio::buffers_begin(bufs);
             Unsigned8 firstByte = *header;
-            _incomingFrame = FramePtr(new Frame(firstByte & 0x0f, firstByte & 0x80)); 
-            _incomingFrame->rsv = firstByte & 0x70;
+            _incomingFrame = FramePtr(new Frame(firstByte & 0x0f, (firstByte & 0x80) != 0)); 
+            _incomingFrame->rsv = (firstByte & 0x70) != 0;
             Unsigned8 secondByte = header[1];
             Unsigned8 tempPayloadLength = (secondByte & 0x7f);
             
             _incomingFrame->masked = (secondByte & 0x80);
-            int frameHeaderSize = 2 + (tempPayloadLength == 126? 2 : 0) + (tempPayloadLength == 127? 8 : 0) + (_incomingFrame->masked? 4 : 0);
+            size_t frameHeaderSize = 2 + (tempPayloadLength == 126? 2 : 0) + (tempPayloadLength == 127? 8 : 0) + (_incomingFrame->masked? 4 : 0);
             if (_recv_buffer.size() < frameHeaderSize) {
                 AC_TRACE << "Need " << frameHeaderSize << " bytes, waiting for more.";
                 async_read_if_needed(frameHeaderSize, &Client::onFrameHeaderRead);
@@ -304,35 +304,35 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             }
             // now calculate payload length
             int i;
-            uint64_t payloadLength;
+            Unsigned64 payloadLength;
             if (tempPayloadLength < 126) {
                 payloadLength = tempPayloadLength;
                 i = 2;
             }
             else if (tempPayloadLength == 126) {
                 payloadLength = 0;
-                payloadLength |= ((uint64_t) (uint8_t)(header[2]) << 8);
-                payloadLength |= ((uint64_t) (uint8_t)(header[3]) << 0);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[2]) << 8);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[3]) << 0);
                 i = 4;
             }
             else if (tempPayloadLength == 127) {
                 payloadLength = 0;
-                payloadLength |= ((uint64_t) (uint8_t)(header[2]) << 56);
-                payloadLength |= ((uint64_t) (uint8_t)(header[3]) << 48);
-                payloadLength |= ((uint64_t) (uint8_t)(header[4]) << 40);
-                payloadLength |= ((uint64_t) (uint8_t)(header[5]) << 32);
-                payloadLength |= ((uint64_t) (uint8_t)(header[6]) << 24);
-                payloadLength |= ((uint64_t) (uint8_t)(header[7]) << 16);
-                payloadLength |= ((uint64_t) (uint8_t)(header[8]) << 8);
-                payloadLength |= ((uint64_t) (uint8_t)(header[9]) << 0);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[2]) << 56);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[3]) << 48);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[4]) << 40);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[5]) << 32);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[6]) << 24);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[7]) << 16);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[8]) << 8);
+                payloadLength |= ((Unsigned64) (Unsigned8)(header[9]) << 0);
                 i = 10;
             }
             /*
             if (ws.mask) {
-                ws.masking_key[0] = ((uint8_t) header[i+0]) << 0;
-                ws.masking_key[1] = ((uint8_t) header[i+1]) << 0;
-                ws.masking_key[2] = ((uint8_t) header[i+2]) << 0;
-                ws.masking_key[3] = ((uint8_t) header[i+3]) << 0;
+                ws.masking_key[0] = ((Unsigned8) header[i+0]) << 0;
+                ws.masking_key[1] = ((Unsigned8) header[i+1]) << 0;
+                ws.masking_key[2] = ((Unsigned8) header[i+2]) << 0;
+                ws.masking_key[3] = ((Unsigned8) header[i+3]) << 0;
             }
             else {
                 ws.masking_key[0] = 0;
@@ -355,7 +355,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 AC_DEBUG << "Server closed connection";
                 ScopeLocker L(_lockEventQueue, true);
                 _readyState = CLOSED;
-                _eventQueue.push_back(EventPtr(new CloseEvent(true, closing_code, closing_reason.c_str())));
+                _eventQueue.push(EventPtr(new CloseEvent(true, closing_code, closing_reason.c_str())));
             } else if (_readyState != OPEN && 
                     (error == boost::system::errc::bad_file_descriptor
                   || error == boost::asio::error::eof 
@@ -476,7 +476,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
     void
     Client::processFinalFragment() {
         AC_DEBUG << "incoming Text Message " << _incomingMessage->size() << " bytes";
-        _eventQueue.push_back(EventPtr(new MessageEvent(_incomingMessage)));
+        _eventQueue.push(EventPtr(new MessageEvent(_incomingMessage)));
         _incomingMessage.reset();
     }
 
@@ -537,8 +537,8 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
         _w_controlQueue.empty();
         FramePtr f = FramePtr(new Frame(Frame::CONNECTION_CLOSE, true));
         if (theCode) {
-            f->payload.push_back((uint8_t)(theCode >> 8));
-            f->payload.push_back((uint8_t)theCode);
+            f->payload.push_back((Unsigned8)(theCode >> 8));
+            f->payload.push_back((Unsigned8)theCode);
         }
 
         for (size_t i; i < theReason.size(); ++i) {
@@ -559,7 +559,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
 
     void
     Client::_w_injectFrame(FramePtr f) {
-        _w_controlQueue.push_back(f);
+        _w_controlQueue.push(f);
         AC_TRACE << "injecting control frame, queue length now " << _w_controlQueue.size() << "/" <<  _w_messageQueue.size();
         if (!_w_outgoingFrame) {
             AC_TRACE << "starting to send front frame";
@@ -575,7 +575,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             return;
         }
         // TODO: message fragmentation
-        _w_messageQueue.push_back(f);
+        _w_messageQueue.push(f);
         AC_TRACE << "queuing message frame, queue length now " << _w_controlQueue.size() << "/" <<  _w_messageQueue.size();
         if (!_w_outgoingFrame) {
             AC_TRACE << "starting to send front frame";
@@ -590,10 +590,10 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
         }
         if (!_w_controlQueue.empty()) {
             _w_outgoingFrame = _w_controlQueue.front();
-            _w_controlQueue.pop_front();
+            _w_controlQueue.pop();
         } else if (!_w_messageQueue.empty()) {
             _w_outgoingFrame = _w_messageQueue.front();
-            _w_messageQueue.pop_front();
+            _w_messageQueue.pop();
         }
         // prepare outgoing frame for transmission
         
@@ -681,7 +681,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                     nextEvent.reset();
                 } else {
                     nextEvent = _eventQueue.front();
-                    _eventQueue.pop_front();
+                    _eventQueue.pop();
                 }
             }
 
@@ -788,7 +788,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 }
             }
         }
-        _eventQueue.push_back(EventPtr(new CloseEvent(false, theCode, theMessage)));
+        _eventQueue.push(EventPtr(new CloseEvent(false, theCode, theMessage)));
     }
 
     Client::~Client()
