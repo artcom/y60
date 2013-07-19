@@ -304,7 +304,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             }
             // now calculate payload length
             int i;
-            Unsigned64 payloadLength;
+            size_t payloadLength;
             if (tempPayloadLength < 126) {
                 payloadLength = tempPayloadLength;
                 i = 2;
@@ -316,7 +316,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 i = 4;
             }
             else if (tempPayloadLength == 127) {
-                payloadLength = 0;
+                Unsigned64 temp64 = 0;
                 payloadLength |= ((Unsigned64) (Unsigned8)(header[2]) << 56);
                 payloadLength |= ((Unsigned64) (Unsigned8)(header[3]) << 48);
                 payloadLength |= ((Unsigned64) (Unsigned8)(header[4]) << 40);
@@ -325,6 +325,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 payloadLength |= ((Unsigned64) (Unsigned8)(header[7]) << 16);
                 payloadLength |= ((Unsigned64) (Unsigned8)(header[8]) << 8);
                 payloadLength |= ((Unsigned64) (Unsigned8)(header[9]) << 0);
+                payloadLength = static_cast<size_t>(temp64);
                 i = 10;
             }
             /*
