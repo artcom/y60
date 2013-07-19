@@ -54,7 +54,8 @@ namespace curl {
         _myErrorBuffer(CURL_ERROR_SIZE, '\0'),
         _privateResponseBuffer(new Block()),
         _myResponseBlock(new Block()),
-        _continueFlag(true)
+        _continueFlag(true),
+        _reqHeaders(0)
     {
         _curlHandle = curl_easy_init();
         AC_DEBUG << "curl init " << curl_version();
@@ -91,6 +92,53 @@ namespace curl {
         setCurlOption<bool>(_jsOptsObject, "verbose", CURLOPT_VERBOSE, 0);
         setCurlOption<long>(_jsOptsObject, "connecttimeout", CURLOPT_CONNECTTIMEOUT, 0);
 
+        // set request verb
+        {
+            jsval propValue;
+            std::string nativeValue;
+
+            JS_GetProperty(_jsContext, _jsOptsObject, "type", &propValue);
+            if (!JSVAL_IS_VOID(propValue) && jslib::convertFrom(_jsContext, propValue, nativeValue)) {
+                if (nativeValue == "POST") {
+                    myStatus = curl_easy_setopt(_curlHandle, CURLOPT_POST, 1); 
+                    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+                    prepareRequestBody();
+                } else if (nativeValue == "PUT") {
+                    myStatus = curl_easy_setopt(_curlHandle, CURLOPT_PUT, 1); 
+                    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+                    _reqHeaders = curl_slist_append(_reqHeaders, "Expect:");
+                    prepareRequestBody();
+                } else if (nativeValue == "HEAD") {
+                    myStatus = curl_easy_setopt(_curlHandle, CURLOPT_NOBODY, 1); 
+                    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+                } else if (nativeValue == "GET") {
+                    myStatus = curl_easy_setopt(_curlHandle, CURLOPT_HTTPGET, 1); 
+                    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+                } else {
+                    myStatus = curl_easy_setopt(_curlHandle, CURLOPT_CUSTOMREQUEST, nativeValue.c_str()); 
+                    checkCurlStatus(myStatus, PLUS_FILE_LINE);
+                }
+            }
+        }
+
+        // set specific request headers
+        {
+            jsval propValue;
+            std::string nativeValue;
+
+            JS_GetProperty(_jsContext, _jsOptsObject, "contentType", &propValue);
+            if (!JSVAL_IS_VOID(propValue) && jslib::convertFrom(_jsContext, propValue, nativeValue)) {
+                AC_WARNING << "adding contentType header '" << std::string("Content-Type: "+nativeValue) << "'";
+                _reqHeaders = curl_slist_append(_reqHeaders, std::string("Content-Type: "+nativeValue).c_str());
+                curl_easy_setopt(_curlHandle, CURLOPT_VERBOSE, 1); 
+            }
+        }
+        
+        setCurlOption<long>(_jsOptsObject, "connecttimeout", CURLOPT_CONNECTTIMEOUT, 0);
+
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_HTTPHEADER, _reqHeaders); 
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+
         if(!JS_AddNamedRoot(_jsContext, &_jsOptsObject, debugIdentifier.c_str())) {
             AC_WARNING << "failed to root request object!";
         }
@@ -119,11 +167,35 @@ namespace curl {
         }
     }
 
+    void
+    Client::prepareRequestBody() {
+        jsval propValue;
+        std::string nativeValue;
+
+        JS_GetProperty(_jsContext, _jsOptsObject, "data", &propValue);
+        if (!JSVAL_IS_VOID(propValue) && jslib::convertFrom(_jsContext, propValue, nativeValue)) {
+            _requestBody = Ptr<Block>(new Block());
+            _requestBody->resize(nativeValue.size());
+            std::copy(nativeValue.begin(), nativeValue.end(), _requestBody->begin());
+        }
+
+        AC_TRACE << "preparing request body " << _requestBody->size() << " bytes.";
+        CURLcode myStatus = curl_easy_setopt(_curlHandle, CURLOPT_POSTFIELDSIZE_LARGE, _requestBody->size());
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_INFILESIZE_LARGE, _requestBody->size());
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_READFUNCTION, &Client::_readFunction);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_READDATA, this);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    }
+
     Client::~Client()
     {
         AC_DEBUG << "~Client " << this;
         CURLcode myStatus = curl_easy_setopt(_curlHandle, CURLOPT_OPENSOCKETDATA, 0);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        curl_slist_free_all(_reqHeaders);
     }
    
     void
@@ -160,33 +232,13 @@ namespace curl {
             JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
             if (ok) {
                 if (!convertFrom(_jsContext, rval, _continueFlag)) {
-                    std::cerr << "#ERROR: HttpClient: progress callback returned a bad result (not a bool)" << std::endl;
+                    AC_ERROR << "HttpClient: progress callback returned a bad result (not a bool)" << std::endl;
                     _continueFlag = true;
                 }
             }
         }
     };
 
-/*
-JSBool
-JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObject, const char * theName, uintN argc, jsval argv[], jsval *rval) {
-    jsval myValue;
-    if (JS_GetProperty(cx, theObject, theName, &myValue)) {
-        if (JS_TypeOfValue(cx, myValue) != JSTYPE_FUNCTION) {
-            AC_WARNING << "Property '" << theName << "' is not a function: type=" << JS_TypeOfValue(cx, myValue);
-            return false;
-        }
-    }
-    try {
-        AC_DEBUG << "cx:" << cx << ", this:" << theThisObject << ", obj:" << theObject << ", theName:" << theName << ", argc:" << argc << ", argv:" << argv << ", rval:" << rval;
-        JSBool ok = JS_CallFunctionValue(cx, theThisObject, myValue, argc, argv, rval);
-        if (!ok) {
-            AC_DEBUG << "Exception while calling js function '" << theName << "'" << endl;
-        }
-        return ok;
-    } HANDLE_CPP_EXCEPTION;
-};
-*/
     void
     Client::onDone(CURLcode result) {
         {
@@ -228,6 +280,20 @@ JSA_CallFunctionName(JSContext * cx, JSObject * theThisObject, JSObject * theObj
         }
         return false;
     }
+
+    size_t 
+    Client::readFunction(unsigned char *ptr, size_t size) {
+        if (_requestBody) {
+            // NOTE: this will be called from one of io_service's threads
+            AC_TRACE << "readfunction called, asking for " << size << " bytes.";
+            size_t bytesSent = min(size, static_cast<size_t>(_requestBody->size()));
+            AC_TRACE << "  will send " << bytesSent << " bytes.";
+            std::copy(_requestBody->begin(), _requestBody->begin()+bytesSent, ptr);
+            return bytesSent;
+        } else {
+            return 0;
+        }
+    };
 
     size_t 
     Client::writeFunction(const unsigned char *ptr, size_t size) {
