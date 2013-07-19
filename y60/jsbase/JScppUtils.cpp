@@ -76,23 +76,6 @@ as_string(JSContext *cx, jsval theVal) {
     if (!myJSStr) {
         throw asl::Exception("Value is not a string", PLUS_FILE_LINE);
     }
-#ifdef _WIN32
-#if _MSC_VER >= 1500
-    const LPWSTR myWChars = reinterpret_cast<LPWSTR>(JS_GetStringChars(myJSStr));
-#else
-    const LPWSTR myWChars = static_cast<LPWSTR>(JS_GetStringChars(myJSStr));
-#endif
-    AC_SIZE_TYPE myUTF8Size = WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, 0, 0, 0, 0);
-    if (myUTF8Size == 0) {
-        DWORD myLastError = GetLastError();
-        throw jslib::UnicodeException(errorDescription(myLastError), PLUS_FILE_LINE);
-    }
-    char * myUTF8Chars = new char[myUTF8Size];
-    WideCharToMultiByte(CP_UTF8, 0, myWChars, -1, myUTF8Chars, myUTF8Size, 0, 0);
-    std::string myResult = std::string(myUTF8Chars);
-    delete [] myUTF8Chars;
-    return myResult;
-#else
     std::string myResult;
     size_t srcLen = JS_GetStringLength(myJSStr);
 
@@ -106,7 +89,6 @@ as_string(JSContext *cx, jsval theVal) {
         throw jslib::UnicodeException(ex.what(), PLUS_FILE_LINE);
     }
     return myResult;
-#endif
 }
 
 std::string as_string(JSContext *cx, JSObject *theObj) {
@@ -182,10 +164,6 @@ jsval as_jsval(JSContext *cx, int theValue) {
 
 bool
 isValidUTF8(const std::string & theU8String) {
-#ifdef _WIN32
-    AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
-    return myWCharSize != 0;
-#else
     std::string::const_iterator it = theU8String.begin();
     while (it != theU8String.end()) {
         utf::code_point cp = utf::utf_traits<char>::decode(it, theU8String.end());
@@ -194,29 +172,11 @@ isValidUTF8(const std::string & theU8String) {
         }
     }
     return it == theU8String.end();
-#endif
 };
 
 jsval
 as_jsval(JSContext *cx, const char * theU8String) {
     // convert from UTF8 to WideChars/UTF16
-#ifdef _WIN32
-    AC_SIZE_TYPE myWCharSize = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, 0, 0);
-    if (myWCharSize == 0) {
-        DWORD myLastError = GetLastError();
-        ostringstream os;
-        os << errorDescription(myLastError) << " '" << theU8String << "' hex:";
-        for (unsigned i = 0; i < strlen(theU8String); ++i) {
-            os << " " << std::hex << int(reinterpret_cast<const unsigned char*>(theU8String)[i]);
-        }
-        throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE);
-    }
-    LPWSTR myWChars = new WCHAR[myWCharSize];
-    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, theU8String, -1, myWChars, myWCharSize);
-    JSString * myString = JS_NewUCStringCopyZ(cx,reinterpret_cast<jschar*>(myWChars));
-    delete [] myWChars;
-    return STRING_TO_JSVAL(myString);
-#else
     JSString * myString;
     try {
         std::basic_string<asl::Unsigned16> utf16String = conv::utf_to_utf<asl::Unsigned16>(theU8String, conv::stop);
@@ -230,7 +190,6 @@ as_jsval(JSContext *cx, const char * theU8String) {
         throw jslib::UnicodeException(os.str(), PLUS_FILE_LINE);
     }
     return STRING_TO_JSVAL(myString);
-#endif
 }
 
 jsval as_jsval(JSContext *cx, const std::string & theValue) {

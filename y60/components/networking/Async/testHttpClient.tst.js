@@ -79,7 +79,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         obj.myClient = new Async.HttpClient({
             url: "http://127.0.0.1:88/foo",
             async: false,
-            verbose: true,
+            verbose: false,
             success: function() {
                 done = true;
             },
@@ -138,8 +138,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 done = true;
             },
             success: function() {
-                print("received in Progress: "+received);
-                print("last responseBlock:"+this.responseBlock.size);
+                DPRINT2("received in Progress: ", received);
+                DPRINT2("last responseBlock:", this.responseBlock.size);
                 done = true;
                 if (received + this.responseBlock.size === 1024*1024*5) {
                     SUCCESS("testBigRequest");
@@ -170,8 +170,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             progress: function(theBlock) {
                 return false;
             },
-            error: function(a, b) {
-                print (a,b);
+            error: function() {
                 SUCCESS("testRequestProgressError");
                 done = true;
             },
@@ -199,8 +198,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         Logger.info("creating client");
         obj.myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/big",
-            error: function(a, b) {
-                print (a,b);
+            error: function() {
                 SUCCESS("testRequestAbort");
                 done = true;
             },
@@ -209,7 +207,6 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 done = true;
             }
         });
-
 
         while (true) {
             Async.onFrame();
@@ -220,7 +217,157 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-    }
+    };
+
+    function testGetRequest() {
+        var done = false;
+
+        Logger.info("creating client");
+        var myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/echo",
+            type: "GET",
+            success: function () {
+                obj.responseString = this.responseString;
+                SUCCESS("testGetRequest");
+                done = true;
+            },
+            error: function () {
+                FAILURE("testGetRequest");
+                done = true;
+            }
+        });
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+        ENSURE_EQUAL("GET:", obj.responseString);
+    };
+
+    function testDeleteRequest() {
+        var done = false;
+
+        Logger.info("creating client");
+        var myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/echo",
+            type: "DELETE",
+            success: function () {
+                obj.responseString = this.responseString;
+                SUCCESS("testDeleteRequest");
+                done = true;
+            },
+            error: function () {
+                FAILURE("testDeleteRequest");
+                done = true;
+            }
+        });
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+        ENSURE_EQUAL("DELETE:", obj.responseString);
+    };
+
+    function testPostRequest() {
+        var done = false;
+
+        Logger.info("creating client");
+        var myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/echo",
+            type: "POST",
+            data: "Hello World!",
+            contentType: "text/plain",
+            success: function () {
+                obj.responseString = this.responseString;
+                SUCCESS("testPostRequest");
+                done = true;
+            },
+            error: function () {
+                FAILURE("testPostRequest");
+                done = true;
+            }
+        });
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+        ENSURE_EQUAL("POST:Hello World!", obj.responseString);
+    };
+
+    function testPutRequest() {
+        var done = false;
+
+        Logger.info("creating client");
+        var myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/echo",
+            type: "PUT",
+            data: "Hello World!",
+            contentType: "text/plain",
+            success: function () {
+                obj.responseString = this.responseString;
+                SUCCESS("testPutRequest");
+                done = true;
+            },
+            error: function () {
+                FAILURE("testPutRequest");
+                done = true;
+            }
+        });
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+        ENSURE_EQUAL("PUT:Hello World!", obj.responseString);
+    };
+
+    function testHeadRequest() {
+        var done = false;
+
+        Logger.info("creating client");
+        var myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/echo",
+            type: "HEAD",
+            success: function () {
+                obj.responseString = this.responseString;
+                SUCCESS("testHeadRequest");
+                done = true;
+            },
+            error: function () {
+                FAILURE("testHeadRequest");
+                done = true;
+            }
+        });
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+        ENSURE_EQUAL("", obj.responseString);
+    };
+
     function testSmallRequests() {
         // test many small requests
         var i = 10;
@@ -260,15 +407,24 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                  },
             big: function(theMethod, theBody) {
                 return new Array(1024*1024+1).join("Fubar"); // 100 MB
+                 },
+            echo: function(theMethod, theBody) {
+                return theMethod+":"+theBody;
                  }
 
         };
         obj.myServer.start("0.0.0.0", "3003");
         obj.myServer.registerCallback("/foo", myServer, myServer.foo);
         obj.myServer.registerCallback("/big", myServer, myServer.big);
+        obj.myServer.registerCallback("/echo", myServer, myServer.echo);
 
-        testBlocking();
         testFireAndForget();
+        testGetRequest();
+        testDeleteRequest();
+        testHeadRequest();
+        testPostRequest();
+        testPutRequest();
+        testBlocking();
         testError();
         testSmallRequests();
         testBigRequest();

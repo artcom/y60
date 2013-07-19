@@ -83,6 +83,8 @@ namespace curl {
             asl::ReadWriteLock _lockResponseBuffer; // lock for _privateResponseBuffer;
             asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread.
             bool _continueFlag;
+            struct curl_slist *_reqHeaders;
+            asl::Ptr<asl::Block> _requestBody;
         public:
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts);
@@ -123,7 +125,17 @@ namespace curl {
 
             void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere); 
             bool hasCallback(const char * theName);
+            void prepareRequestBody();
 
+            size_t readFunction(unsigned char *ptr, size_t size);
+            static size_t _readFunction(unsigned char *ptr, size_t size, size_t nmemb, Client *self) {
+                AC_DEBUG << "calling readfunction for " << self;
+                if (self) {
+                    return self->readFunction(ptr, size*nmemb);
+                } else {
+                    return 0;
+                }
+            };
             size_t writeFunction(const unsigned char *ptr, size_t size);
             static size_t _writeFunction(unsigned char *ptr, size_t size, size_t nmemb, Client *self) {
                 AC_DEBUG << "calling writefunction for " << self;
