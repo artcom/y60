@@ -295,25 +295,23 @@ namespace y60 {
     void
     Renderer::renderExternal( const ExternalPartPtr & theExternalPart, const Viewport & theViewport, const Camera & theCamera) {
         //const y60::World & myWorld = theExternalPart->getWorld();
-        const External & myExternal = theExternalPart->getExternal();
-
-        glPopMatrix();
         CHECK_OGL_ERROR;
-
-        _myState->setClippingPlanes(theExternalPart->getClippingPlanes());
-        _myState->setScissorBox(theExternalPart->getScissorBox(), theViewport);
-
-        glPushMatrix();
+        const External & myExternal = theExternalPart->getExternal();
 
         glMultMatrixf((myExternal.get<GlobalMatrixTag>().getData()));
 
-        const MaterialBase & myMaterial = myExternal.getMaterial();
-        bool myMaterialHasChanged = switchMaterial(theViewport, myMaterial);
-
-        myExternal.callOnRenderCallBack();
+        deactivatePreviousMaterial();
         _myPreviousMaterial = 0;
-        switchMaterial(theViewport, myMaterial);
+
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+        glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);        
+        myExternal.callOnRenderCallBack();
+        CHECK_OGL_ERROR;
+        glPopClientAttrib();
+        glPopAttrib();
+
         glMatrixMode( GL_MODELVIEW );
+        CHECK_OGL_ERROR;
     }
     void
     Renderer::renderBodyPart(const BodyPartPtr & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
@@ -1352,7 +1350,6 @@ namespace y60 {
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
         glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-
         // Render underlays
         {
             MAKE_GL_SCOPE_TIMER(renderUnderlays);
