@@ -42,4 +42,5 @@ y60_add_component(
 
 y60_add_jstest(HttpServer mod_Async)
 y60_add_jstest(HttpClient mod_Async)
+y60_add_jstest(WebSocketClient mod_Async)
 
