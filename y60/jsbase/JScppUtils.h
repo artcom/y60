@@ -375,6 +375,9 @@ Y60_JSBASE_DECL std::string
 searchFileRelativeToJSInclude(JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
                               const std::string & theFile);
 
+Y60_JSBASE_DECL bool 
+isValidUTF8(const std::string & theU8String);
+
 }
 
 #endif

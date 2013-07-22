@@ -59,12 +59,34 @@ SocketAdapter::handleOperations(SocketPtr s, curl_socket_t theCurlSocket) {
 
             }
             break;
+        case CURL_POLL_INOUT:
+            if (s->read_in_progress == false) {
+                s->read_in_progress = true;
+                AC_TRACE << "queuing read " << s->native();
+                s->boost_socket.async_read_some(
+                        boost::asio::null_buffers(),
+                        s->_parent->_strand.wrap(
+                        boost::bind(&SocketAdapter::handleRead, s,
+                            boost::asio::placeholders::error)));
+
+            }
+            if (s->write_in_progress == false) {
+                s->write_in_progress = true;
+                AC_TRACE << "queuing write " << s->native();
+                s->boost_socket.async_write_some(
+                        boost::asio::null_buffers(),
+                        s->_parent->_strand.wrap(
+                        boost::bind(&SocketAdapter::handleWrite, s,
+                            boost::asio::placeholders::error)));
+            }
+            break;
         case CURL_POLL_REMOVE:
             // we don't need to do anything here. We'll keep the connection open 
             // so it can be reused by later clients
             break;
         default:
-            throw asl::Exception("Unknown Socket State "+s->readyState); 
+            AC_ERROR << "readyState: " << s->readyState;
+            throw asl::Exception("Unknown Socket State "+asl::as_string(s->readyState)); 
     };
 }
 
