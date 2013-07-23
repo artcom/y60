@@ -93,7 +93,6 @@
 #define DBP2(x) // x
 #endif
 
-using namespace std;
 using namespace asl;
 
 namespace y60 {
@@ -527,7 +526,7 @@ namespace y60 {
                 }
                 CHECK_OGL_ERROR;
             } else {
-                throw RendererException(string("Body Part of shape: ") + theBodyPart.getShape().get<IdTag>() +
+                throw RendererException(std::string("Body Part of shape: ") + theBodyPart.getShape().get<IdTag>() +
                     " does not contain required vertexdata of role: " +
                     getStringFromEnum(myParameter.getRole(), GLRegisterString), PLUS_FILE_LINE);
             }
@@ -948,7 +947,7 @@ namespace y60 {
         // get lod facade of given node
         const LodFacadePtr myLodFacade = theNode->getFacade<LodFacade>();
         if (!myLodFacade) {
-            throw RendererException(string("Node with id: ") + theNode->getAttributeString(ID_ATTRIB)
+            throw RendererException(std::string("Node with id: ") + theNode->getAttributeString(ID_ATTRIB)
                 + " is not a lod node", PLUS_FILE_LINE);
         }
 
@@ -1074,12 +1073,12 @@ namespace y60 {
 
                 // support billboardlookat
                 y60::TransformHierarchyFacadePtr myTransform(theCamera);
-                const string& lookatId = myBody.get<BillboardLookatTag>();
+                const std::string& lookatId = myBody.get<BillboardLookatTag>();
                 if (lookatId != "") {
                     // billboardlookat specified -> use referenced transform
                     const dom::NodePtr& myLookatTransformPtr = theNode->getElementById(lookatId);
                     if (!myLookatTransformPtr) {
-                        throw RendererException(string("billboardlookat: Transform with ID '") + lookatId +
+                        throw RendererException(std::string("billboardlookat: Transform with ID '") + lookatId +
                                                 "' not found.", PLUS_FILE_LINE);
                     }
                     myTransform = myLookatTransformPtr->getFacade<TransformHierarchyFacade>();
@@ -1108,12 +1107,12 @@ namespace y60 {
                 
                 // default billboardlookat is the camera
                 y60::TransformHierarchyFacadePtr myTransform(theCamera);
-                const string& lookatId = myBody.get<BillboardLookatTag>();
+                const std::string& lookatId = myBody.get<BillboardLookatTag>();
                 if (lookatId != "") {
                     // billboardlookat specified -> use referenced transform
                     const dom::NodePtr& myLookatTransformPtr = theNode->getElementById(lookatId);
                     if (!myLookatTransformPtr) {
-                        throw RendererException(string("billboardlookat: Transform with ID '") + lookatId +
+                        throw RendererException(std::string("billboardlookat: Transform with ID '") + lookatId +
                                                 "' not found.", PLUS_FILE_LINE);
                     }
                     myTransform = myLookatTransformPtr->getFacade<TransformHierarchyFacade>();
@@ -1265,7 +1264,7 @@ namespace y60 {
         for (unsigned i = 0; i < myPlaneIds.size(); ++i) {
             myPlaneNode = theNode->getElementById( myPlaneIds[i] );
             if (!myPlaneNode) {
-                throw RendererException(string("Can not find geometry '")+myPlaneIds[i]+
+                throw RendererException(std::string("Can not find geometry '")+myPlaneIds[i]+
                     "' for node " + theNode->nodeName() + " with id '" +
                     theNode->getAttributeString(ID_ATTRIB)+ "' named '" + theNode->getAttributeString(NAME_ATTRIB) + "'!", PLUS_FILE_LINE);
             }
@@ -1281,7 +1280,7 @@ namespace y60 {
     {
         TransformHierarchyFacadePtr myFacade = theNode->getFacade<TransformHierarchyFacade>();
 
-        const string & myScissorId = myFacade->get<ScissorTag>();
+        const std::string & myScissorId = myFacade->get<ScissorTag>();
         if (myScissorId == "") {
             return;
         }
@@ -1363,7 +1362,7 @@ namespace y60 {
         if ( myCameraId.length() ) {
             dom::NodePtr myCameraNode = theViewport->getNode().getElementById(myCameraId);
             if (!myCameraNode) {
-                throw RendererException(string("Can not find camera '")+theViewport->get<CameraTag>()+
+                throw RendererException(std::string("Can not find camera '")+theViewport->get<CameraTag>()+
                         "' for viewport '"+theViewport->get<NameTag>()+"' id="+theViewport->get<IdTag>(), PLUS_FILE_LINE);
             }
             CameraPtr myCamera = myCameraNode->getFacade<Camera>();
@@ -1699,7 +1698,7 @@ namespace y60 {
     void
     Renderer::enableFog(WorldPtr & theWorld) {
         MAKE_GL_SCOPE_TIMER(Renderer_enableFog);
-        const string & myFogModeString = theWorld->get<FogModeTag>();
+        const std::string & myFogModeString = theWorld->get<FogModeTag>();
         if (myFogModeString.size() == 0) {
             return;
         }
@@ -1722,7 +1721,7 @@ namespace y60 {
                 glFogf(GL_FOG_DENSITY, theWorld->get<FogDensityTag>());
                 break;
             default :
-                throw RendererException(string("World Fog Mode :'") + theWorld->get<FogModeTag>()+
+                throw RendererException(std::string("World Fog Mode :'") + theWorld->get<FogModeTag>()+
                             "' unknown", PLUS_FILE_LINE);
         }
         glFogfv(GL_FOG_COLOR, &(theWorld->get<FogColorTag>()[0]));
@@ -1782,14 +1781,14 @@ namespace y60 {
         std::string myMaterialId = myWorld->get<SkyBoxMaterialTag>();
         dom::NodePtr myMaterialNode = _myScene->getMaterialsRoot()->getElementById(myMaterialId);
         if (!myMaterialNode) {
-            AC_ERROR << "Could not find SkyBox material: " << myMaterialId << endl;
+            AC_ERROR << "Could not find SkyBox material: " << myMaterialId << std::endl;
             return;
         }
 
         MaterialBasePtr myMaterial = myMaterialNode->getFacade<MaterialBase>();
         //MaterialBasePtr myMaterial = _myScene->getMaterial(myMaterialId);
         if (!myMaterial) {
-            AC_ERROR << "Could not find SkyBox material: " << myMaterialId << endl;
+            AC_ERROR << "Could not find SkyBox material: " << myMaterialId << std::endl;
             return;
         }
 
@@ -2001,7 +2000,7 @@ namespace y60 {
             if (myMaterialId.empty() == false) {
                 MaterialBasePtr myMaterial = _myScene->getMaterialsRoot()->getElementById(myMaterialId)->getFacade<MaterialBase>();
                 if (!myMaterial) {
-                    AC_WARNING << "renderOverlay() material:" << myMaterialId << " not found." << endl;
+                    AC_WARNING << "renderOverlay() material:" << myMaterialId << " not found." << std::endl;
                     // UH: missing glPopMatrix()
                     return;
                 }

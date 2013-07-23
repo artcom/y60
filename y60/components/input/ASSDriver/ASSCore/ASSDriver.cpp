@@ -64,7 +64,6 @@
 #endif
 
 
-using namespace std;
 using namespace asl;
 using namespace y60;
 using namespace jslib;
@@ -607,8 +606,8 @@ namespace y60 {
                 Point2i myLowerLeft;
                 Point2i myLowerRight;
                 _myUserDefinedMomentumBox.getCorners(myUpperLeft, myLowerRight, myUpperRight, myLowerLeft);
-                myBox = Box2i(max(0, myCenter[0] + myUpperLeft[0]) , max(0,myCenter[1] + myUpperLeft[1]),
-                              min(_myGridSize[0], myCenter[0] + myLowerRight[0]) ,min(_myGridSize[1], myCenter[1] + myLowerRight[1]));
+                myBox = Box2i(std::max(0, myCenter[0] + myUpperLeft[0]) , std::max(0,myCenter[1] + myUpperLeft[1]),
+                              std::min(_myGridSize[0], myCenter[0] + myLowerRight[0]) ,std::min(_myGridSize[1], myCenter[1] + myLowerRight[1]));
             }
             AnalyseMoment<SubRaster> myMomentAnalysis;
             // XXX is this correct ?
@@ -717,8 +716,8 @@ namespace y60 {
         }
 
         if (_myDebugTouchEventsFlag) {
-            cout << _myRunTime << "\t" << theCursorIt->second.intensity << "\t" << myFirstDerivative*0.1 << "\t" << myTouch
-                 << "\t" << theCursorIt->second.position[0] << endl;
+            std::cout << _myRunTime << "\t" << theCursorIt->second.intensity << "\t" << myFirstDerivative*0.1 << "\t" << myTouch
+                 << "\t" << theCursorIt->second.position[0] << std::endl;
         }
 
     }
@@ -889,7 +888,7 @@ namespace y60 {
                 int myNewID( _myIDCounter++ );
                 AC_TRACE << "new cursor " <<myNewID<< " at " << theCurrentPositions[i].center;
                 myCorrelatedPositions[i] = myNewID;
-                _myCursors.insert( make_pair( myNewID, MomentCursor( theCurrentPositions[i],
+                _myCursors.insert( std::make_pair( myNewID, MomentCursor( theCurrentPositions[i],
                                                                      asBox2f( myROIs[i]->bbox()) )));
                 _myCursors[myNewID].correlatedPosition = i;
                 createEvent( myNewID, "add", theCurrentPositions[i].center,
@@ -1001,7 +1000,7 @@ namespace y60 {
                 int myNewID( _myIDCounter++ );
                 AC_TRACE << "new cursor " <<myNewID<< " at " << theCurrentPositions[i].center;
                 myCorrelatedPositions[i] = myNewID;
-                _myCursors.insert( make_pair( myNewID, MaximumCursor( theCurrentPositions[i],
+                _myCursors.insert( std::make_pair( myNewID, MaximumCursor( theCurrentPositions[i],
                                                                       asBox2f( myROIs[i]->bbox()) )));
                 _myCursors[myNewID].correlatedPosition = i;
                 createEvent( myNewID, "add", theCurrentPositions[i].center,
@@ -1264,7 +1263,7 @@ namespace y60 {
                         if (_myProbePosition[0] >= 0 && _myProbePosition[1] >= 0) {
                             unsigned char myValue = * (_myRawRaster.raster->pixels().begin() +
                                                        int(_myProbePosition[1]) * _myPoTSize[0] + int(_myProbePosition[0]));
-                            drawLabel(theWindow, string("Value") + as_string(_myProbePosition) +
+                            drawLabel(theWindow, std::string("Value") + as_string(_myProbePosition) +
                                       " = " + as_string(int(myValue)));
                         }
                     } else {
@@ -1373,7 +1372,7 @@ namespace y60 {
     void
     ASSDriver::setupDriver(dom::NodePtr theSettings) {
         if (!theSettings) {
-            throw ASSException(string("Sorry, setup of assdriver with invalid settings node "),
+            throw ASSException(std::string("Sorry, setup of assdriver with invalid settings node "),
                                PLUS_FILE_LINE);
         }
         if ( _myTransportLayer && _myTransportLayer->settingsChanged( theSettings ) ) {
@@ -1381,8 +1380,8 @@ namespace y60 {
         }
 
         if ( ! _myTransportLayer ) {
-            string myTransportName;
-            getConfigSetting( theSettings, "TransportLayer", myTransportName, string("serial") );
+            std::string myTransportName;
+            getConfigSetting( theSettings, "TransportLayer", myTransportName, std::string("serial") );
 
             if ( myTransportName == "serial" ) {
                 TransportLayer* myTmp = new SerialTransport(theSettings);
@@ -1394,7 +1393,7 @@ namespace y60 {
             } else if ( myTransportName == "udp") {
                 _myTransportLayer = TransportLayerPtr( new UDPTransport(theSettings) );
             } else {
-                throw ASSException(string("Unknown transport layer '") + myTransportName + "'",
+                throw ASSException(std::string("Unknown transport layer '") + myTransportName + "'",
                                    PLUS_FILE_LINE);
             }
 
@@ -1567,7 +1566,7 @@ namespace y60 {
         if (_myScene) {
             dom::NodePtr myImage = _myScene->getSceneDom()->getElementById(MOMENT_RASTER);
             std::ostringstream streamer;
-            streamer << setw(5) << setfill('0') << _myCapturedFrameCounter++;
+            streamer << std::setw(5) << std::setfill('0') << _myCapturedFrameCounter++;
 
             myImage->getFacade<y60::Image>()->saveToFile("SensorData" + streamer.str() + ".png");
 

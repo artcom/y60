@@ -139,7 +139,7 @@ AddCursor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         TuioServerPlugin* myPlugin = GetInstance();
 
         if (argc != 3) {
-            JS_ReportError(cx, "TuioServerPlugin::addCursor - expected three arguments: cursorId, x, y. Argument count was " + argc);
+            JS_ReportError(cx, "TuioServerPlugin::addCursor - expected three arguments: cursorId, x, y. Argument count was %d.", argc);
             return JS_FALSE;
         }
         
@@ -171,7 +171,7 @@ UpdateCursor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         TuioServerPlugin* myPlugin = GetInstance();
 
         if (argc != 3) {
-            JS_ReportError(cx, "TuioServerPlugin::updateCursor - expected three arguments: cursorId, x, y. Argument count was " + argc);
+            JS_ReportError(cx, "TuioServerPlugin::updateCursor - expected three arguments: cursorId, x, y. Argument count was %d.", argc);
             return JS_FALSE;
         }
         
@@ -202,7 +202,7 @@ RemoveCursor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         TuioServerPlugin* myPlugin = GetInstance();
 
         if (argc != 1) {
-            JS_ReportError(cx, "TuioServerPlugin::removeCursor - expected one arguments: cursorId. Argument count was " + argc);
+            JS_ReportError(cx, "TuioServerPlugin::removeCursor - expected one arguments: cursorId. Argument count was %d.", argc);
             return JS_FALSE;
         }
         

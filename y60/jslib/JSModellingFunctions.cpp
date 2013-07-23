@@ -50,7 +50,6 @@
 
 #include <iostream>
 
-using namespace std;
 using namespace asl;
 
 using namespace y60;
@@ -131,10 +130,10 @@ CreateExternal(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *r
             myResult = createExternal(mySceneNode, myParentNode);
         } else if (argc > 2) {
 
-            string myExternalName;
+            std::string myExternalName;
             convertFrom(cx, argv[2], myExternalName);
 
-            string myMaterialId("");
+            std::string myMaterialId("");
             if (argc  == 4) {
                 convertFrom(cx, argv[3], myMaterialId);
             }
@@ -166,7 +165,7 @@ CreateTransform(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
         if (argc == 1) {
             myResult = createTransform(myParentNode);
         } else {
-            string myTransformName;
+            std::string myTransformName;
             convertFrom(cx, argv[1], myTransformName);
             myResult = createTransform(myParentNode, myTransformName);
         }
@@ -190,7 +189,7 @@ CreateCanvas(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rva
 
         y60::ScenePtr mySceneNode;
         convertFrom(cx, argv[0], mySceneNode);
-        string myCanvasName;
+        std::string myCanvasName;
         convertFrom(cx, argv[1], myCanvasName);
 
         dom::NodePtr myResult = createCanvas(mySceneNode, myCanvasName);
@@ -213,7 +212,7 @@ CreateBody(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 
         dom::NodePtr  myParentNode;
         convertFrom(cx, argv[0], myParentNode);
-        string myShapeId;
+        std::string myShapeId;
         convertFrom(cx, argv[1], myShapeId);
 
         dom::NodePtr myResult = createBody(myParentNode, myShapeId);
@@ -239,7 +238,7 @@ CreateQuad(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval)
 
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
         Vector3f myTopLeftCorner;
         convertFrom(cx, argv[2], myTopLeftCorner);
@@ -271,7 +270,7 @@ CreatePlane(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *rval
 
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
         Vector3f myTopLeftCorner;
         convertFrom(cx, argv[2], myTopLeftCorner);
@@ -309,7 +308,7 @@ CreateSphericalPlane(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, js
 
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
         Sphere<float> mySphere;
         convertFrom(cx, argv[2], mySphere);
@@ -348,11 +347,11 @@ CreateSurface2DFromContour(JSContext * cx, JSObject * obj, uintN argc, jsval *ar
         if (argc == 4 || argc == 5) {
             y60::ScenePtr myScene;
             convertFrom(cx, argv[0], myScene);
-            string myMaterialId;
+            std::string myMaterialId;
             convertFrom(cx, argv[1], myMaterialId);
             VectorOfVector2f myContour;
             convertFrom(cx, argv[2], myContour);
-            string myShapeName;
+            std::string myShapeName;
             convertFrom(cx, argv[3], myShapeName);
             if (argc == 4) {
                 myResult = createSurface2DFromContour(myScene, myMaterialId,
@@ -389,7 +388,7 @@ CreateCrosshair(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
 
         float myInnerRadius;
@@ -398,7 +397,7 @@ CreateCrosshair(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
         float myHairLength;
         convertFrom(cx, argv[3], myHairLength);
 
-        string myName;
+        std::string myName;
         convertFrom(cx, argv[4], myName);
 
         dom::NodePtr myResult = createCrosshair(myScene, myMaterialId, myInnerRadius,
@@ -424,13 +423,13 @@ CreateDistanceMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, js
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
 
         std::vector<asl::Vector3f> myPositions;
         convertFrom(cx, argv[2], myPositions);
 
-        string myName;
+        std::string myName;
         if (argc > 3) {
             convertFrom(cx, argv[3], myName);
         }
@@ -471,7 +470,7 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
 
         asl::Vector3f myApex;
@@ -486,7 +485,7 @@ CreateAngleMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
         bool myOuterAngleFlag;
         convertFrom(cx, argv[5], myOuterAngleFlag);
 
-        string myName;
+        std::string myName;
         if (argc > 6) {
             convertFrom(cx, argv[6], myName);
         }
@@ -529,7 +528,7 @@ CreatePartialDisk(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
 
         float myRadius;
@@ -544,7 +543,7 @@ CreatePartialDisk(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval
         float mySweepAngle;
         convertFrom(cx, argv[5], mySweepAngle);
 
-        string myName;
+        std::string myName;
         if (argc > 6) {
             convertFrom(cx, argv[6], myName);
         }
@@ -573,7 +572,7 @@ static JSBool CreateStrip(const std::string &theType, JSContext * cx, JSObject *
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[1], myMaterialId);
 
         std::vector<asl::Vector3f> myPositions;
@@ -696,16 +695,16 @@ CreateTriangleMeshMarkup(JSContext * cx, JSObject * obj, uintN argc, jsval *argv
         y60::ScenePtr myScene;
         convertFrom(cx, argv[0], myScene);
 
-        string myLineMaterialId;
+        std::string myLineMaterialId;
         convertFrom(cx, argv[1], myLineMaterialId);
 
-        string myAreaMaterialId;
+        std::string myAreaMaterialId;
         convertFrom(cx, argv[2], myAreaMaterialId);
 
         std::vector<asl::Vector3f> myPositions;
         convertFrom(cx, argv[3], myPositions);
 
-        string myName;
+        std::string myName;
         if (argc > 4) {
             convertFrom(cx, argv[4], myName);
         }
@@ -833,7 +832,7 @@ CreateImage(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) 
             *rval = as_jsval(cx, myResult);
 
         } else {
-            throw asl::Exception(string("Not enough arguments, must be 2 (scene,filename) or 4(scene,width,height,encoding)."));
+            throw asl::Exception(std::string("Not enough arguments, must be 2 (scene,filename) or 4(scene,width,height,encoding)."));
         }
         return JS_TRUE;
 
@@ -1016,7 +1015,7 @@ CreatePhongMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsv
             // KAPUTT
         }
 
-        string myName;
+        std::string myName;
         if (argc > 2) {
             if ( ! convertFrom(cx, argv[2], myName)) {
                 myName = "PhongMaterial";
@@ -1071,7 +1070,7 @@ CreatePhongTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
 
         dom::NodePtr myResult;
 
-        string myTextureFilename;
+        std::string myTextureFilename;
         convertFrom(cx, argv[1], myTextureFilename);
 
         // parse phong props
@@ -1098,7 +1097,7 @@ CreatePhongTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
             // KAPUTT
         }
 
-        string myName;
+        std::string myName;
         if (argc > 3) {
             if ( ! convertFrom(cx, argv[3], myName)) {
                 myName = "PhongMaterial";
@@ -1174,13 +1173,13 @@ CreateUnlitTexturedMaterial(JSContext * cx, JSObject * obj, uintN argc, jsval *a
         dom::NodePtr myResult;
 
         dom::NodePtr myImageNode;
-        string myTextureFilename;
+        std::string myTextureFilename;
         if (argc > 1) {
           if (!convertFrom(cx, argv[1], myImageNode)) {
             convertFrom(cx, argv[1], myTextureFilename);
           }
         }
-        string myName;
+        std::string myName;
         if (argc > 2) {
             convertFrom(cx, argv[2], myName);
         }
@@ -1285,10 +1284,10 @@ CreateQuadStack(JSContext * cx, JSObject * obj, uintN argc, jsval *argv, jsval *
         float mySize;
         convertFrom(cx, argv[2], mySize);
 
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[3], myMaterialId);
 
-        string myName;
+        std::string myName;
         if (argc > 4) {
             convertFrom(cx, argv[4], myName);
         }
@@ -1337,10 +1336,10 @@ CreateVoxelProxyGeometry(JSContext * cx, JSObject * obj, uintN argc, jsval *argv
         float mySampleRate;
         convertFrom(cx, argv[5], mySampleRate);
 
-        string myMaterialId;
+        std::string myMaterialId;
         convertFrom(cx, argv[6], myMaterialId);
 
-        string myName;
+        std::string myName;
         convertFrom(cx, argv[7], myName);
 
         dom::NodePtr myResult;
@@ -1475,8 +1474,8 @@ JSBool
 JSModellingFunctions::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("This object is static. You do not need to construct it.");
     DOC_END;
-    AC_TRACE << "Constructor start " << endl;
-    AC_TRACE << "Constructor argc =" << argc << endl;
+    AC_TRACE << "Constructor start " << std::endl;
+    AC_TRACE << "Constructor argc =" << argc << std::endl;
     if (JSA_GetClass(cx,obj) != Base::Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
         return JS_FALSE;

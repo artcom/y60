@@ -70,11 +70,11 @@ size_t LC_COUNT = 0;
 
 Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io) :
         _jsContext(cx),
+        _jsOptsObject(theOpts),
+        _readyState(CONNECTING),
         _resolver(io),
         _socket(io),
-        _writeStrand(io),
-        _jsOptsObject(theOpts),
-        _readyState(CONNECTING)
+        _writeStrand(io)
     {
         ostringstream s;
         s << "WebSocketClient::" << hex << this;
@@ -310,21 +310,22 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 i = 2;
             }
             else if (tempPayloadLength == 126) {
-                payloadLength = 0;
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[2]) << 8);
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[3]) << 0);
+                Unsigned64 temp64 = 0;
+                temp64 |= (Unsigned64)(Unsigned8) header[2] << 8;
+                temp64 |= (Unsigned64)(Unsigned8) header[3] << 0;
+                payloadLength = static_cast<size_t>(temp64);
                 i = 4;
             }
             else if (tempPayloadLength == 127) {
                 Unsigned64 temp64 = 0;
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[2]) << 56);
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[3]) << 48);
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[4]) << 40);
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[5]) << 32);
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[6]) << 24);
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[7]) << 16);
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[8]) << 8);
-                payloadLength |= ((Unsigned64) (Unsigned8)(header[9]) << 0);
+                temp64 |= (Unsigned64)(Unsigned8) header[2] << 56;
+                temp64 |= (Unsigned64)(Unsigned8) header[3] << 48;
+                temp64 |= (Unsigned64)(Unsigned8) header[4] << 40;
+                temp64 |= (Unsigned64)(Unsigned8) header[5] << 32;
+                temp64 |= (Unsigned64)(Unsigned8) header[6] << 24;
+                temp64 |= (Unsigned64)(Unsigned8) header[7] << 16;
+                temp64 |= (Unsigned64)(Unsigned8) header[8] <<  8;
+                temp64 |= (Unsigned64)(Unsigned8) header[9] <<  0;
                 payloadLength = static_cast<size_t>(temp64);
                 i = 10;
             }
@@ -615,14 +616,14 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
             request_stream.put(_w_outgoingFrame->payload.size() ); 
         } else {
             request_stream.put((_w_outgoingFrame->masked? 0x80 : 0) + 127);
-            request_stream.put(_w_outgoingFrame->payload.size() >> 56); 
-            request_stream.put(_w_outgoingFrame->payload.size() >> 48); 
-            request_stream.put(_w_outgoingFrame->payload.size() >> 40); 
-            request_stream.put(_w_outgoingFrame->payload.size() >> 32); 
-            request_stream.put(_w_outgoingFrame->payload.size() >> 24); 
-            request_stream.put(_w_outgoingFrame->payload.size() >> 16); 
-            request_stream.put(_w_outgoingFrame->payload.size() >> 8); 
-            request_stream.put(_w_outgoingFrame->payload.size() ); 
+            request_stream.put((char)((Unsigned64)_w_outgoingFrame->payload.size() >> 56)); 
+            request_stream.put((char)((Unsigned64)_w_outgoingFrame->payload.size() >> 48)); 
+            request_stream.put((char)((Unsigned64)_w_outgoingFrame->payload.size() >> 40)); 
+            request_stream.put((char)((Unsigned64)_w_outgoingFrame->payload.size() >> 32)); 
+            request_stream.put((char)((Unsigned64)_w_outgoingFrame->payload.size() >> 24)); 
+            request_stream.put((char)((Unsigned64)_w_outgoingFrame->payload.size() >> 16)); 
+            request_stream.put((char)((Unsigned64)_w_outgoingFrame->payload.size() >>  8)); 
+            request_stream.put((char)((Unsigned64)_w_outgoingFrame->payload.size()      )); 
         }
         if (_w_outgoingFrame->masked) {
             request_stream.write(reinterpret_cast<const char*>(_w_outgoingFrame->masking_key), sizeof(_w_outgoingFrame->masking_key));

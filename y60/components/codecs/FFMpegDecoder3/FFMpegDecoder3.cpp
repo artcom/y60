@@ -66,7 +66,6 @@
 #define DBV(x) x
 #define DBA(x) x
 
-using namespace std;
 using namespace asl;
 
 extern "C"
@@ -138,10 +137,10 @@ namespace y60 {
             asl::toLowerCase(asl::getExtension(theUrl)) != "d60" &&
             asl::toLowerCase(asl::getExtension(theUrl)) != "i60" )
         {
-            AC_DEBUG << "FFMpegDecoder3 can decode :" << theUrl << endl;
+            AC_DEBUG << "FFMpegDecoder3 can decode :" << theUrl << std::endl;
             return MIME_TYPE_MPG;
         } else {
-            AC_DEBUG << "FFMpegDecoder3 can not decode :" << theUrl << endl;
+            AC_DEBUG << "FFMpegDecoder3 can not decode :" << theUrl << std::endl;
             return "";
         }
     }
@@ -536,7 +535,7 @@ namespace y60 {
 #else
             if (avcodec_open(myCodecContext, myCodec) < 0 ) {
 #endif
-                throw FFMpegDecoder3Exception(std::string("Unable to open codec " + myCodecContext->codec_id), PLUS_FILE_LINE);
+                throw FFMpegDecoder3Exception(std::string("Unable to open codec " + as_string(myCodecContext->codec_id)), PLUS_FILE_LINE);
             }
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
             av_dict_free(&opts);
@@ -1085,7 +1084,7 @@ namespace y60 {
     }
 
     VideoMsgPtr FFMpegDecoder3::createFrame(double theTimestamp) {
-        vector<unsigned> myBufferSizes;
+        std::vector<unsigned> myBufferSizes;
         switch (_myDestinationPixelFormat) {
             case PIX_FMT_BGRA:
                 myBufferSizes.push_back(_myFrameWidth * _myFrameHeight * 4);

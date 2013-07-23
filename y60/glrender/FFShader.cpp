@@ -44,7 +44,6 @@
 
 #include <asl/base/Dashboard.h>
 
-using namespace std;
 using namespace asl;
 using namespace y60;
 
@@ -61,7 +60,7 @@ namespace y60 {
             loadShaderProperties(myFFShaderNode, _myFixedFunctionShader);
             loadParameters(myFFShaderNode, _myFixedFunctionShader);
         } else {
-            throw ShaderException(string("FFShader::FFShader() - missing node ")+
+            throw ShaderException(std::string("FFShader::FFShader() - missing node ")+
                     FIXED_FUNCTION_SHADER_NODE_NAME +
                     " in shader " + theNode->getAttributeString(ID_ATTRIB),PLUS_FILE_LINE);
         }

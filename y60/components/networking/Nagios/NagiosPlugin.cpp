@@ -44,7 +44,6 @@
 
 #include "StatusServer.h"
 
-using namespace std;
 using namespace asl;
 using namespace jslib;
 using namespace inet;
@@ -158,7 +157,7 @@ NagiosPlugin::onSetProperty(const std::string & thePropertyName,
     } else if (thePropertyName == "text") {
         StatusServer::writeStatusText(thePropertyValue.get<std::string>());
     } else {
-        cerr << "### WARNING: Unknown property: " << thePropertyName << endl;
+        std::cerr << "### WARNING: Unknown property: " << thePropertyName << std::endl;
     }
 }
 

@@ -50,7 +50,6 @@
 
 #define DB(x) // x
 
-using namespace std;
 using namespace asl;
 
 extern "C"
@@ -111,10 +110,10 @@ namespace y60 {
             asl::toLowerCase(asl::getExtension(theUrl)) != "d60" &&
             asl::toLowerCase(asl::getExtension(theUrl)) != "i60" )
         {
-            AC_INFO << "FFMpegDecoder1 can decode :" << theUrl << endl;
+            AC_INFO << "FFMpegDecoder1 can decode :" << theUrl << std::endl;
             return MIME_TYPE_MPG;
         } else {
-            AC_INFO << "FFMpegDecoder1 can not decode :" << theUrl << endl;
+            AC_INFO << "FFMpegDecoder1 can not decode :" << theUrl << std::endl;
             return "";
         }
     }
@@ -454,7 +453,7 @@ namespace y60 {
     // TODO: Make theTimestamp an input-only parameter.
     bool
     FFMpegDecoder1::decodeFrame(double & theTimestamp, dom::ResizeableRasterPtr theTargetRaster) {
-        AC_DEBUG << "--- decodeFrame ---" << endl;
+        AC_DEBUG << "--- decodeFrame ---" << std::endl;
         double myTimeUnitsPerSecond = 1/ av_q2d(_myVStream->time_base);
         double myTimePerFrame = myTimeUnitsPerSecond / getFrameRate();
         if (_myVStream->index_entries != NULL) {

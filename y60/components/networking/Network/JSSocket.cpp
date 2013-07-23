@@ -92,7 +92,7 @@ read(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
         DB(cerr << "Socket::read(): " << string(myBuffer) << endl;)
 
-        *rval = as_jsval(cx, myBuffer);
+        *rval = as_jsval(cx, std::string(myBuffer));
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION
 }

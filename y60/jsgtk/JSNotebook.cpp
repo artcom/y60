@@ -368,4 +368,10 @@ jsval as_jsval(JSContext *cx, JSNotebook::OWNERPTR theOwner, JSNotebook::NATIVE 
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
+jsval as_jsval(JSContext *cx, JSNotebook::NATIVE * theNative) {
+    JSObject * myReturnObject = JSNotebook::Construct(cx, JSNotebook::OWNERPTR(), theNative);
+    return OBJECT_TO_JSVAL(myReturnObject);
+}
+
+
 }
