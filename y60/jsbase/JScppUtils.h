@@ -329,6 +329,9 @@ Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::string & theValue);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String);
 
 template <class T>
+jsval as_jsval(JSContext *cx, T*);
+
+template <class T>
 jsval as_jsval(JSContext *cx, const std::vector<T> & theVector);
 
 template <class T> struct JSClassTraits;
