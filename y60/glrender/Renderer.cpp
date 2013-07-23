@@ -181,7 +181,7 @@ namespace y60 {
     Renderer::switchMaterial(const Viewport & theViewport,
                              const MaterialBase & theMaterial,
                              bool isOverlay) {
-
+//AC_PRINT << theMaterial.get<NameTag>();
         if (_myPreviousMaterial == &theMaterial) {
             return false;
         } else if (_myPreviousMaterial == 0) {
@@ -294,25 +294,23 @@ namespace y60 {
     void
     Renderer::renderExternal( const ExternalPartPtr & theExternalPart, const Viewport & theViewport, const Camera & theCamera) {
         //const y60::World & myWorld = theExternalPart->getWorld();
-        const External & myExternal = theExternalPart->getExternal();
-
-        glPopMatrix();
         CHECK_OGL_ERROR;
-
-        _myState->setClippingPlanes(theExternalPart->getClippingPlanes());
-        _myState->setScissorBox(theExternalPart->getScissorBox(), theViewport);
-
-        glPushMatrix();
+        const External & myExternal = theExternalPart->getExternal();
 
         glMultMatrixf((myExternal.get<GlobalMatrixTag>().getData()));
 
-        const MaterialBase & myMaterial = myExternal.getMaterial();
-        bool myMaterialHasChanged = switchMaterial(theViewport, myMaterial);
-
-        myExternal.callOnRenderCallBack();
+        deactivatePreviousMaterial();
         _myPreviousMaterial = 0;
-        switchMaterial(theViewport, myMaterial);
+
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
+        glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);        
+        myExternal.callOnRenderCallBack();
+        CHECK_OGL_ERROR;
+        glPopClientAttrib();
+        glPopAttrib();
+
         glMatrixMode( GL_MODELVIEW );
+        CHECK_OGL_ERROR;
     }
     void
     Renderer::renderBodyPart(const BodyPartPtr & theBodyPart, const Viewport & theViewport, const Camera & theCamera) {
@@ -1333,6 +1331,8 @@ namespace y60 {
     // called once per Canvas per Frame
     void
     Renderer::render(ViewportPtr theViewport) {
+//AC_PRINT << "---------";
+
         AC_TRACE << "Rendering:" << theViewport->getNode();
         MAKE_GL_SCOPE_TIMER(render);
         _myRenderedUnderlays = false;
@@ -1349,7 +1349,6 @@ namespace y60 {
         // text and overlay rendering). But not thouse that are managed by the renderstate class.
         glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT);
         glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-
         // Render underlays
         {
             MAKE_GL_SCOPE_TIMER(renderUnderlays);
@@ -1489,19 +1488,19 @@ namespace y60 {
         }
 
 
+        glPopClientAttrib();
+        glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
 
         {
             MAKE_GL_SCOPE_TIMER(renderOverlays);
             renderOverlays(*theViewport, OVERLAY_LIST_NAME);
         }
 
-
-        glPopClientAttrib();
-        glPopAttrib();  // GL_TEXTURE_BIT + GL_COLOR_BUFFER_BIT
-
         // Set renderer into known state for drawing calls from js
         deactivatePreviousMaterial();
         _myPreviousMaterial = 0;
+
+
         _myState->setDepthWrites(true);
         _myState->setIgnoreDepth(false);
 
@@ -1901,8 +1900,8 @@ namespace y60 {
             return;
         }
 
-        deactivatePreviousMaterial();
-        _myPreviousMaterial = 0;
+     //   deactivatePreviousMaterial();
+     //   _myPreviousMaterial = 0;
 
         glPushAttrib(GL_TEXTURE_BIT | GL_COLOR_BUFFER_BIT | GL_POLYGON_BIT);
         //glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -1953,7 +1952,6 @@ namespace y60 {
         glMatrixMode(GL_MODELVIEW);
 
         glPopAttrib();
-
         _myState->setBackfaceCulling(theViewport.get<ViewportBackfaceCullingTag>());
 
         _myRenderedUnderlays = true;
