@@ -1221,8 +1221,6 @@ namespace y60 {
             const External & myExternal = *(dynamic_cast_Ptr<External>(myFacade));
             Matrix4f myTransform = myExternal.get<GlobalMatrixTag>();
             myTransform.postMultiply(theEyeSpaceTransform);
-            double myFarPlane = myFrustum.getFar();
-            double myNearPlane = myFrustum.getNear();
             const MaterialBase & myMaterial = myExternal.getMaterial();
             const_cast<MaterialBase&>(myMaterial).set<LastActiveFrameTag>(_myFrameNumber);
             asl::Unsigned16 myExternalKey = 0;
