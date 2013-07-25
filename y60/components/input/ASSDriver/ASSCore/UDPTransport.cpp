@@ -218,7 +218,7 @@ void UDPTransport::generateGridValues() {
     _myGridValues.resize(_myGridWidth * _myGridHeight);
     vector<unsigned char>::iterator myIt = _myGridValues.begin();
 
-    for(int i=0; i<_myGridHeight*_myGridWidth; i++) {
+    for(unsigned int i=0; i<_myGridHeight*_myGridWidth; i++) {
       (*myIt++) = frame[i];
     }
 }

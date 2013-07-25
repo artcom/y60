@@ -57,6 +57,9 @@
 typedef ssize_t socklen_t;
 #endif
 
+#ifdef __GNUG__
+#pragma GCC diagnostic ignored "-Wunused-result"
+#endif
 
 static void SockaddrFromIpEndpointName( struct sockaddr_in& sockAddr, const IpEndpointName& endpoint )
 {
