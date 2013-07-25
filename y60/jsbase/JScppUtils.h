@@ -328,6 +328,11 @@ Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const char * theU8String);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::string & theValue);
 Y60_JSBASE_DECL jsval as_jsval(JSContext *cx, const std::basic_string<asl::Unsigned16> & theUTF16String);
 
+// Without this, as_jsval calls with pointers as arguments will compile to 
+// calls to as_jsval(cx, bool) (implicit pointer conversion to boolean).
+// This undefined function declaration will safeguard these calls and cause
+// a linker error. (A compile error would be even better - any ideas anyone?)
+
 template <class T>
 jsval as_jsval(JSContext *cx, T*);
 
