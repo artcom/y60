@@ -280,12 +280,16 @@ BaseConfigurator.prototype.Constructor = function (Public, Protected, theSceneVi
         Logger.warning("<BaseConfigurator::saveSettings> -- implement me");
     };
 
-    Protected.notifyListeners = function () {
+    Protected.notifyListeners = function (theSectionChanged) {
+        if (theSectionChanged === undefined) {
+            // hack to maintain backward compatibility
+            theSectionChanged = _.currentSection.nodeName;
+        }
         var i, myListener;
         for (i = 0; i < _.listeners.length; ++i) {
             myListener = _.listeners[i];
             if (myListener.section) {
-                if (myListener.section === _.currentSection.nodeName) {
+                if (myListener.section === theSectionChanged) {
                     myListener.obj.onUpdateSettings(Protected.settings.childNode(myListener.section));
                 }
             } else {
