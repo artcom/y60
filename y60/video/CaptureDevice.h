@@ -131,6 +131,10 @@ namespace y60 {
         void setDevice(unsigned theId) {
             _myParent->set<DeviceTag>(theId);
         }
+        void setTimeCode(const std::string & theTimeCode) {
+            _myParent->set<TimeCodeTag>(theTimeCode);
+        }
+
         unsigned getDevice() const {
             return _myParent->get<DeviceTag>();
         }

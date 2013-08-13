@@ -47,6 +47,7 @@ namespace y60 {
         NormTag::Plug(theNode),
         FrameRateTag::Plug(theNode),
         PlayModeTag::Plug(theNode),
+        TimeCodeTag::Plug(theNode),
          _myDevice(),
         _myPlayMode(PLAY_MODE_STOP)
     {
