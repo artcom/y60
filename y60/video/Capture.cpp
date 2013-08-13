@@ -104,7 +104,11 @@ namespace y60 {
         if (myPlayMode != _myPlayMode) {
             setPlayMode(myPlayMode);
         }
-        _myDevice->readFrame(getRasterPtr());
+        if (_myDevice->getEOF()) {
+            setPlayMode(PLAY_MODE_STOP);
+        } else {
+            _myDevice->readFrame(getRasterPtr());
+        }
     }
 
     void Capture::load(asl::PackageManager & thePackageManager) {
