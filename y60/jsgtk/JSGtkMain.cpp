@@ -292,7 +292,7 @@ JSGtkMain::on_idle( JSContext * cx, JSObject * theJSObject, std::string theMetho
 bool
 JSGtkMain::onAcceptorTimeout() {
     asl::Ptr<MessageAcceptor<LocalPolicy>::Message> myMessage;
-    while (myMessage = JSGtkMain::ourAppAcceptor->popIncomingMessage()) {
+    while ( (myMessage = JSGtkMain::ourAppAcceptor->popIncomingMessage()) ) {
         AC_DEBUG << "received '" << myMessage->as_string() << "'";
         JSGtkMain::ourAppAcceptor->pushOutgoingMessage(myMessage->server, "ACK");
         AC_DEBUG << "sent ACK ";

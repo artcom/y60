@@ -67,7 +67,6 @@
 #include <fstream>
 #include <map>
 
-using namespace std;
 using namespace asl;
 
 namespace jslib {
@@ -314,7 +313,7 @@ jsval as_jsval(JSContext *cx, dom::ValuePtr theValue) {
     }
 
     TypeConverterMap::init();
-    //AC_TRACE << "looking for C++ to JS conversion type " << theValue->getTypeInfo().name() << endl;
+    //AC_TRACE << "looking for C++ to JS conversion type " << theValue->getTypeInfo().name() << std::endl;
     TypeConverterMap::JSValFromValuePtr myConverter
         = TypeConverterMap::findAsJsval(theValue->getTypeInfo().name());
 
@@ -344,7 +343,7 @@ bool convertFrom(JSContext *cx, jsval theValue, const std::string & theTypeName,
 
     TypeConverterMap::init();
 
-    //AC_TRACE << "looking for JS to C++ conversion type  " << theTypeName << endl;
+    //AC_TRACE << "looking for JS to C++ conversion type  " << theTypeName << std::endl;
     TypeConverterMap::ValuePtrFromJSVal myConverter = TypeConverterMap::findConvertFrom(theTypeName);
 
     if (myConverter) {
@@ -399,7 +398,7 @@ dom::NodePtr &
 JSNode::getNodePtrRef(JSContext *cx, jsval theJSValue) {
     JSObject * myArgument;
     if (!JS_ValueToObject(cx, theJSValue, &myArgument)) {
-        AC_ERROR << "getNativeNode: bad argument type" << endl;
+        AC_ERROR << "getNativeNode: bad argument type" << std::endl;
     }
     return getNodePtrRef(cx, myArgument);
 }
@@ -418,7 +417,7 @@ dom::NodePtr
 JSNode::getNodePtr(JSContext *cx, jsval theJSValue) {
     JSObject * myArgument;
     if (!JS_ValueToObject(cx, theJSValue, &myArgument)) {
-        AC_ERROR << "getNativeNode: bad argument type" << endl;
+        AC_ERROR << "getNativeNode: bad argument type" << std::endl;
         return dom::NodePtr();
     }
     return getNodePtr(cx, myArgument);
@@ -509,7 +508,7 @@ addSchema(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 useFactoriesImpl(JSContext *cx, dom::Node & theNode, const std::string & theFactories) {
     asl::Ptr<dom::ValueFactory> myFactory = asl::Ptr<dom::ValueFactory>(new dom::ValueFactory());
-    std::vector<string> myFactoryNames = asl::splitString(string(theFactories),", \t\n\r;");
+    std::vector<std::string> myFactoryNames = asl::splitString(std::string(theFactories),", \t\n\r;");
     for (unsigned i = 0; i < myFactoryNames.size(); ++i) {
         if (myFactoryNames[i] == "w3c-schema") {
             dom::registerStandardTypes(*myFactory);
@@ -1071,7 +1070,7 @@ nodeValueDependsOn(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval 
 
 JSFunctionSpec *
 JSNode::Functions() {
-    AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<endl;
+    AC_DEBUG << "Registering class '"<<ClassName()<<"'"<<std::endl;
     static JSFunctionSpec myFunctions[] = {
         /* name                 native               nargs    */
         {"insertBefore",        insertBefore,        2},
@@ -1480,9 +1479,9 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
         } else {
             JSString *myJSStr = JS_ValueToString(cx, id);
             std::string myProperty = JS_GetStringBytes(myJSStr);
-            AC_TRACE << "JSNode::getProperty:" << myProperty << endl;
-            AC_TRACE << "JSNode::getProperty: nodeName = " <<myNode->nodeName() << endl;
-            //AC_TRACE << "JSNode::getProperty: myNode = " <<*myNode << endl;
+            AC_TRACE << "JSNode::getProperty:" << myProperty << std::endl;
+            AC_TRACE << "JSNode::getProperty: nodeName = " <<myNode->nodeName() << std::endl;
+            //AC_TRACE << "JSNode::getProperty: myNode = " <<*myNode << std::endl;
 
             // check special properties starting with $ that are interpreted as dereferenced id values
             if (myProperty[0] == '$') {
@@ -1514,7 +1513,7 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             if (myNode->hasFacade()) {
                 dom::FacadePtr myFacade = myNode->getFacade();
                 if (myFacade) {
-                    AC_TRACE << "JSNode::hasFacade " << myProperty << endl;
+                    AC_TRACE << "JSNode::hasFacade " << myProperty << std::endl;
                     dom::NodePtr myAttrNode = myFacade->getNamedItem(myProperty);
                     if (myAttrNode) {
                         AC_TRACE << "JSNode::getProperty: myAttrNode-Facade = " <<*myAttrNode;
@@ -1550,7 +1549,7 @@ JSNode::getProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             // Third: Check again for attributes, because the faced creates default values.
             myAttrNode = myNode->attributes().getNamedItem(myProperty);
             if (myAttrNode) {
-                IF_NOISY(AC_TRACE << "JSNode::getProperty: myAttrNode = " <<*myAttrNode << endl);
+                IF_NOISY(AC_TRACE << "JSNode::getProperty: myAttrNode = " <<*myAttrNode << std::endl);
                 *vp = as_jsval(cx, myAttrNode->nodeValueWrapperPtr());
                 return JS_TRUE;
             }
@@ -1634,9 +1633,9 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             }
 #endif
             //IF_NOISY(
-                AC_TRACE << "JSNode::setProperty:" << myProperty << endl;
-                AC_TRACE << "JSNode::setProperty: nodeName = " << myNode->nodeName() << endl;
-                AC_TRACE << "JSNode::setProperty: myNode = " << *myNode << endl;
+                AC_TRACE << "JSNode::setProperty:" << myProperty << std::endl;
+                AC_TRACE << "JSNode::setProperty: nodeName = " << myNode->nodeName() << std::endl;
+                AC_TRACE << "JSNode::setProperty: myNode = " << *myNode << std::endl;
             //)
             dom::NodePtr myAttrNode = myNode->attributes().getNamedItem(myProperty);
 
@@ -1647,7 +1646,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             }
 
             if (myAttrNode) {
-                AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << endl;
+                AC_TRACE << "JSNode::setProperty: myAttrNode = " <<*myAttrNode << std::endl;
                 myAttrNode->nodeValue(myResult);
                 return JS_TRUE;
             } else {
@@ -1656,11 +1655,11 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                     if (myFacade) {
                         dom::NodePtr myAttrNode = myFacade->getNamedItem(myProperty);
                         if (myAttrNode) {
-                            AC_TRACE << "JSNode::setProperty: myAttrNode-Facade = " <<*myAttrNode << endl;
+                            AC_TRACE << "JSNode::setProperty: myAttrNode-Facade = " <<*myAttrNode << std::endl;
 #define FACADE_ATTRIBUTES_WRITE_PROTECED
 #ifdef FACADE_ATTRIBUTES_WRITE_PROTECED
                             dumpJSStack(cx);
-                            AC_ERROR << "JSNode::setProperty: facade attribute '"<<myProperty<<"' is not writeable."<<endl;
+                            AC_ERROR << "JSNode::setProperty: facade attribute '"<<myProperty<<"' is not writeable."<<std::endl;
                             return JS_FALSE;
 #else
                             myAttrNode->nodeValue(myResult);
@@ -1670,7 +1669,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
                         // ask the facades propertylist (features, properties, etc)
                         dom::NodePtr myPropertyNode = myFacade->getProperty(myProperty);
                         if (myPropertyNode) {
-                            AC_TRACE << "JSNode::setProperty: myPropertyNode = " <<*myPropertyNode << endl;
+                            AC_TRACE << "JSNode::setProperty: myPropertyNode = " <<*myPropertyNode << std::endl;
                             myPropertyNode->nodeValue(myResult);
                             return JS_TRUE;
                         }
@@ -1681,7 +1680,7 @@ JSNode::setProperty(JSContext *cx, JSObject *obj, jsval id, jsval *vp)
             // retry to check for attrribute again; it may have been created by the facade
             myAttrNode = myNode->attributes().getNamedItem(myProperty);
             if (myAttrNode) {
-                AC_TRACE << "JSNode::setProperty: myAttrNode-post = " <<*myAttrNode << endl;
+                AC_TRACE << "JSNode::setProperty: myAttrNode-post = " <<*myAttrNode << std::endl;
                 // Try to convert array to strings
                 std::string myResult;
                 if (!JSA_ArrayToString(cx, vp, myResult)) {
@@ -1703,12 +1702,12 @@ JSNode::newResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject
     IF_NOISY(
         printParams("newresolve",cx,obj,id);
         if (flags & JSRESOLVE_QUALIFIED) {
-            AC_TRACE << "JSRESOLVE_QUALIFIED"<<endl;
+            AC_TRACE << "JSRESOLVE_QUALIFIED"<<std::endl;
         }
         if (flags & JSRESOLVE_ASSIGNING) {
-            AC_TRACE << "JSRESOLVE_ASSIGNING"<<endl;
+            AC_TRACE << "JSRESOLVE_ASSIGNING"<<std::endl;
         }
-        AC_TRACE << "objp=" << (void*)*objp<<endl;
+        AC_TRACE << "objp=" << (void*)*objp<<std::endl;
     )
     if (!JSVAL_IS_INT(id)) {
         JSString *myJSStr = JS_ValueToString(cx, id);
@@ -1726,14 +1725,14 @@ JSNode::newResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject
         }
 
         IF_NOISY(
-            AC_TRACE << "JSNode::newresolve: " << myProperty << endl;
-            AC_TRACE << "JSNode::newresolve: nodeName = " << myNode->nodeName() << endl;
-            AC_TRACE << "JSNode::newresolve: myNode = " << *myNode << endl;
+            AC_TRACE << "JSNode::newresolve: " << myProperty << std::endl;
+            AC_TRACE << "JSNode::newresolve: nodeName = " << myNode->nodeName() << std::endl;
+            AC_TRACE << "JSNode::newresolve: myNode = " << *myNode << std::endl;
         )
 
         dom::NodePtr myAttrNode = myNode->attributes().getNamedItem(myProperty);
         if (myAttrNode) {
-            IF_NOISY(AC_TRACE << "JSNode::newResolve: found attribute: "<< myProperty << endl);
+            IF_NOISY(AC_TRACE << "JSNode::newResolve: found attribute: "<< myProperty << std::endl);
 
             dom::ValuePtr myVal = myAttrNode->nodeValueWrapperPtr();
             jsval myJSVal = as_jsval(cx,myVal);
@@ -1745,10 +1744,10 @@ JSNode::newResolve(JSContext *cx, JSObject *obj, jsval id, uintN flags, JSObject
                 return JS_FALSE;
             }
             *objp = obj;
-            IF_NOISY(AC_TRACE << "JSNode::newResolve: return objp= "<< (void*)(*objp) << endl);
+            IF_NOISY(AC_TRACE << "JSNode::newResolve: return objp= "<< (void*)(*objp) << std::endl);
             return JS_TRUE;
         } else {
-            IF_NOISY(AC_TRACE << "JSNode::newResolve: attribute: "<< myProperty << " does not exist." << endl);
+            IF_NOISY(AC_TRACE << "JSNode::newResolve: attribute: "<< myProperty << " does not exist." << std::endl);
             *objp = 0;
             return JS_TRUE;
         }
@@ -1775,7 +1774,7 @@ JSNode::customConvert(JSContext *cx, JSObject *obj, JSType type, jsval *vp)
 void
 JSNode::finalizeImpl(JSContext *cx, JSObject *obj)
 {
-    IF_NOISY_F(AC_TRACE << "finalize "<<ClassName() << (void*)obj << endl);
+    IF_NOISY_F(AC_TRACE << "finalize "<<ClassName() << (void*)obj << std::endl);
     JSNode * myImpl = static_cast<JSNode*>(JS_GetPrivate(cx,obj));
     delete myImpl;
 }
@@ -1848,7 +1847,7 @@ JSBool
 JSNode::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Constructing a node from scratch or from a string.");
     DOC_END;
-    IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << endl);
+    IF_NOISY2(AC_TRACE << "Constructor argc =" << argc << std::endl);
     if (JSA_GetClass(cx,obj) != Class()) {
         JS_ReportError(cx,"Constructor for %s  bad object; did you forget a 'new'?",ClassName());
         return JS_FALSE;
@@ -1858,7 +1857,7 @@ JSNode::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval
         myNewObject=new JSNode(dom::NodePtr(new dom::Node));
     } else {
         if (argc == 1) {
-            IF_NOISY(AC_TRACE << "Node::Constructor: constructing Node from string"<<endl);
+            IF_NOISY(AC_TRACE << "Node::Constructor: constructing Node from string"<<std::endl);
             std::string myXmlText = as_string(cx, argv[0]);
             myNewObject=new JSNode(dom::NodePtr(new dom::Document(myXmlText)));
         }

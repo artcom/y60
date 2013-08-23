@@ -44,7 +44,6 @@
 #include <iostream>
 
 using namespace asl;
-using namespace std;
 using namespace y60;
 using namespace dom;
 
@@ -159,8 +158,8 @@ public:
 int main(int argc, char *argv[]) {
     MyTestSuite mySuite(argv[0], argc, argv);
     mySuite.run();
-    cerr << ">> Finished test suite '" << argv[0] << "'"
-         << ", return status = " << mySuite.returnStatus() << endl;
+    std::cerr << ">> Finished test suite '" << argv[0] << "'"
+         << ", return status = " << mySuite.returnStatus() << std::endl;
 
     return mySuite.returnStatus();
 }

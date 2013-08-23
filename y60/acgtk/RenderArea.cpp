@@ -195,7 +195,7 @@ RenderArea::swapBuffers() {
 bool
 RenderArea::on_expose_event (GdkEventExpose *event) {
     try {
-        /*GdkGLDrawable *gldrawable =*/ gtk_widget_get_gl_drawable (GTK_WIDGET(gobj()));
+        /*GdkGLDrawable *gldrawable =*/ (void)gtk_widget_get_gl_drawable (GTK_WIDGET(gobj()));
         ScopedGLContext myContext(this);
 
         if (_myRenderer && _myScene) {

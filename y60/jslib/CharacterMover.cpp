@@ -40,7 +40,6 @@
 
 using namespace y60;
 using namespace asl;
-using namespace std;
 
 namespace jslib {
 

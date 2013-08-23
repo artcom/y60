@@ -135,9 +135,9 @@ namespace websocket {
             opcode(theOpCode), final(theFinalFlag),
             disconnect_after_sending(false)
         {};
+        unsigned char opcode;
         bool final;
         unsigned char rsv; 
-        unsigned char opcode;
         bool masked;
         unsigned char masking_key[4];
 

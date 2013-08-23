@@ -115,6 +115,7 @@ struct JSClassTraits<JSNotebook::NATIVE>
     : public JSClassTraitsWrapper<JSNotebook::NATIVE, JSNotebook> {};
 
 Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSNotebook::OWNERPTR theOwner, JSNotebook::NATIVE * theNotebook);
+Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSNotebook::NATIVE * theNotebook);
 
 } // namespace
 

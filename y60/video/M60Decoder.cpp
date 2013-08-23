@@ -39,7 +39,6 @@
 #include <asl/base/Ptr.h>
 #include <asl/base/RunLengthEncoder.h>
 
-using namespace std;
 using namespace asl;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,17 +83,17 @@ namespace y60 {
         M60Header myHeader(*_myMovieBlock);
 
         if (!myHeader.checkMagicNumber()) {
-            throw M60DecoderException(string("Movie ") + theFilename +
+            throw M60DecoderException(std::string("Movie ") + theFilename +
                 " has a wrong magic number. '" + M60_MAGIC_NUMBER + "' expected.", PLUS_FILE_LINE);
         }
 
         if (!myHeader.checkHeadersize()) {
-            throw M60DecoderException(string("Movie ") + theFilename +
+            throw M60DecoderException(std::string("Movie ") + theFilename +
                 " has a wrong headersize number.", PLUS_FILE_LINE);
         }
 
         if (myHeader.version != CURRENT_MOVIE_FORMAT_VERSION) {
-            throw M60DecoderException(string("M60Decoder ") + theFilename + " file format version: " +
+            throw M60DecoderException(std::string("M60Decoder ") + theFilename + " file format version: " +
                 as_string(myHeader.version) + " does not match current reader version: " +
                 as_string(CURRENT_MOVIE_FORMAT_VERSION), PLUS_FILE_LINE);
         }
@@ -102,7 +101,7 @@ namespace y60 {
         if (MovieEncoding(myHeader.compression) != MOVIE_DRLE &&
             MovieEncoding(myHeader.compression) != MOVIE_RLE)
         {
-            throw M60DecoderException(string("M60Decoder ") + theFilename + " compression: " +
+            throw M60DecoderException(std::string("M60Decoder ") + theFilename + " compression: " +
                 as_string(myHeader.compression) + " not supported. Currently only RLE and DRLE supported.", PLUS_FILE_LINE);
         }
         _myEncoding = MovieEncoding(myHeader.compression);

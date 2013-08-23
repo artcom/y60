@@ -61,7 +61,6 @@
 #endif //defined(_MSC_VER)
 
 
-using namespace std;
 using namespace asl;
 
 namespace y60 {
@@ -395,7 +394,7 @@ namespace y60 {
                                    const TextureApplyMode & theApplyMode)
     {
         checkState();
-        string myFileName = theFrontFileName + "|" + theRightFileName + "|"
+        std::string myFileName = theFrontFileName + "|" + theRightFileName + "|"
             + theBackFileName + "|" + theLeftFileName + "|"
             + theTopFileName + "|" + theBottomFileName;
 

@@ -52,7 +52,6 @@
 #include <asl/base/Logger.h>
 
 
-using namespace std;
 using namespace asl;
 using namespace dom;
 
@@ -146,12 +145,12 @@ namespace y60 {
         unload();
     }
 
-    const string &
+    const std::string &
     GLShader::getId() const {
         return _myId;
     }
 
-    const string &
+    const std::string &
     GLShader::getName() const {
         return _myName;
     }
@@ -162,7 +161,7 @@ namespace y60 {
     }
 
     GLShader::ShaderMatch
-    GLShader::matches(const string & theFeatureClass,
+    GLShader::matches(const std::string & theFeatureClass,
                       const VectorOfString & theRequirementList) const
     {
         const VectorOfString * myFeaturesLeft = _myFeatureSet.getFeatures(theFeatureClass);
@@ -280,13 +279,13 @@ namespace y60 {
                                     GL_ONE_MINUS_SRC_ALPHA);
                 CHECK_OGL_ERROR;
             } else if(myBlendFunction.size() == 4) {
-                throw ShaderException(string("Blend function for material '")
+                throw ShaderException(std::string("Blend function for material '")
                                       + theMaterial.get<NameTag>()
                                       + "' specifies separate blend functions"
                                       + ", which is unsupported in combination with glow",
                                       PLUS_FILE_LINE);
             } else {
-                throw ShaderException(string("Blend function for material '")
+                throw ShaderException(std::string("Blend function for material '")
                                       + theMaterial.get<NameTag>()
                                       + "' has invalid length "
                                       + asl::as_string(myBlendFunction.size())
@@ -300,7 +299,7 @@ namespace y60 {
                 glBlendColor(1.0,1.0,1.0, myRealGlow);
                 CHECK_OGL_ERROR;
             } else {
-                throw ShaderException(string("Blend color on material '")
+                throw ShaderException(std::string("Blend color on material '")
                                       + theMaterial.get<NameTag>()
                                       + "' has been set"
                                       + ", which is unsupported in combination with glow",
@@ -317,7 +316,7 @@ namespace y60 {
                                     asGLBlendFunction(myBlendFunction[2]),
                                     asGLBlendFunction(myBlendFunction[3]));
             } else {
-                throw ShaderException(string("Blend function for material '")
+                throw ShaderException(std::string("Blend function for material '")
                                       + theMaterial.get<NameTag>()
                                       + "' has invalid length "
                                       + asl::as_string(myBlendFunction.size())
@@ -340,7 +339,7 @@ namespace y60 {
                 glBlendEquationSeparate(asGLBlendEquation(myBlendEquation[0]),
                                         asGLBlendEquation(myBlendEquation[1]));
             } else {
-                throw ShaderException(string("Blend equation for material '")
+                throw ShaderException(std::string("Blend equation for material '")
                                       + theMaterial.get<NameTag>()
                                       + "' has invalid length "
                                       + asl::as_string(myBlendEquation.size())
@@ -403,7 +402,7 @@ namespace y60 {
             // bind/enable texture
             glBindTexture(myTextureTarget, myTextureId);
             glEnable(myTextureTarget);
-            AC_TRACE << "GLShader::enableTextures unit=" << i << " texId=" << myTextureId << " target=0x" << hex << myTextureTarget << dec;
+            AC_TRACE << "GLShader::enableTextures unit=" << i << " texId=" << myTextureId << " target=0x" << std::hex << myTextureTarget << std::dec;
             setTextureParameters(myTextureUnit, alreadyHasSpriteTexture, myFrameNumber);
 
         }
@@ -465,8 +464,8 @@ namespace y60 {
         for (unsigned i = 0; i < myParameterCount; ++i) {
             dom::NodePtr myParameterNode = myParameterListNode->childNode(i);
             if (myParameterNode->nodeType() != dom::Node::COMMENT_NODE) {
-                const string & myPropertyName = myParameterNode->getAttributeString("name");
-                const string & myPropertyTypeString = myParameterNode->nodeName();
+                const std::string & myPropertyName = myParameterNode->getAttributeString("name");
+                const std::string & myPropertyTypeString = myParameterNode->nodeName();
                 TypeId myPropertyType;
                 myPropertyType.fromString(myPropertyTypeString);
                 //= TypeId(asl::getEnumFromString(myPropertyTypeString, TypeIdStrings));
@@ -474,7 +473,7 @@ namespace y60 {
                 VertexDataRole myPropertyRole =
                     VertexDataRole(asl::getEnumFromString(myPropertyName, VertexDataRoleString));
 
-                string  myParameterFunctionString = VERTEXPARAM_PASS_THROUGH;
+                std::string  myParameterFunctionString = VERTEXPARAM_PASS_THROUGH;
                 if (myParameterNode->getAttribute(FUNCTION_ATTRIB) ) {
                     myParameterFunctionString = myParameterNode->getAttributeString(FUNCTION_ATTRIB);
                 }
@@ -484,13 +483,13 @@ namespace y60 {
 
                 GLRegister myRegister;
                 if (myParameterNode->getAttribute(REGISTER_ATTRIB)) {
-                    const string & myRegisterString = myParameterNode->getAttributeString("register");
+                    const std::string & myRegisterString = myParameterNode->getAttributeString("register");
                     myRegister = GLRegister(asl::getEnumFromString(myRegisterString, GLRegisterString));
                 } else {
                     myRegister = GLRegister(asl::getEnumFromString(myPropertyName, GLRegisterString));
                 }
 
-                string myDefaultValue = "";
+                std::string myDefaultValue = "";
                 dom::NodePtr myTextNode = myParameterNode->childNode("#text");
                 if (myTextNode) {
                     myDefaultValue = myTextNode->nodeValue();
@@ -632,7 +631,7 @@ namespace y60 {
     }
 
     const VectorOfString *
-    GLShader::getFeatures(const string & theFeatureClass) const {
+    GLShader::getFeatures(const std::string & theFeatureClass) const {
         return _myFeatureSet.getFeatures(theFeatureClass);
     }
     const VectorOfTextureUsage &
@@ -640,7 +639,7 @@ namespace y60 {
         return _myFeatureSet.getTextureFeature();
     }
 
-    bool GLShader::hasFeature(const string & theFeatureClass) const {
+    bool GLShader::hasFeature(const std::string & theFeatureClass) const {
         return _myFeatureSet.hasFeature(theFeatureClass);
     }
 

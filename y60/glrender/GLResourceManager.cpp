@@ -47,7 +47,6 @@ We need to find a clean way to deal with NPOT textures then.
 #include <asl/base/file_functions.h>
 #include <asl/base/Dashboard.h>
 
-using namespace std;
 using namespace asl;
 
 #define DB(x) // x
@@ -56,7 +55,7 @@ namespace y60 {
     const unsigned int CUBEMAP_SIDES = 6;
 
     GLResourceManager::~GLResourceManager() {
-        AC_DEBUG << "GLResourceManager::~GLResourceManager()" << endl;
+        AC_DEBUG << "GLResourceManager::~GLResourceManager()" << std::endl;
     }
 
     void
@@ -106,8 +105,8 @@ namespace y60 {
         CHECK_OGL_ERROR;
 
         AC_DEBUG << "GLResourceManager::setupTexture '" << theTexture->get<NameTag>()
-                 << "' id=" << theTexture->get<IdTag>() << " texTarget=0x" << hex
-                 << myTextureTarget << dec << " texId=" << myTextureId;
+                 << "' id=" << theTexture->get<IdTag>() << " texTarget=0x" << std::hex
+                 << myTextureTarget << std::dec << " texId=" << myTextureId;
         updatePixelTransfer(theTexture);
 
         switch (theTexture->getType()) {
@@ -160,8 +159,8 @@ namespace y60 {
         CHECK_OGL_ERROR;
 
         AC_DEBUG << "GLResourceManager::updateTextureData '" << theTexture->get<NameTag>()
-                 << "' id=" << theTexture->get<IdTag>() << " texTarget=0x" << hex
-                 << myTextureTarget << dec << " texId=" << myTextureId;
+                 << "' id=" << theTexture->get<IdTag>() << " texTarget=0x" << std::hex
+                 << myTextureTarget << std::dec << " texId=" << myTextureId;
         updatePixelTransfer(theTexture);
 
         switch (theTexture->getType()) {
@@ -454,7 +453,7 @@ namespace y60 {
         bool myMipmapFlag = theTexture->get<TextureMipmapTag>();
         if (myPixelEncoding.compressedFlag && myMipmapFlag) {
             AC_DEBUG << "disabling mipmap for compressed texture: "
-                     << theTexture->get<NameTag>() << endl;
+                     << theTexture->get<NameTag>() << std::endl;
             theTexture->set<TextureMipmapTag>(false);
             myMipmapFlag = false;
         }
@@ -630,7 +629,7 @@ namespace y60 {
         theTexture->set<TextureHeightTag>(myTexHeight);
         theTexture->set<TextureDepthTag>(myTexDepth);
 
-        AC_TRACE << "setupTexture3D internalFormat=0x" << hex << myPixelEncoding.internalformat << dec;
+        AC_TRACE << "setupTexture3D internalFormat=0x" << std::hex << myPixelEncoding.internalformat << std::dec;
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         if (myPixelEncoding.compressedFlag) {
