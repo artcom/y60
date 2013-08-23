@@ -368,9 +368,10 @@ jsval as_jsval(JSContext *cx, JSNotebook::OWNERPTR theOwner, JSNotebook::NATIVE 
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-jsval as_jsval(JSContext *cx, JSNotebook::NATIVE * theNative) {
-    JSObject * myReturnObject = JSNotebook::Construct(cx, JSNotebook::OWNERPTR(), theNative);
-    return OBJECT_TO_JSVAL(myReturnObject);
+// NOTE: we don't expose Notebook Pages yet, and they are deprecated anyway, so we just wrap this as an int 
+template<>
+jsval as_jsval<GtkNotebookPage>(JSContext *cx, GtkNotebookPage * theNative) {
+    return as_jsval(cx, reinterpret_cast<intptr_t>(theNative));
 }
 
 

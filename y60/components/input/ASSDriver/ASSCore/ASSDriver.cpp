@@ -295,7 +295,7 @@ namespace y60 {
     template <class RASTER>
     struct FindMaximum {
         FindMaximum()
-        {   result.max = 0; }
+        {   result.max = 0; result.center = Vector2f(0.0f,0.0f); }
         void operator () (const RASTER & theRaster) {
             findMaximum(theRaster, result);
         }

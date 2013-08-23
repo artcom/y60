@@ -150,6 +150,7 @@ AppendColumn(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
         } else {
             myNewColNum = myNative->append_column(myColLabel, myScheme->_myColumns.at(myColNum-1));
         }
+        *rval = as_jsval(cx, myNewColNum);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }
@@ -179,6 +180,7 @@ AppendColumnEditable(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
         } else {
             myNewColNum = myNative->append_column_editable(myColLabel, myScheme->_myColumns.at(myColNum-1));
         }
+        *rval = as_jsval(cx, myNewColNum);
         return JS_TRUE;
     } HANDLE_CPP_EXCEPTION;
 }

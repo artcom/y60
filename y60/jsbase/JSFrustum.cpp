@@ -36,6 +36,7 @@
 #include "JSPlane.h"
 #include "JSMatrix.h"
 #include "JSWrapper.impl"
+#include "JSBox.h"
 
 #include <y60/base/DataTypes.h>
 
@@ -61,12 +62,35 @@ toString(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+inside(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("check if a box is inside frustum");
+    DOC_PARAM("theBox", "", DOC_TYPE_BOX3F);
+    DOC_RVAL("Returns TRUE if some of the box in inside frustum.", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    if (argc == 1) {
+        asl::Box3f myBox;
+        if (convertFrom(cx, argv[0], myBox)) {
+            bool myOverlapFlag;
+            bool myResult =  asl::intersection(myBox, JSFrustum::getJSWrapper(cx,obj).getNative(), myOverlapFlag); 
+            *rval = as_jsval(cx, myResult);       
+            return JS_TRUE;
+        }
+        JS_ReportError(cx,"JSFrustum::inside bad argument: box3f expected");
+    } else {
+        JS_ReportError(cx,"JSFrustum::inside: bad number of arguments, 1 expected");
+    }
+    return JS_FALSE;
+}
+
 JSFunctionSpec *
 JSFrustum::Functions() {
     IF_REG(cerr << "Registering class '"<<ClassName()<<"'"<<endl);
     static JSFunctionSpec myFunctions[] = {
         /* name                native          nargs    */
         {"toString",           toString,                0},
+        {"inside",             inside,     1         }, // box
+
         {0}
     };
     return myFunctions;

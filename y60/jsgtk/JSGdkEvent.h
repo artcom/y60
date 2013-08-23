@@ -90,11 +90,13 @@ struct JSClassTraits<JSGdkEvent::NATIVE>
 
 Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, JSGdkEvent::OWNERPTR theOwner, JSGdkEvent::NATIVE * theNative);
 
-Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEvent * theNative);
-Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEventButton * theNative);
-Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEventMotion * theNative);
-Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEventKey * theNative);
-Y60_JSGTK_DECL jsval as_jsval(JSContext *cx, GdkEventFocus * theNative);
+template<> Y60_JSGTK_DECL jsval as_jsval<GdkEvent>(JSContext *cx, GdkEvent* theNative);
+template<> Y60_JSGTK_DECL jsval as_jsval<GdkEventKey>(JSContext *cx, GdkEventKey * theNative);
+template<> Y60_JSGTK_DECL jsval as_jsval<GdkEventAny>(JSContext *cx, GdkEventAny * theNative);
+template<> Y60_JSGTK_DECL jsval as_jsval<GdkEventFocus>(JSContext *cx, GdkEventFocus * theNative);
+template<> Y60_JSGTK_DECL jsval as_jsval<GdkEventButton>(JSContext *cx, GdkEventButton * theNative);
+template<> Y60_JSGTK_DECL jsval as_jsval<GdkEventCrossing>(JSContext *cx, GdkEventCrossing * theNative);
+template<> Y60_JSGTK_DECL jsval as_jsval<GdkEventMotion>(JSContext *cx, GdkEventMotion * theNative);
 
 } // namespace
 

@@ -914,7 +914,6 @@ namespace y60 {
         bool operator()(Primitive * thePrimitive, int theElementIndex,
                         const asl::LineSegment<float> & theEdge) {
 
-            asl::SweptSphereContact<float> nextContact;
 
             asl::LineSegment<float> mySphereSpaceEdge;
             mySphereSpaceEdge.origin = theEdge.origin * _mySphereSpaceTransform;
@@ -928,6 +927,7 @@ namespace y60 {
             //TODO fill nextContact from x0,f0,x1,f1
 
             if (myContactCount) {
+                asl::SweptSphereContact<float> nextContact;
                 addContactInfo(thePrimitive, theElementIndex, nextContact);
                 _myCurrentContact = nextContact;
                 return true;

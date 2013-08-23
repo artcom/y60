@@ -259,32 +259,39 @@ jsval as_jsval(JSContext *cx, JSGdkEvent::OWNERPTR theOwner, JSGdkEvent::NATIVE 
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-jsval as_jsval(JSContext *cx, GdkEvent * theNative) {
+template<> 
+jsval as_jsval<GdkEvent>(JSContext *cx, GdkEvent * theNative) {
     JSObject * myReturnObject = JSGdkEvent::Construct(cx, JSGdkEvent::OWNERPTR(), theNative);
     return OBJECT_TO_JSVAL(myReturnObject);
 }
 
-jsval as_jsval(JSContext *cx, GdkEventButton * theNative) {
+template<> 
+jsval as_jsval<GdkEventButton>(JSContext *cx, GdkEventButton * theNative) {
     return as_jsval(cx, reinterpret_cast<GdkEvent*>(theNative));
 }
 
-jsval as_jsval(JSContext *cx, GdkEventMotion * theNative) {
+template<> 
+jsval as_jsval<GdkEventMotion>(JSContext *cx, GdkEventMotion * theNative) {
     return as_jsval(cx, reinterpret_cast<GdkEvent*>(theNative));
 }
 
-jsval as_jsval(JSContext *cx, GdkEventKey * theNative) {
+template<> 
+jsval as_jsval<GdkEventKey>(JSContext *cx, GdkEventKey * theNative) {
     return as_jsval(cx, reinterpret_cast<GdkEvent*>(theNative));
 }
 
-jsval as_jsval(JSContext *cx, GdkEventCrossing * theNative) {
+template<> 
+jsval as_jsval<GdkEventCrossing>(JSContext *cx, GdkEventCrossing * theNative) {
     return as_jsval(cx, reinterpret_cast<GdkEvent*>(theNative));
 }
 
-jsval as_jsval(JSContext *cx, GdkEventAny * theNative) {
+template<> 
+jsval as_jsval<GdkEventAny>(JSContext *cx, GdkEventAny * theNative) {
     return as_jsval(cx, reinterpret_cast<GdkEvent*>(theNative));
 }
 
-jsval as_jsval(JSContext *cx, GdkEventFocus * theNative) {
+template<> 
+jsval as_jsval<GdkEventFocus>(JSContext *cx, GdkEventFocus * theNative) {
     return as_jsval(cx, reinterpret_cast<GdkEvent*>(theNative));
 }
 

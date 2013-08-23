@@ -694,7 +694,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                             jsval argv[1], rval;
                             argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
                             AC_TRACE << "Calling onClose for " << debugIdentifier;
-                            JSBool ok = JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onclose", 1, argv, &rval);
+                            JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onclose", 1, argv, &rval);
                             AC_TRACE << "Called onClose for " << debugIdentifier;
                         }
                         releaseJSWrapper();
@@ -703,14 +703,14 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                             jsval argv[1], rval;
                             argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
                             AC_TRACE << "Calling onOpen for " << debugIdentifier;
-                            JSBool ok = JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onopen", 1, argv, &rval);
+                            JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onopen", 1, argv, &rval);
                             AC_TRACE << "Called onOpen for " << debugIdentifier;
                         }
                     } else if (boost::shared_ptr<MessageEvent> e = boost::dynamic_pointer_cast<MessageEvent>(nextEvent)) {
                         if (hasCallback("onmessage")) {
                             jsval argv[1], rval;
                             argv[0] = OBJECT_TO_JSVAL(e->newJSObject(_jsContext, _jsWrapper));
-                            JSBool ok = JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onmessage", 1, argv, &rval);
+                            JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "onmessage", 1, argv, &rval);
                         }
                     } else {
                         AC_WARNING << "Unknown event type - invoke JS Callback here";

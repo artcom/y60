@@ -252,6 +252,14 @@ setBlockingMode(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rv
     return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::setBlockingMode,cx,obj,argc,argv,rval);
 }
 
+static JSBool
+setTcpNoDelay(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Enable/disable TCP_NODELAY on connection");
+    DOC_PARAM("isNoDelay", "If true, disable the Nagle algorithm for send coalescing", DOC_TYPE_BOOLEAN);
+    DOC_END;
+    return Method<JSSocket::NATIVE>::call(&JSSocket::NATIVE::setTcpNoDelay,cx,obj,argc,argv,rval);
+}
+
 JSSocket::~JSSocket() {
 }
 
@@ -268,6 +276,7 @@ JSSocket::Functions() {
         {"close",                close,                   0},
         {"connect",              connect,                 2},
         {"setBlockingMode",      setBlockingMode,         1},
+        {"setTcpNoDelay",        setTcpNoDelay,           1},
         {0}
     };
     return myFunctions;

@@ -11,7 +11,6 @@
 
 #ifdef LINUX
 #   if BOOST_VERSION  >= 104800 and BOOST_VERSION < 104900
-#       warning Boost 1.48 ASIO has a buggy epoll. Falling back to select. 
 #       define BOOST_ASIO_DISABLE_EPOLL
 #   endif
 #endif
