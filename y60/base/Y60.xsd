@@ -3281,6 +3281,11 @@ Possible values are:
                             <xs:documentation>Norm to capture in. Usually PAL. Ignored for non-capable devices.</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
+                    <xs:attribute name="timecode" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation>Device-dependent timecode of the captured frame. Not all devices supply timecodes.</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

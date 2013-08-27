@@ -80,6 +80,7 @@ namespace y60 {
          * @return real time of the frame return in theTargetRaster
          */
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster) = 0;
+        virtual bool getEOF() { return false; };
         virtual void load(const std::string & theFilename) = 0;
 
         /**
@@ -131,6 +132,10 @@ namespace y60 {
         void setDevice(unsigned theId) {
             _myParent->set<DeviceTag>(theId);
         }
+        void setTimeCode(const std::string & theTimeCode) {
+            _myParent->set<TimeCodeTag>(theTimeCode);
+        }
+
         unsigned getDevice() const {
             return _myParent->get<DeviceTag>();
         }

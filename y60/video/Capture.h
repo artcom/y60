@@ -54,7 +54,8 @@ namespace y60 {
     /* @{ */
 
     //                  theTagName    theType      theAttributeName            theDefault
-    DEFINE_ATTRIBUTE_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,   "PAL", Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,       "PAL", Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(TimeCodeTag,  std::string, CAPTURE_TIMECODE_ATTRIB,   "", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(DeviceTag,    unsigned,    CAPTURE_DEVICE_ATTRIB, 0, Y60_VIDEO_DECL);
 
     class Y60_VIDEO_DECL CaptureDevice;
@@ -74,7 +75,8 @@ namespace y60 {
         public DeviceTag::Plug,
         public NormTag::Plug,
         public FrameRateTag::Plug,
-        public PlayModeTag::Plug
+        public PlayModeTag::Plug,
+        public TimeCodeTag::Plug
     {
     public:
         Capture(dom::Node & theNode);
