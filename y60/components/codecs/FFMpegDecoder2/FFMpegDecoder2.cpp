@@ -905,7 +905,6 @@ namespace y60 {
             if (!validStream) {
                 continue;
             }
-AC_PRINT << "open movie : " << theFilename;      
             // open codec
             AVCodecContext * myCodecContext = _myFormatContext->streams[i]->codec;
             AVCodec * myCodec = avcodec_find_decoder(myCodecContext->codec_id);
