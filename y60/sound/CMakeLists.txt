@@ -39,7 +39,7 @@ ac_add_library(
     y60sound y60/sound
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS aslbase aslmath aslaudio
+    DEPENDS aslbase aslmath aslaudio y60base
     EXTERNS ${EXTERNALS}
     TESTS   ${TESTS}
     VERSION ${VERSION_STRING}

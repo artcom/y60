@@ -12,6 +12,7 @@ RankedFeature.cpp
 TypeTraits.cpp
 Y60xsd.cpp
 iostream_functions.cpp
+FFMpegOpenCloseThreadlock.cpp
 )
 
 set(HEADERS
@@ -36,6 +37,7 @@ property_functions.h
 typedefs.h
 y60_pixel_types.h
 y60_base_settings.h
+FFMpegOpenCloseThreadlock.h
 )
 
 set(TESTS

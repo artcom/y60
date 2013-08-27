@@ -52,6 +52,8 @@ extern "C" {
 #include <asl/base/Auto.h>
 #include <asl/audio/Pump.h>
 
+#include <y60/base/FFMpegOpenCloseThreadlock.h>
+
 using namespace std;
 using namespace asl;
 
@@ -175,7 +177,8 @@ void FFMpegAudioDecoder::open() {
         }
 
         {
-            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+//            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+            AutoLocker<ThreadLock> myLocker(FFMpegOpenCloseThreadlock::get().getLock());
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,6,0)
             if (avcodec_open2(myCodecContext, myCodec, NULL) < 0 ) {
 #else
@@ -225,7 +228,9 @@ void FFMpegAudioDecoder::close() {
             myCodecContext = _myFormatContext->streams[_myStreamIndex]->codec;
         }
         if (_mySampleRate && _myNumChannels) {
-            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+//            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
+            AutoLocker<ThreadLock> myLocker(FFMpegOpenCloseThreadlock::get().getLock());
+            
             avcodec_close(myCodecContext);
         }
         if (_myFormatContext) {
