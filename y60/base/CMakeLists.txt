@@ -45,6 +45,9 @@ DataTypes
 XmlDomY60Types
 )
 
+if(NOT WIN32)
+    find_package(Boost COMPONENTS thread system)
+endif(NOT WIN32)
 
 add_definitions(-D__STDC_CONSTANT_MACROS) # ffmpeg is c99 only and needs some c macros
 
@@ -53,7 +56,7 @@ ac_add_library(
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom
-    EXTERNS OPENEXR FFMPEG
+    EXTERNS OPENEXR FFMPEG Boost
     TESTS   ${TESTS}
     VERSION ${VERSION_STRING}
     SOVERSION ${VERSION_MAJOR}
