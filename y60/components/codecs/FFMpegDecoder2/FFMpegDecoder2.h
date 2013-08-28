@@ -124,7 +124,7 @@ namespace y60 {
         void run();
 
         void startOverAgain();
-        void openStreams();
+        void openStreams(const std::string & theFilename);
         void setupVideo(const std::string & theFilename);
         void setupAudio(const std::string & theFilename);
         void getVideoProperties(const std::string & theFilename);
@@ -173,8 +173,6 @@ namespace y60 {
         // Used in main thread
         VideoMsgPtr _myLastVideoFrame;
 
-        // Used in both threads
-        asl::ThreadLock _myAVCodecLock;
         AVFormatContext * _myFormatContext;
         int _myVStreamIndex;
         AVStream * _myVStream;

@@ -71,7 +71,7 @@ class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
         void close();
 
          // avcodec open/close must be protected by locks
-        asl::ThreadLock _myAVCodecLock;
+        //asl::ThreadLock _myAVCodecLock;
 
         std::string _myURI;
         AVFormatContext * _myFormatContext;
