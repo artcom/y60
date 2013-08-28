@@ -42,7 +42,6 @@
 
 #include <asl/base/PlugInBase.h>
 #include <asl/base/PosixThread.h>
-#include <asl/base/ThreadLock.h>
 #include <asl/base/ThreadSemaphore.h>
 #include <asl/base/Stream.h>
 #include <asl/base/Ptr.h>

@@ -28,35 +28,22 @@
 // along with ART+COM Y60.  If not, see <http://www.gnu.org/licenses/>.
 // __ ___ ____ _____ ______ _______ ________ _______ ______ _____ ____ ___ __
 */
-//
-//   $RCSfile: FFMpegOpenCloseThreadlock.h,v $
-//   $Author: pavel $
-//   $Revision: 1.2 $
-//   $Date: 2005/04/24 00:41:17 $
-//
-//
-//=============================================================================
 
-#ifndef _y60_ffmpeg_threadlock_included_
-#define _y60_ffmpeg_threadlock_included_
+#ifndef _y60_ffmpeg_lockmanager_included_
+#define _y60_ffmpeg_lockmanager_included_
 
 #include "y60_base_settings.h"
 
 #include <asl/base/Singleton.h>
-#include <asl/base/ThreadLock.h>
 
 namespace y60 {
 
-
-class Y60_BASE_DECL FFMpegOpenCloseThreadlock : public asl::Singleton<FFMpegOpenCloseThreadlock> {
-        friend class asl::SingletonManager;	
+class Y60_BASE_DECL FFMpegLockManager : public asl::Singleton<FFMpegLockManager> {
+        friend class asl::SingletonManager;
     public:
-        virtual ~FFMpegOpenCloseThreadlock();
-        asl::ThreadLock & getLock();
+        virtual ~FFMpegLockManager();
     private:
-    	FFMpegOpenCloseThreadlock();
-         // avcodec open/close must be protected by locks
-        asl::ThreadLock _myAVCodecLock;
+        FFMpegLockManager();
 };
 
 

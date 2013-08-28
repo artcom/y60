@@ -32,6 +32,7 @@
 #include "FFMpegDecoder3.h"
 #include "AsyncDemuxer.h"
 
+#include <y60/base/FFMpegLockManager.h>
 #include <y60/video/Movie.h>
 #include <y60/sound/SoundManager.h>
 #include <asl/base/Ptr.h>
@@ -164,6 +165,7 @@ namespace y60 {
 #endif
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
+            FFMpegLockManager::get();
             avRegistered = true;
         }
 

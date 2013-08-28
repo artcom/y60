@@ -12,7 +12,7 @@ RankedFeature.cpp
 TypeTraits.cpp
 Y60xsd.cpp
 iostream_functions.cpp
-FFMpegOpenCloseThreadlock.cpp
+FFMpegLockManager.cpp
 )
 
 set(HEADERS
@@ -37,7 +37,7 @@ property_functions.h
 typedefs.h
 y60_pixel_types.h
 y60_base_settings.h
-FFMpegOpenCloseThreadlock.h
+FFMpegLockManager.h
 )
 
 set(TESTS
@@ -45,12 +45,15 @@ DataTypes
 XmlDomY60Types
 )
 
+
+add_definitions(-D__STDC_CONSTANT_MACROS) # ffmpeg is c99 only and needs some c macros
+
 ac_add_library(
     y60base y60/base
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
     DEPENDS aslbase aslmath asldom
-    EXTERNS OPENEXR
+    EXTERNS OPENEXR FFMPEG
     TESTS   ${TESTS}
     VERSION ${VERSION_STRING}
     SOVERSION ${VERSION_MAJOR}

@@ -23,7 +23,7 @@ y60_add_component(
     FFMpegDecoder3
     SOURCES ${SOURCES}
     HEADERS ${HEADERS}
-    DEPENDS asldom aslaudio y60video
+    DEPENDS asldom aslaudio y60base y60video
     EXTERNS ${EXTERNALS}
 )
 

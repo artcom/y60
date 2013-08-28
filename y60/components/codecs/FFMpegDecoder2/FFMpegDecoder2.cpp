@@ -34,7 +34,7 @@
 
 #include <y60/video/Movie.h>
 #include <y60/sound/SoundManager.h>
-#include <y60/base/FFMpegOpenCloseThreadlock.h>
+#include <y60/base/FFMpegLockManager.h>
 
 #include <asl/base/Ptr.h>
 #include <asl/base/Auto.h>
@@ -75,7 +75,6 @@ EXPORT asl::PlugInBase * FFMpegDecoder2_instantiatePlugIn(asl::DLHandle myDLHand
 }
 
 namespace y60 {
-
 
     const double FFMpegDecoder2::AUDIO_BUFFER_SIZE = 0.5;
 
@@ -158,9 +157,11 @@ namespace y60 {
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(53,8,0)
             AC_INFO << "multithreaded decoding is not available - update your ffmpeg libs to libavcodec >= " << AV_STRINGIFY(AV_VERSION(53,8,0));
 #endif
+
             av_log_set_level(AV_LOG_ERROR);
             av_register_all();
             avRegistered = true;
+            FFMpegLockManager::get();
         }
 
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(53, 2, 0)
@@ -344,7 +345,6 @@ namespace y60 {
         // stop thread
         stopMovie();
 
-        AutoLocker<ThreadLock> myLocker(FFMpegOpenCloseThreadlock::get().getLock());
         // codecs
         if (_myVStream) {
             {
@@ -872,8 +872,7 @@ namespace y60 {
 
     void
     FFMpegDecoder2::openStreams(const std::string & theFilename) {
-        AutoLocker<ThreadLock> myLocker(FFMpegOpenCloseThreadlock::get().getLock());
-
+        
         unsigned myAudioStreamIndex = 0;
         _myAllAudioStreamIndicies.clear();
         for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
@@ -915,8 +914,6 @@ namespace y60 {
             if (!av_dict_get(opts, "threads", NULL, 0)) {
                 av_dict_set(&opts, "threads", thread_count.c_str(), 0);
             }
-            {
-
             if (avcodec_open2(myCodecContext, myCodec, &opts) < 0 ) {
 #else
             if (avcodec_open(myCodecContext, myCodec) < 0 ) {
@@ -926,8 +923,7 @@ namespace y60 {
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
             av_dict_free(&opts);
 #endif
-            }
-            }
+        }
     }
 
     void FFMpegDecoder2::setupVideo(const std::string & theFilename) {

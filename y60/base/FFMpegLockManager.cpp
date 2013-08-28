@@ -30,16 +30,57 @@
 */
 
 //own header
-#include "FFMpegOpenCloseThreadlock.h"
+#include "FFMpegLockManager.h"
+
+extern "C" {
+#    include <libavformat/avformat.h>
+}
 
 #include <asl/base/Logger.h>
+#include <boost/thread.hpp>
+
 
 namespace y60 {
 
-asl::ThreadLock & FFMpegOpenCloseThreadlock::getLock(){
-	return _myAVCodecLock;
-}
-FFMpegOpenCloseThreadlock::FFMpegOpenCloseThreadlock() {};
-FFMpegOpenCloseThreadlock::~FFMpegOpenCloseThreadlock() {};
+    int
+    lockmanager_callback(void **mutex, enum AVLockOp op) {
+        if (NULL == mutex) return -1;
+        switch(op) {
+            case AV_LOCK_CREATE:
+                {
+                *mutex = NULL;
+                boost::mutex * m = new boost::mutex();
+                *mutex = static_cast<void*>(m);
+                break;
+                }
+            case AV_LOCK_OBTAIN:
+                {
+                boost::mutex * m =  static_cast<boost::mutex*>(*mutex);
+                m->lock();
+                break;
+                }
+            case AV_LOCK_RELEASE:
+                {
+                boost::mutex * m = static_cast<boost::mutex*>(*mutex);
+                m->unlock();
+                break;
+                }
+            case AV_LOCK_DESTROY:
+                {
+                boost::mutex * m = static_cast<boost::mutex*>(*mutex);
+                delete m;
+                break;
+                }
+            default:
+                break;
+            }
+        return 0;
+    }
 
+    FFMpegLockManager::FFMpegLockManager() {
+        av_lockmgr_register(&lockmanager_callback);
+    }
+    FFMpegLockManager::~FFMpegLockManager() {
+        av_lockmgr_register(NULL);
+    }
 }

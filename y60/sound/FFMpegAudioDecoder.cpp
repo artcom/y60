@@ -52,7 +52,7 @@ extern "C" {
 #include <asl/base/Auto.h>
 #include <asl/audio/Pump.h>
 
-#include <y60/base/FFMpegOpenCloseThreadlock.h>
+#include <y60/base/FFMpegLockManager.h>
 
 using namespace std;
 using namespace asl;
@@ -176,17 +176,13 @@ void FFMpegAudioDecoder::open() {
                     PLUS_FILE_LINE);
         }
 
-        {
-//            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
-            AutoLocker<ThreadLock> myLocker(FFMpegOpenCloseThreadlock::get().getLock());
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,6,0)
-            if (avcodec_open2(myCodecContext, myCodec, NULL) < 0 ) {
+        if (avcodec_open2(myCodecContext, myCodec, NULL) < 0 ) {
 #else
-            if (avcodec_open(myCodecContext, myCodec) < 0 ) {
+        if (avcodec_open(myCodecContext, myCodec) < 0 ) {
 #endif
-                throw DecoderException(std::string("Unable to open codec: ") + _myURI,
-                        PLUS_FILE_LINE);
-            }
+            throw DecoderException(std::string("Unable to open codec: ") + _myURI,
+                    PLUS_FILE_LINE);
         }
 
         _mySampleRate = myCodecContext->sample_rate;
@@ -228,8 +224,6 @@ void FFMpegAudioDecoder::close() {
             myCodecContext = _myFormatContext->streams[_myStreamIndex]->codec;
         }
         if (_mySampleRate && _myNumChannels) {
-//            AutoLocker<ThreadLock> myLocker(_myAVCodecLock);
-            AutoLocker<ThreadLock> myLocker(FFMpegOpenCloseThreadlock::get().getLock());
             
             avcodec_close(myCodecContext);
         }
@@ -340,7 +334,7 @@ FFMpegAudioDecoderFactory::FFMpegAudioDecoderFactory() {
     AC_INFO << "Soundmanager: using " << LIBAVCODEC_IDENT << endl;
     av_log_set_level(AV_LOG_ERROR);
     av_register_all();
-
+    FFMpegLockManager::get();
 }
 
 IAudioDecoder* FFMpegAudioDecoderFactory::tryCreateDecoder(const std::string& myURI)
