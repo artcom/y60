@@ -334,7 +334,7 @@ macro(y60_add_jstest NAME PREFIX)
     get_target_property(Y60_EXECUTABLE y60 LOCATION_${Y60_TEST_BUILD_TYPE})
     
     # path with test-specifics
-    set(_PATH ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+    set(_PATH ${Y60_JSTEST_INCLUDE_PATH} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/lib ${CMAKE_CURRENT_SOURCE_DIR})
 
     # register the test
     add_test(${PREFIX}_${NAME}
