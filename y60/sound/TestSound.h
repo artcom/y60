@@ -668,7 +668,6 @@ class SoundTestSuite : public UnitTestSuite {
                 myNoisy = false;
                 mySoundManager.setVolume(0);
             }
-            AC_PRINT<<"SoundManager setVolume";
 #if 1
             addTest(new TestPlay(mySoundManager));
             addTest(new TestStop(mySoundManager));
