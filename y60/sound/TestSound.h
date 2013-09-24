@@ -655,9 +655,11 @@ class SoundTestSuite : public UnitTestSuite {
 
         void setup() {
             UnitTestSuite::setup();
+            AC_PRINT<<"Pump setUseRealPump";
             Pump::setUseRealPump(!_myUseDummyPump);
+            AC_PRINT<<"create SoundManager singleton";
             SoundManager& mySoundManager = Singleton<SoundManager>::get();
-
+            AC_PRINT<<"SoundManager singleton created";
             bool myNoisy;
             string myVal;
             if (_myUseDummyPump || get_environment_var("Y60_NOISY_SOUND_TESTS", myVal)) {
@@ -667,6 +669,7 @@ class SoundTestSuite : public UnitTestSuite {
                 myNoisy = false;
                 mySoundManager.setVolume(0);
             }
+            AC_PRINT<<"SoundManager setVolume";
 #if 1
             addTest(new TestPlay(mySoundManager));
             addTest(new TestStop(mySoundManager));
