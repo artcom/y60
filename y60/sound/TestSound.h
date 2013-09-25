@@ -658,7 +658,6 @@ class SoundTestSuite : public UnitTestSuite {
             Pump::setUseRealPump(!_myUseDummyPump);
             AC_PRINT << "create soundmanager singleton";
             SoundManager& mySoundManager = Singleton<SoundManager>::get();
-
             bool myNoisy;
             string myVal;
             if (_myUseDummyPump || get_environment_var("Y60_NOISY_SOUND_TESTS", myVal)) {
