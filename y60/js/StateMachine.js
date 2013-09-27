@@ -217,7 +217,7 @@ var SM = (function () {
                     Logger.debug(arguments[0] + " terminated transition, skipping to " + nextState);
                     self.transition.switchState(nextState); // forces pending state-change immediately
                 } else {
-                    Logger.debug("dropped " + arguments[0] + " during transition");
+                    Logger.trace("dropped " + arguments[0] + " during transition");
                 }
             } else {
                 if ('terminateTransition' in self.stateObject) {
@@ -228,11 +228,11 @@ var SM = (function () {
 
         self.handleEvent = function () {
             if (self.transition !== null && !self.transition.handleEvent.apply(self.transition, arguments)) {
-                Logger.debug("<StateMachine::handleEvent> dropped " + arguments[0] + " during handleEvent: transition still active: " + _currentState);
+                Logger.trace("<StateMachine::handleEvent> dropped " + arguments[0] + " during handleEvent: transition still active: " + _currentState);
                 return;
             }
             if (!_currentState) {
-                Logger.debug("dropped " + arguments[0] + " during handleEvent: because current state is null");
+                Logger.trace("dropped " + arguments[0] + " during handleEvent: because current state is null");
                 return;
             }
             Logger.trace("<StateMachine::handleEvent> got event " + arguments[0]);
