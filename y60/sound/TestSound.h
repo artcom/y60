@@ -656,6 +656,7 @@ class SoundTestSuite : public UnitTestSuite {
         void setup() {
             UnitTestSuite::setup();
             Pump::setUseRealPump(!_myUseDummyPump);
+            AC_PRINT << "create soundmanager singleton";
             SoundManager& mySoundManager = Singleton<SoundManager>::get();
             bool myNoisy;
             string myVal;
