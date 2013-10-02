@@ -506,6 +506,7 @@ SceneViewer.prototype.Constructor = function (self, theArguments) {
                 break;
             case "PRINT SCREEN":
             case "SYS REQ":
+            case ".":
                 if (!_myVideoRecorder) {
                     _myVideoRecorder = new VideoRecorder(30);
                 }
