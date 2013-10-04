@@ -32,17 +32,17 @@
 /*globals Logger*/
 
 var SM = (function () {
-    
+
     ////////////
     // Public //
     ////////////
     var State = function (theStateID) {
         this.Constructor(this, theStateID);
     };
-    
+
     State.prototype.Constructor = function (self, theStateID) {
         var _id = theStateID;
-        self.__defineGetter__('id', function () { 
+        self.__defineGetter__('id', function () {
             return _id;
         });
         self.toString = function toString() {
@@ -61,7 +61,7 @@ var SM = (function () {
 
     Sub.prototype.Constructor = function (self, theStateID, theSubMachine) {
         State.prototype.Constructor(self, theStateID);
-        
+
         var _subMachine = theSubMachine;
         self._enter = function (thePreviousState, theData) {
             _subMachine.setup(theData);
@@ -76,27 +76,27 @@ var SM = (function () {
             _subMachine.handleEvent.apply(_subMachine, arguments);
         };
         self.toString = function toString() {
-            return self.id + "/(" + _subMachine + ")"; 
+            return self.id + "/(" + _subMachine + ")";
         };
         self.__defineGetter__("subMachine", function () {
             return _subMachine;
-        }); 
+        });
         self.__defineGetter__("states", function () {
             return _subMachine.states;
         });
     };
-    
+
     var Parallel = function (theStateID) {
         var myStateMachines = Array.prototype.slice.call(arguments);
         myStateMachines.shift();
         this.Constructor(this, theStateID, myStateMachines);
     };
-    
+
     Parallel.prototype.Constructor = function (self, theStateID, theStatemachines) {
         State.prototype.Constructor(self, theStateID);
-        
+
         var _subMachines = theStatemachines || [];
-        
+
         self.toString = function toString() {
             return self.id + "/(" + _subMachines.join('|') + ")";
         };
@@ -126,7 +126,7 @@ var SM = (function () {
     var Transition = function (theNextState) {
         this.Constructor(this, theNextState);
     };
-    
+
     Transition.prototype.Constructor = function (self, theNextState) {
         self.nextState = theNextState;
         self.travel = function () {
@@ -139,7 +139,7 @@ var SM = (function () {
             return false; // ignore all events during transition.
         };
     };
-    
+
     var StateMachine = function () {
         this.Constructor(this, arguments);
     };
@@ -151,7 +151,7 @@ var SM = (function () {
         if (typeof(theArguments[0]) === 'object' && theArguments[0] instanceof Array) {
             _myPreparedArguments = theArguments[0];
         }
-        
+
         self.initialState = !!_myPreparedArguments.length ? _myPreparedArguments[0].id : null; // NOTE: initialState needs to be set before setup()
         self.transition   = null;
         var _currentState = null;
@@ -175,10 +175,10 @@ var SM = (function () {
         });
 
         self.switchState = function (newState, theData) {
-            if (self.transition !== null) { 
+            if (self.transition !== null) {
                 self.transition.switchState = function () {
                     Logger.debug("<StateMachine::switchState> events from the past caught up with you");
-                }; 
+                };
                 self.transition = null;
             }
             Logger.debug("State transition '" + _currentState + "' => '" + newState + "'");
@@ -187,7 +187,7 @@ var SM = (function () {
                 Logger.debug("<StateMachine::switchState> exiting state '" + _currentState + "'");
                 self.stateObject._exit(newState, theData);
             }
-            var oldState  = _currentState; 
+            var oldState  = _currentState;
             _currentState = newState;
             // call new state's enter handler
             if (_currentState !== null && '_enter' in self.stateObject) {
