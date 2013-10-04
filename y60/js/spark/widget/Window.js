@@ -1,7 +1,7 @@
 /*jslint nomen: false, bitwise:false*/
 /*global spark, use, SceneViewer, window, RenderWindow,
          Logger, Vector2i, Vector2f, Vector3f, Point2f, clone,
-         ASS_BASE_EVENT, LEFT_BUTTON, magnitude, distance*/
+         LEFT_BUTTON, magnitude, distance*/
 
 /**
  * Simple wrapper for the Y60 scene viewer.
@@ -22,7 +22,6 @@ spark.Window.Constructor = function (Protected, theArguments) {
     // Private Members //
     /////////////////////
 
-    var MOVE_DISTANCE_THRESHOLD = 0;//0.1;
     var PICK_RADIUS = 1;
 
     var _myCamera            = null;
@@ -82,7 +81,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
         case "onTuioEvent":
             return "tuio" + theId;
         case "onGesture":
-            if (theEvent.baseeventtype == ASS_BASE_EVENT) {
+            if (theEvent.baseeventtype == spark.ASS_BASE_EVENT) {
                 return "pmtx" + theId;
             } else {
                 return "tuio" + theId;
@@ -107,7 +106,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                                      theEvent.position.y * ((theEvent.toucharea.y > 0) ? theEvent.toucharea.y : Public.height));
             break;
         case "onGesture":
-            if (theEvent.baseeventtype == ASS_BASE_EVENT) {
+            if (theEvent.baseeventtype == spark.ASS_BASE_EVENT) {
                 myPosition = new Point2f(theEvent.position3D.x, theEvent.position3D.y);
             } else {
                 myPosition = new Point2f(theEvent.position3D.x * ((theEvent.toucharea.x > 0) ? theEvent.toucharea.x : Public.width),
@@ -154,7 +153,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
             if (theEvent.type == "add") {
                 Logger.debug("Cursor " + myId + " appears in " + myPick);
                 var myAppear = null;
-                if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                if (theEvent.tuiotype == spark.TUIO_OBJECT_CLASS) {
                     myAppear = new spark.ObjectEvent(spark.ObjectEvent.APPEAR, myCursor, theEvent);
                 } else {
                     myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor, theEvent);
@@ -168,7 +167,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
 
                 if (myFocused) {
                     var myLeave = null;
-                    if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                    if (theEvent.tuiotype == spark.TUIO_OBJECT_CLASS) {
                         myLeave = new spark.ObjectEvent(spark.ObjectEvent.LEAVE, myCursor, theEvent);
                     } else {
                         myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor, theEvent);
@@ -176,7 +175,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                     myFocused.dispatchEvent(myLeave);
                 }
                 var myEnter = null;
-                if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                if (theEvent.tuiotype == spark.TUIO_OBJECT_CLASS) {
                     myEnter = new spark.ObjectEvent(spark.ObjectEvent.ENTER, myCursor, theEvent);
                 } else {
                     myEnter = new spark.CursorEvent(spark.CursorEvent.ENTER, myCursor, theEvent);
@@ -187,10 +186,10 @@ spark.Window.Constructor = function (Protected, theArguments) {
             if (myCursor.active && (theEvent.type == "move" || theEvent.type == "update")) {
 
                 var myMoveDistance = distance(myPosition, myCursor.lastStagePosition);
-                if (myMoveDistance >= MOVE_DISTANCE_THRESHOLD) {
-                    Logger.debug("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
+                if (myMoveDistance > spark.MOVE_DISTANCE_THRESHOLD) {
+                    Logger.trace("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
                     var myMove = null;
-                    if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                    if (theEvent.tuiotype == spark.TUIO_OBJECT_CLASS) {
                         myMove = new spark.ObjectEvent(spark.ObjectEvent.MOVE, myCursor, theEvent);
                     } else {
                         myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor, theEvent);
@@ -211,7 +210,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
 
                 if (myFocused) {
                     var myLeave = null;
-                    if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                    if (theEvent.tuiotype == spark.TUIO_OBJECT_CLASS) {
                         Logger.debug("Object " + myId + " leaves " + myFocused);
                         myLeave = new spark.ObjectEvent(spark.ObjectEvent.LEAVE, myCursor, theEvent);
                     } else {
@@ -221,7 +220,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                     myFocused.dispatchEvent(myLeave);
 
                     var myVanish = null;
-                    if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
+                    if (theEvent.tuiotype == spark.TUIO_OBJECT_CLASS) {
                         Logger.debug("Object " + myId + " vanishes in " + myFocused);
                         myVanish = new spark.ObjectEvent(spark.ObjectEvent.VANISH, myCursor, theEvent);
                     } else {
@@ -664,7 +663,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
         var myWidget = getWidgetForMultitouchCursor(myCursor, myPosition);
 
         var myScale = new Vector3f(1, 1, 1);
-        if (theGesture.baseeventtype == TUIO_BASE_EVENT) {
+        if (theGesture.baseeventtype == spark.TUIO_BASE_EVENT) {
             myScale = new Vector3f((theGesture.toucharea.x > 0) ? theGesture.toucharea.x : Public.width,
                                    (theGesture.toucharea.y > 0) ? theGesture.toucharea.y : Public.height, 1);
         }

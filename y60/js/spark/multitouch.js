@@ -64,8 +64,10 @@ spark.enableTuio = function (theStage) {
     }
 };
 
-var TUIO_OBJECT_CLASS = "object";
-var TUIO_CURSOR_CLASS = "cursor";
+spark.TUIO_OBJECT_CLASS = "object";
+spark.TUIO_CURSOR_CLASS = "cursor";
+
+spark.MOVE_DISTANCE_THRESHOLD = 0;
 
 /**
  * Multitouch cursors
@@ -419,8 +421,8 @@ spark.ObjectEvent.Constructor = function (Protected, theType, theObject, theEven
  * multitouch gesture events
  */
 
-var ASS_BASE_EVENT  = 0;
-var TUIO_BASE_EVENT = 1;
+spark.ASS_BASE_EVENT  = 0;
+spark.TUIO_BASE_EVENT = 1;
 
 spark.GestureEvent = spark.Class("GestureEvent");
 spark.GestureEvent.Constructor = function (Protected, theType, theBaseEvent, theCursor) {
