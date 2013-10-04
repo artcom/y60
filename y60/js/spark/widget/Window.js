@@ -17,24 +17,24 @@ spark.Window.Constructor = function (Protected, theArguments) {
     Public.Inherit(spark.Stage);
     // Also inherit from SceneViewer
     SceneViewer.prototype.Constructor(this, theArguments);
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
 
     var MOVE_DISTANCE_THRESHOLD = 0;//0.1;
     var PICK_RADIUS = 1;
-    
+
     var _myCamera            = null;
     var _myWorld             = null;
     var _myPickRadius        = PICK_RADIUS;
     var _myMultitouchCursors = {};
-    
+
     // XXX: a somewhat hackish callback to get a hand on the scene
     //      after the model has been loaded but before any spark components
     //      are added.
     var _mySceneLoadedCallback;
-    
+
     var _myMousePosition     = new Vector2f();
     var _myMouseButtonStates = {};
     var _myMouseFocused      = null;
@@ -43,11 +43,11 @@ spark.Window.Constructor = function (Protected, theArguments) {
     var _myJoystickFocused   = null;
 
     var _myLayouter          = null;
-    
+
     /////////////////////
     // Private Methods //
     /////////////////////
-    
+
     function getWidgetForMultitouchCursor(theCursor, thePosition) {
         var myWidget;
         if (theCursor.grabbed) {
@@ -60,7 +60,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
         }
         return myWidget;
     }
-    
+
     function getMultitouchCursor(theId) {
         var myCursor;
         if (theId in _myMultitouchCursors) {
@@ -72,7 +72,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
         }
         return myCursor;
     }
-    
+
     function getSparkConformedCursorId(theEvent, theId) {
         switch (theEvent.callback) {
         case "onProximatrix2Event":
@@ -92,7 +92,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
             return null;
         }
     }
-    
+
     function getMultitouchCursorPosition(theEvent) {
         var myPosition;
         switch (theEvent.callback) {
@@ -133,7 +133,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
             break;
         case "add":
         case "move": // proximatrix
-        case "update": // tuio        
+        case "update": // tuio
             var myCursor = getMultitouchCursor(myId);
             var myFocused;
             if (theEvent.type == "add") {
@@ -141,16 +141,16 @@ spark.Window.Constructor = function (Protected, theArguments) {
             } else {
                 myFocused = myCursor.focused;
             }
-            
+
             var myPosition = getMultitouchCursorPosition(theEvent);
-        
+
             if (theEvent.callback == "onProximatrix2Event") {
                 myPosition.y = Public.height - myPosition.y;
             }
 
             var myPick = getWidgetForMultitouchCursor(myCursor, myPosition);
             myCursor.update(myPick, myPosition);
-            
+
             if (theEvent.type == "add") {
                 Logger.debug("Cursor " + myId + " appears in " + myPick);
                 var myAppear = null;
@@ -159,7 +159,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                 } else {
                     myAppear = new spark.CursorEvent(spark.CursorEvent.APPEAR, myCursor, theEvent);
                 }
-                
+
                 myPick.dispatchEvent(myAppear);
             }
             if (myCursor.active && (myPick != myFocused)) {
@@ -185,7 +185,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
             }
 
             if (myCursor.active && (theEvent.type == "move" || theEvent.type == "update")) {
-                
+
                 var myMoveDistance = distance(myPosition, myCursor.lastStagePosition);
                 if (myMoveDistance >= MOVE_DISTANCE_THRESHOLD) {
                     Logger.debug("Cursor " + myId + " moves to " + myPosition + " over " + myPick);
@@ -195,7 +195,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                     } else {
                         myMove = new spark.CursorEvent(spark.CursorEvent.MOVE, myCursor, theEvent);
                     }
-                    
+
                     myPick.dispatchEvent(myMove);
                 }
             }
@@ -212,14 +212,14 @@ spark.Window.Constructor = function (Protected, theArguments) {
                 if (myFocused) {
                     var myLeave = null;
                     if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
-                        Logger.debug("Object " + myId + " leaves " + myFocused);                    
+                        Logger.debug("Object " + myId + " leaves " + myFocused);
                         myLeave = new spark.ObjectEvent(spark.ObjectEvent.LEAVE, myCursor, theEvent);
                     } else {
-                        Logger.debug("Cursor " + myId + " leaves " + myFocused);                    
+                        Logger.debug("Cursor " + myId + " leaves " + myFocused);
                         myLeave = new spark.CursorEvent(spark.CursorEvent.LEAVE, myCursor, theEvent);
                     }
                     myFocused.dispatchEvent(myLeave);
-                    
+
                     var myVanish = null;
                     if (theEvent.tuiotype == TUIO_OBJECT_CLASS) {
                         Logger.debug("Object " + myId + " vanishes in " + myFocused);
@@ -236,7 +236,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
             break;
         }
     }
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
@@ -244,7 +244,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
     Public.__defineGetter__("title", function ()  {
         return window.title;
     });
-    
+
     Public.__defineSetter__("title", function (theTitle) {
         window.title = theTitle;
     });
@@ -273,7 +273,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                      Protected.getNumber("height", 480),
                      Protected.getBoolean("fullscreen", false),
                      Protected.getString("title", "SPARK Application"));
-        
+
         if (mySceneFile.length > 0 && _mySceneLoadedCallback) {
             _mySceneLoadedCallback(window.scene.dom);
         }
@@ -351,7 +351,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
         }
         return null;
     };
-    
+
     Public.__defineGetter__("mousePosition", function () {
         return _myMousePosition;
     });
@@ -380,7 +380,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
     Public.focusKeyboard = function (theWidget) {
         _myKeyboardFocused = theWidget;
     };
-    
+
     Public.__defineGetter__("joystickFocused", function () {
         return _myJoystickFocused;
     });
@@ -396,7 +396,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
     Public.__defineSetter__("onSceneLoaded", function (f) {
         _mySceneLoadedCallback = f;
     });
-    
+
     Public.__defineGetter__("pickRadius", function () {
         return _myPickRadius;
     });
@@ -488,7 +488,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
                 myWidget.dispatchEvent(myMouseCursorMoveEvent);
             }
         }
-        
+
         if (myWidget != _myMouseFocused) {
             Logger.debug("Mouse focuses " + myWidget +
                          (_myMouseFocused ? ", leaving " + _myMouseFocused : ""));
@@ -516,8 +516,8 @@ spark.Window.Constructor = function (Protected, theArguments) {
         Logger.debug("Mouse moves to [" + theX + "," + theY + "] over " + myWidget);
         var myMoveEvent = new spark.MouseEvent(spark.MouseEvent.MOVE, theX, theY);
         myWidget.dispatchEvent(myMoveEvent);
-        
-        
+
+
         _myMouseFocused = myWidget;
     };
 
@@ -537,7 +537,7 @@ spark.Window.Constructor = function (Protected, theArguments) {
         if (!myWidget) {
             myWidget = Public;
         }
-        
+
         var myMouseCursorEvent;
         if (theButton === LEFT_BUTTON) {
             if (theState) {
@@ -648,21 +648,21 @@ spark.Window.Constructor = function (Protected, theArguments) {
                                          new Vector2f(theGridSizeX, theGridSizeY), theCount);
         Public.dispatchEvent(myEvent);
     };
-    
+
     Public.onProximatrix2Event = handleMultitouchEvent;
     Public.onASSEvent = handleMultitouchEvent;
     Public.onTuioEvent = handleMultitouchEvent;
-    
+
     // Will be called on a gesture event
     Public.onGesture = function (theGesture) {
-        
+
         var mySparkConformedCursorId = getSparkConformedCursorId(theGesture, theGesture.cursorid);
         var myPosition = getMultitouchCursorPosition(theGesture);
-        
+
         // picking with considering cursor grabbing
         var myCursor = getMultitouchCursor(mySparkConformedCursorId);
         var myWidget = getWidgetForMultitouchCursor(myCursor, myPosition);
-        
+
         var myScale = new Vector3f(1, 1, 1);
         if (theGesture.baseeventtype == TUIO_BASE_EVENT) {
             myScale = new Vector3f((theGesture.toucharea.x > 0) ? theGesture.toucharea.x : Public.width,
@@ -679,9 +679,9 @@ spark.Window.Constructor = function (Protected, theArguments) {
             var mySparkConformedCursorPartnerId = getSparkConformedCursorId(theGesture, theGesture.cursorpartnerid);
             myCursorPartner = getMultitouchCursor(mySparkConformedCursorPartnerId);
         }
-        
+
         switch (theGesture.type) {
-        case "tap": 
+        case "tap":
             var myTapEvent = new spark.TapGestureEvent(spark.GestureEvent.TAP, theGesture.baseeventtype, myCursor, myPosition);
             myWidget.dispatchEvent(myTapEvent);
             break;
