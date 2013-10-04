@@ -34,11 +34,11 @@
 
 /**
  * Load the proximatrix driver
- * 
+ *
  * After doing so, the main window will receive
  * proximatrix events. A toplevel Window instance
  * will then dispatch these as cursor events.
- * 
+ *
  * This must be given a reference to the stage
  * due to the baroque API of ASSManager.
  */
@@ -49,7 +49,7 @@ spark.enableProximatrix = function (theStage) {
 
 /**
  * Load the TUIO receiver
- * 
+ *
  * After doing so, the main window will receive
  * TUIO events. A toplevel Window instance will
  * then dispatch these as cursor events.
@@ -69,19 +69,19 @@ var TUIO_CURSOR_CLASS = "cursor";
 
 /**
  * Multitouch cursors
- * 
+ *
  * This class represents the retained state of
  * a single multitouch cursor.
  */
 spark.Cursor = spark.Class("Cursor");
 spark.Cursor.Constructor = function (Protected, theId) {
-    
+
     var Public = this;
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myId         = theId;
     var _myActive     = false;
     var _myGrabHolder = null;
@@ -95,7 +95,7 @@ spark.Cursor.Constructor = function (Protected, theId) {
 
     /**
      * ID of this cursor.
-     * 
+     *
      * Any creator of cursors shall ensure uniqueness
      * (within application runtime) of these.
      */
@@ -105,7 +105,7 @@ spark.Cursor.Constructor = function (Protected, theId) {
 
     /**
      * Whether this cursor still exists.
-     * 
+     *
      * This will be true for as long as the sensoric
      * keeps track of this cursor. Can be used to
      * identify "dead" cursors when dealing with
@@ -114,7 +114,7 @@ spark.Cursor.Constructor = function (Protected, theId) {
     Public.__defineGetter__("active", function () {
         return _myActive;
     });
-    
+
     /**
      * Current grab holder of this cursor.
      */
@@ -131,7 +131,7 @@ spark.Cursor.Constructor = function (Protected, theId) {
 
     /**
      * Returns widget currently being hovered.
-     * 
+     *
      * This is always updated, even when under grab.
      */
     Public.__defineGetter__("hovered", function () {
@@ -140,7 +140,7 @@ spark.Cursor.Constructor = function (Protected, theId) {
 
     /**
      * Returns widget currently being focused.
-     * 
+     *
      * Depending on grab state, this is either
      * the grab holder or the currently hovered widget.
      */
@@ -151,7 +151,7 @@ spark.Cursor.Constructor = function (Protected, theId) {
             return _myHovered;
         }
     });
-    
+
     /**
      * Last stage position as cloned Point2f.
      */
@@ -221,7 +221,7 @@ spark.Cursor.Constructor = function (Protected, theId) {
 
 /**
  * Cursor events
- * 
+ *
  * Each of these represents a change in state
  * on the given cursor.
  */
@@ -229,14 +229,14 @@ spark.CursorEvent = spark.Class("CursorEvent");
 
 /**
  * Appear event: "new cursor created here"
- * 
+ *
  * Symmetric to VANISH.
  */
 spark.CursorEvent.APPEAR = "cursor-appear";
 
 /**
  * Vanish event: "cursor ceases to exist"
- * 
+ *
  * Symmetric to APPEAR.
  */
 spark.CursorEvent.VANISH = "cursor-vanish";
@@ -248,14 +248,14 @@ spark.CursorEvent.MOVE   = "cursor-move";
 
 /**
  * Enter event: "cursor entered widget"
- * 
+ *
  * Symmetric to LEAVE.
  */
 spark.CursorEvent.ENTER  = "cursor-enter";
 
 /**
  * Leave event: "cursor left widget"
- * 
+ *
  * Symmetric to ENTER.
  */
 spark.CursorEvent.LEAVE  = "cursor-leave";
@@ -270,9 +270,9 @@ spark.CursorEvent.APPEAR_ENTER = "cursor-appear-enter";
 spark.CursorEvent.VANISH_LEAVE = "cursor-vanish-leave";
 
 spark.CursorEvent.eventMapping = {};
-spark.CursorEvent.eventMapping[spark.CursorEvent.APPEAR_ENTER] = 
+spark.CursorEvent.eventMapping[spark.CursorEvent.APPEAR_ENTER] =
     [spark.CursorEvent.APPEAR, spark.CursorEvent.ENTER];
-spark.CursorEvent.eventMapping[spark.CursorEvent.VANISH_LEAVE] = 
+spark.CursorEvent.eventMapping[spark.CursorEvent.VANISH_LEAVE] =
     [spark.CursorEvent.VANISH, spark.CursorEvent.LEAVE];
 
 spark.CursorEvent.getMappedEvents = function (theEventType) {
@@ -295,9 +295,9 @@ spark.CursorEvent.Constructor = function (Protected, theType, theCursor, theEven
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     /**
-     * Reference to the original event node. 
+     * Reference to the original event node.
      */
     Public.__defineGetter__("eventNode", function () {
         return _myEventNode;
@@ -337,14 +337,14 @@ spark.ObjectEvent = spark.Class("ObjectEvent");
 
 /**
  * Appear event: "new object created here"
- * 
+ *
  * Symmetric to VANISH.
  */
 spark.ObjectEvent.APPEAR = "object-appear";
 
 /**
  * Vanish event: "object ceases to exist"
- * 
+ *
  * Symmetric to APPEAR.
  */
 spark.ObjectEvent.VANISH = "object-vanish";
@@ -356,14 +356,14 @@ spark.ObjectEvent.MOVE   = "object-move";
 
 /**
  * Enter event: "object entered widget"
- * 
+ *
  * Symmetric to LEAVE.
  */
 spark.ObjectEvent.ENTER  = "object-enter";
 
 /**
  * Leave event: "object left widget"
- * 
+ *
  * Symmetric to ENTER.
  */
 spark.ObjectEvent.LEAVE  = "object-leave";
@@ -371,38 +371,38 @@ spark.ObjectEvent.LEAVE  = "object-leave";
 spark.ObjectEvent.Constructor = function (Protected, theType, theObject, theEvent) {
     var Public = this;
     this.Inherit(spark.CursorEvent, theType, theObject);
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myEvent = theEvent;
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     /**
      * Rotation of the object
      */
     Public.__defineGetter__("rotation", function () {
         return _myEvent.rotation;
     });
-    
+
     /**
      * Rotation speed of the object
      */
     Public.__defineGetter__("rotationspeed", function () {
         return _myEvent.rotationspeed;
     });
-    
+
     /**
      * Rotation acceleration of the object
      */
     Public.__defineGetter__("rotationaccel", function () {
         return _myEvent.rotationaccel;
     });
-    
+
     /**
      * Symbolid of the object
      */
@@ -414,8 +414,8 @@ spark.ObjectEvent.Constructor = function (Protected, theType, theObject, theEven
 
 /**
  * Multitouch gestures
- * 
- * This class represents 
+ *
+ * This class represents
  * multitouch gesture events
  */
 
@@ -436,25 +436,25 @@ spark.WipeGestureEvent = spark.Class("WipeGestureEvent");
 spark.WipeGestureEvent.Constructor = function (Protected, theType, theBaseEvent, theCursor, theDirection, theVelocity) {
     var Public = this;
     this.Inherit(spark.GestureEvent, theType, theBaseEvent, theCursor);
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myDirection = theDirection;
     var _myVelocity = theVelocity;
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     /**
      * Direction vector of the wipe event
      */
     Public.__defineGetter__("direction", function () {
         return _myDirection;
     });
-    
+
     /**
      * Velocity of the movement
      */
@@ -473,17 +473,17 @@ spark.TapGestureEvent = spark.Class("TapGestureEvent");
 spark.TapGestureEvent.Constructor = function (Protected, theType, theBaseEvent, theCursor, thePosition) {
     var Public = this;
     this.Inherit(spark.GestureEvent, theType, theBaseEvent, theCursor);
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myPosition = thePosition;
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     /**
      * Position of the tap event
      */
@@ -502,26 +502,26 @@ spark.MultiCursorGestureEvent = spark.Class("MultiCursorGestureEvent");
 spark.MultiCursorGestureEvent.Constructor = function (Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance) {
     var Public = this;
     this.Inherit(spark.GestureEvent, theType, theBaseEvent, theMainCursor);
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myPartnerCursor = thePartnerCursor;
     var _myCenterPoint   = theCenterpoint;
     var _myDistance      = theDistance;
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     /**
      * get partner cursor
      */
     Public.__defineGetter__("partnerCursor", function () {
         return _myPartnerCursor;
     });
-    
+
     /**
      * centerpoint between the two cursors
      */
@@ -546,33 +546,33 @@ spark.ZoomGestureEvent = spark.Class("ZoomGestureEvent");
 spark.ZoomGestureEvent.Constructor = function (Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance, theLastDistance, theInitialDistance, theZoomFactor) {
     var Public = this;
     this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance);
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myLastDistance    = theLastDistance;
     var _myZoomFactor      = theZoomFactor;
     var _myInitialDistance = theInitialDistance;
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     /**
      * current distance between zoom partners
      */
     Public.__defineGetter__("lastDistance", function () {
         return _myLastDistance;
     });
-    
+
     /**
      * initial distance between zoom partners
      */
     Public.__defineGetter__("initialDistance", function () {
         return _myInitialDistance;
     });
-    
+
     /**
      * current zoom factor
      */
@@ -589,19 +589,19 @@ spark.RotateGestureEvent = spark.Class("RotateGestureEvent");
 spark.RotateGestureEvent.Constructor = function (Protected, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance, theAngle) {
     var Public = this;
     this.Inherit(spark.MultiCursorGestureEvent, theType, theBaseEvent, theMainCursor, thePartnerCursor, theCenterpoint, theDistance);
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myAngle = theAngle;
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     /**
-     * angle 
+     * angle
      */
     Public.__defineGetter__("angle", function () {
         return _myAngle;
