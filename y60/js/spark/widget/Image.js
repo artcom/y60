@@ -4,7 +4,7 @@
  * NOTE: does not adjust it's size when image is changed. However, the size
  *       can be changed by setting the width, height and size properties.
  */
- 
+
 /*jslint nomen: false*/
 /*globals spark, window, Modelling, Logger*/
 
@@ -30,11 +30,11 @@ spark.Image.Constructor = function (Protected) {
     var _myUseCaching = true;
     var _myASyncLoad  = false;
     var _myLoadCB     = null;
-    
+
     /////////////////////
     // Private Methods //
     /////////////////////
-    
+
     Protected.handleI18nLanguage = function(e) {
         Public.src = e.src;
     }
@@ -90,9 +90,9 @@ spark.Image.Constructor = function (Protected) {
         _mySource = theSourceFile;
         var myCachedImageFlag = false;
         if (_myUseCaching) {
-            var myCacheInfo = spark.getCachedImage(_mySource, _myASyncLoad); 
+            var myCacheInfo = spark.getCachedImage(_mySource, _myASyncLoad);
             Public.image = myCacheInfo.image
-            myCachedImageFlag = myCacheInfo.cached; 
+            myCachedImageFlag = myCacheInfo.cached;
         } else {
             if (_mySource === "") {
                 Public.image = Modelling.createImage(window.scene, Public.width, Public.height, "BGRA");
@@ -118,7 +118,7 @@ spark.Image.Constructor = function (Protected) {
         _mySourceId = theValue;
         attachToI18nItem(theValue);
     });
-    
+
     Public.__defineGetter__("i18nItem", function () {
         return Public.srcId;
     });
@@ -145,7 +145,7 @@ spark.Image.Constructor = function (Protected) {
     Public.__defineGetter__("useCaching", function () {
         return _myUseCaching;
     });
-    
+
     Public.__defineSetter__("useCaching", function (theFlag) {
         _myUseCaching = !!theFlag;
     });
@@ -202,7 +202,7 @@ spark.Image.Constructor = function (Protected) {
         registerImageOnLoadCallBack(_myImage, Public, function(theAttribNode) {onLoad();});
     };
     function onLoad() {
-        if (_myImage) {                                
+        if (_myImage) {
             Public.width = Protected.getNumber("width", _myImage.raster.width);
             Public.height = Protected.getNumber("height", _myImage.raster.height);
             _myLoadCB ? _myLoadCB(Public):null
@@ -223,12 +223,12 @@ function registerImageOnLoadCallBack(theImage, theSparkObject, theCallBack) {
         utils.dom.bindOnSetNodeValue(theImage, "loaded", imageOnLoadCallBackDispatcher);
         ourImageOnLoadCallBackMap[theImage.id] = [];
     }
-    ourImageOnLoadCallBackMap[theImage.id].push({object: theSparkObject, callback: theCallBack});    
+    ourImageOnLoadCallBackMap[theImage.id].push({object: theSparkObject, callback: theCallBack});
 }
 
-function imageOnLoadCallBackDispatcher(theAttribNode) {    
+function imageOnLoadCallBackDispatcher(theAttribNode) {
     var myObjects = ourImageOnLoadCallBackMap[theAttribNode.parentNode.id];
     for (var i = 0; i < myObjects.length; i++) {
         myObjects[i].callback(theAttribNode);
-    }    
+    }
 }

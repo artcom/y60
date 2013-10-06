@@ -15,16 +15,16 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myMaterial;
     var _myShape;
     var _myVertices;
     var _myUVCoords = null;
-    
+
     /////////////////////
     // Private Methods //
     /////////////////////
-    
+
     function applySize() {
         if (_myVertices && _myVertices.length === 4) {
             var o = Public.origin;
@@ -61,7 +61,7 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         Public.height = theSize.y;
     });
 
-    
+
     Public.Property("width",  Number, 1, applySize, spark.CALL_PROPERTY_HANDLER_ON_CHANGE);
     Public.Property("height", Number, 1, applySize, spark.CALL_PROPERTY_HANDLER_ON_CHANGE);
 
@@ -119,7 +119,7 @@ spark.ResizableRectangle.Constructor = function (Protected) {
             */
             _myShape.name = Public.name + "-shape";
         }
-                
+
         if (myTextureUnit) {
             _myUVCoords = _myShape.find(".//*[@name='uvset']").firstChild.nodeValue;
         }
@@ -137,7 +137,7 @@ spark.ResizableRectangle.Constructor = function (Protected) {
                 myDepthTestNode.firstChild.nodeValue = myDepthTest;
             }
         }
-        
+
         _myVertices = _myShape.find(".//*[@name='position']").firstChild.nodeValue;
 
         var myBody = Modelling.createBody(Public.parent.innerSceneNode, _myShape.id);
@@ -170,5 +170,5 @@ spark.ResizableRectangle.Constructor = function (Protected) {
     Protected.__defineGetter__("uvset", function () {
         return _myUVCoords;
     });
-    
+
 };
