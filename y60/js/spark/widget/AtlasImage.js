@@ -92,6 +92,12 @@ spark.AtlasImage.Constructor = function (Protected) {
         if (_mySubTextureName) {
             Public.setTexture(_mySubTextureName, _myAtlasPath);
         }
+        var myOrigin = Protected.getString("origin", undefined);
+        if (myOrigin === "center") {
+            Public.origin = product(Protected.originalImageSize.xy0, 0.5);
+        } else {
+            Public.origin = Protected.getVector3f("origin", Public.origin);
+        }
     };
 
     Base.postRealize = Public.postRealize;
@@ -106,12 +112,8 @@ spark.AtlasImage.Constructor = function (Protected) {
             Protected.applyAtlasTextureInformation();
             Protected.material = _getMaterial();
             Protected.material.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
-            Public.width  = Protected.getNumber("width",
-                                                Public.root.textureAtlasManager.getSize(_mySubTextureName,
-                                                                                        _myAtlasPath)[0]);
-            Public.height = Protected.getNumber("height",
-                                                Public.root.textureAtlasManager.getSize(_mySubTextureName,
-                                                                                        _myAtlasPath)[1]);
+            Public.width  = Protected.getNumber("width", Protected.originalImageSize[0]);
+            Public.height = Protected.getNumber("height", Protected.originalImageSize[1]);
         }
     };
 };
