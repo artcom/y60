@@ -9,18 +9,18 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
     var Public = this;
     var Base   = {};
     Public.Inherit(spark.AtlasImage);
-    
+
     /////////////////////
     // Private Members //
     /////////////////////
-    
+
     var _myShapeStretcher = null;
     var _myImageSize      = null;
-    
+
     /////////////////////
     // Private Methods //
     /////////////////////
-    
+
     function _addEdgeProperty(theAcessorName, theEdgeName) {
         Public.__defineGetter__(theAcessorName, function () {
             return _myShapeStretcher.edges[theEdgeName];
@@ -31,7 +31,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
             _reset();
         });
     }
-    
+
     function _addCropProperty(theAcessorName, theEdgeName) {
         Public.__defineGetter__(theAcessorName, function () {
             return _myShapeStretcher.crop[theEdgeName];
@@ -42,7 +42,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
             _reset();
         });
     }
-    
+
     function _reset() {
         if (!_myShapeStretcher) {
             return;
@@ -52,11 +52,11 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         Protected.applyAtlasTextureInformation();
         _myShapeStretcher.updateGeometry(Public.size, false, Public.origin);
     }
-    
+
     ////////////////////
     // Public Methods //
     ////////////////////
-    
+
     _addEdgeProperty('edgeTop',    'top');
     _addEdgeProperty('edgeBottom', 'bottom');
     _addEdgeProperty('edgeLeft',   'left');
@@ -73,7 +73,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
                 _myShapeStretcher.edges.right,
                 _myShapeStretcher.edges.top];
     });
-    
+
     Public.__defineSetter__("edges", function (theEdges) {
         _myShapeStretcher.edges.left   = theEdges[0];
         _myShapeStretcher.edges.bottom = theEdges[1];
@@ -81,14 +81,14 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         _myShapeStretcher.edges.top    = theEdges[3];
         _reset();
     });
-    
+
     Public.__defineGetter__("crop", function () {
         return [_myShapeStretcher.crop.left,
                 _myShapeStretcher.crop.bottom,
                 _myShapeStretcher.crop.right,
                 _myShapeStretcher.crop.top];
     });
-    
+
     Public.__defineSetter__("crop", function (theEdges) {
         _myShapeStretcher.crop.left   = theEdges[0];
         _myShapeStretcher.crop.bottom = theEdges[1];
@@ -96,7 +96,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         _myShapeStretcher.crop.top    = theEdges[3];
         _reset();
     });
-    
+
     Protected.__defineGetter__("shapeStretcher", function () {
             return _myShapeStretcher;
     });
@@ -107,7 +107,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         var myShapeStretcherCtor = spark.ShapeStretcher.Factory.getShapeStretcherFromAttribute(
                 Protected.getString("shapeStretcher", "default"));
         _myShapeStretcher = new myShapeStretcherCtor(Protected.shape);
-        
+
         Base.imageSetter = Public.__lookupSetter__("image");
         Public.__defineSetter__("image", function (theImage) {
             Base.imageSetter(theImage);
@@ -145,7 +145,7 @@ spark.StretchyAtlasImage.Constructor = function (Protected) {
         _myShapeStretcher.initialize(Public.node?Public.node:new Node("<StretchyAtlasImage/>"));
         _reset();
     };
-    
+
     Base.setTexture = Public.setTexture;
     Public.setTexture = function (theTextureName, theAtlasPath) {
         Base.setTexture(theTextureName, theAtlasPath);
