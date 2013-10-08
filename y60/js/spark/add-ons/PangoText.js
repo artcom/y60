@@ -30,6 +30,9 @@ spark.PangoText.Constructor = function (Protected) {
 
     var _myStyle = {};
     var _myPangoLayout = null;
+    
+    var _myReverse = false;
+    var _myOriginalText = "";
 
     var RENDER_AREA_SIZE = 700; //TODO: maybe this should be maxwidth/maxheight later
 
@@ -88,7 +91,12 @@ spark.PangoText.Constructor = function (Protected) {
         if (_myMaxHeight > -1) {
             dimensions[1] = _myMaxHeight;
         }
-        applyImageFilter(_myImage, "crop", [0,0,dimensions[0],dimensions[1]]);
+        
+        // make sure that the cropped dimensions are not bigger than the image itself
+        dimensions[0] = Math.min(_myImage.width,  dimensions[0]);
+        dimensions[1] = Math.min(_myImage.height, dimensions[1]);
+        
+        applyImageFilter(_myImage, "crop", [0, 0, dimensions[0], dimensions[1]]);
         Public.width = dimensions[0];
         Public.height = dimensions[1];
     };
@@ -98,18 +106,23 @@ spark.PangoText.Constructor = function (Protected) {
     ////////////////////
 
     Public.__defineGetter__("text", function () {
-        return _myText;
+        return _myOriginalText;
     });
 
     Public.__defineSetter__("text", function (theValue) {
+        _myOriginalText = theValue;
         _myText = theValue;
+        if (_myReverse) {
+            _myText = _myText.split("").reverse().join("");
+        }
         Protected.render();
     });
 
     Base.realize = Public.realize;
     Public.realize = function () {
 
-        _myText = Protected.getString("text", "");
+        _myReverse = Protected.getBoolean("reverse", false);
+        var myText = Protected.getString("text", "");
         // handle internationalization
         _myTextId = Protected.getString("textId", "");
 
@@ -159,7 +172,7 @@ spark.PangoText.Constructor = function (Protected) {
         if (_myStyle.hAlign) {
             _myPangoLayout.setAlignment(_myStyle.hAlign);
         }
-        Public.text = _myText;
+        Public.text = myText;
     };
 
     Base.postRealize = Public.postRealize;
