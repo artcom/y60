@@ -146,7 +146,8 @@ spark.applyStyleDefaults = function(theStyle) {
     !theStyle.getAttribute("vAlign")    ? theStyle.vAlign    = "top"  : null;
     !theStyle.getAttribute("hinting")    ? theStyle.hinting    = spark.AUTOHINTING  : null;
 
-    !theStyle.getAttribute("textColor")       ? theStyle.textColor        = "000000" : null;
+    !theStyle.getAttribute("indentation") ? theStyle.indentation = 0 : null;
+    !theStyle.getAttribute("textColor")   ? theStyle.textColor   = "000000" : null;
 };
 
 spark.isFontStyleNode = function(theNode) {
@@ -163,8 +164,9 @@ spark.isFontStyleNode = function(theNode) {
             theNode.getAttribute("hAlign") ||
             theNode.getAttribute("vAlign") ||
             theNode.getAttribute("hinting") ||
+            theNode.getAttribute("indentation") ||
             theNode.getAttribute("textColor"));
-}
+};
 
 spark.mergeFontStyles = function(theOldStyle, theNewStyle) {
     if(!spark.isFontStyleNode(theOldStyle) || !spark.isFontStyleNode(theNewStyle)) {
@@ -199,16 +201,14 @@ spark.mergeFontStyles = function(theOldStyle, theNewStyle) {
 
     mergeAttributeIfPresent("tracking");
     mergeAttributeIfPresent("lineHeight");
-
     mergeAttributeIfPresent("hAlign");
     mergeAttributeIfPresent("vAlign");
     mergeAttributeIfPresent("hinting");
-
+    mergeAttributeIfPresent("indentation");
     mergeAttributeIfPresent("textColor");
 
    return myMergedStyle;
-
-}
+};
 
 
 /**
@@ -249,7 +249,7 @@ spark.fontStyleFromNode = function(theNode) {
     copyAttributeIfPresent("hAlign");
     copyAttributeIfPresent("vAlign");
     copyAttributeIfPresent("hinting");
-
+    copyAttributeIfPresent("indentation");
     copyAttributeIfPresent("textColor");
 
     //spark.applyStyleDefaults(myStyle);
