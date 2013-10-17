@@ -38,6 +38,8 @@ private:
     typedef std::pair<const char*, TuioObject*> ObjectEvent;
     typedef std::vector<CursorEvent> CursorEventList;
     typedef std::vector<ObjectEvent> ObjectEventList;
+    typedef asl::Ptr<TuioClient> TuioClientPtr;
+    typedef std::vector<TuioClientPtr> TuioClientList;
 
 
 public:
@@ -60,8 +62,12 @@ public:
         _myMaxCursorPositionsInHistory = 1;
     }
 
-    ~TUIOPlugin()
-    { }
+    ~TUIOPlugin() {
+        for(TuioClientList::iterator it = _myClients.begin(); it != _myClients.end(); ++it) {
+            it->get()->removeTuioListener(this);
+            it->get()->disconnect();
+        }
+    }
 
 // IScriptablePlugin
 
@@ -200,7 +206,7 @@ public:
 
     void listenToUDP(Unsigned16 thePort) {
         AC_INFO << "Listening for TUIO messages on UDP port " << thePort;
-        TuioClient *myClient = new TuioClient(thePort);
+        TuioClientPtr myClient = TuioClientPtr (new TuioClient(thePort));
         myClient->connect();
         myClient->addTuioListener(this);
         _myClients.push_back(myClient);
@@ -300,7 +306,7 @@ private:
     CursorEventList _myUndeliveredCursors;
     ObjectEventList _myUndeliveredObjects;
 
-    std::vector<TuioClient*> _myClients;
+    TuioClientList _myClients;
     asl::Vector2f _myTouchArea;
 };
 
