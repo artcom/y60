@@ -978,10 +978,10 @@ EmptyObject.prototype.nop = function() {
 }
 
 
-
-function main() {
-    var myTestName = "testFixedVector.tst.js";
-    var mySuite = new UnitTestSuite(myTestName);
+try {
+    var myScriptPathSegments = __FILE__().split("/");
+    var mySuiteName = myScriptPathSegments[myScriptPathSegments.length - 1];
+    var mySuite = new UnitTestSuite(mySuiteName);
 
     mySuite.addTest(new JSGlobalUnitTest());
     mySuite.addTest(new FixedVectorUnitTest());
@@ -990,11 +990,12 @@ function main() {
     mySuite.addTest(new BoxUnitTest());
     mySuite.run();
 
-    print(">> Finished test suite '"+myTestName+"', return status = " + mySuite.returnStatus() + "");
-    return mySuite.returnStatus();
-}
-
-if (main() != 0) {
+    print(">> Finished test suite '" + mySuiteName + "', return status = " + mySuite.returnStatus() + "");
+    exit(mySuite.returnStatus());
+} catch (ex) {
+    print("-----------------------------------------------------------------------------------------");
+    print("### Error: " + ex);
+    print("-----------------------------------------------------------------------------------------");
     exit(1);
-};
+}
 
