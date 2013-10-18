@@ -286,7 +286,7 @@ JSPlane::initClass(JSContext *cx, JSObject *theGlobalObject) {
 }
 
 bool convertFrom(JSContext *cx, jsval theValue, asl::Plane<Number>  & thePlane) {
-    if (JSVAL_IS_OBJECT(theValue)) {
+    if (JSVAL_IS_OBJECT(theValue) && !JSVAL_IS_NULL(theValue)) {
         JSObject * myArgument;
         if (JS_ValueToObject(cx, theValue, &myArgument)) {
             if (JSA_GetClass(cx,myArgument) == JSClassTraits<asl::Plane<Number> >::Class()) {

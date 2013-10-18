@@ -787,7 +787,189 @@ BoxUnitTest.prototype.Constructor = function(obj, theName) {
     } //function
 };
 
+function JSGlobalUnitTest() {
+    this.Constructor(this, "JSGlobalUnitTest");
+}
 
+JSGlobalUnitTest.prototype.Constructor = function(obj, theName) {
+
+    UnitTest.prototype.Constructor(obj, theName);
+
+    obj.run = function() {
+        ENSURE_EXCEPTION('almostEqual(new Vector3f(1,2,3),new Vector4f(1,2,3,4))');
+        ENSURE_EXCEPTION('almostEqual(new Vector4f(1,2,3,4),new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('almostEqual(new Vector4f(1,2,3,4),new Vector2f(1,2))');
+        ENSURE_EXCEPTION('almostEqual(new Vector4f(1,2,3,4),undefined)');
+        ENSURE_EXCEPTION('almostEqual(undefined,undefined)');
+        ENSURE_EXCEPTION('almostEqual(new Vector4f(1,2,3,4),null)');
+        ENSURE_EXCEPTION('almostEqual(null,new Vector4f(1,2,3,4))');
+        ENSURE_EXCEPTION('almostEqual(null,null)');
+        ENSURE_EXCEPTION('almostEqual(null)');
+        ENSURE_EXCEPTION('almostEqual(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('almostEqual(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('dot(null,null)');
+        ENSURE_EXCEPTION('dot(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('dot(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('dot(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('dot(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('dot(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('dot(null)');
+        ENSURE_EXCEPTION('dot(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('dot(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('sum(null,null)');
+        ENSURE_EXCEPTION('sum(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('sum(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('sum(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('sum(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('sum(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('sum(null)');
+        ENSURE_EXCEPTION('sum(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('sum(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('difference(null,null)');
+        ENSURE_EXCEPTION('difference(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('difference(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('difference(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('difference(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('difference(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('difference(null)');
+        ENSURE_EXCEPTION('difference(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('difference(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('product(null,null)');
+        ENSURE_EXCEPTION('product(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('product(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('product(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('product(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('product(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('product(null)');
+        ENSURE_EXCEPTION('product(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('product(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        ENSURE('almostEqual(product(new Vector3f(1,2,3), 1), new Vector3f(1,2,3))');
+        ENSURE('almostEqual(product(new Vector3f(1,2,3), 0), new Vector3f(0,0,0))');
+        
+        ENSURE_EXCEPTION('quotient(null,null)');
+        ENSURE_EXCEPTION('quotient(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('quotient(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('quotient(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('quotient(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('quotient(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('quotient(null)');
+        ENSURE_EXCEPTION('quotient(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('quotient(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('cross(null,null)');
+        ENSURE_EXCEPTION('cross(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('cross(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('cross(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('cross(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('cross(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('cross(null)');
+        ENSURE_EXCEPTION('cross(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('cross(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('magnitude()');
+        ENSURE_EXCEPTION('magnitude(null)');
+        ENSURE_EXCEPTION('magnitude(10)');
+        ENSURE_EXCEPTION('magnitude(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('normalized()');
+        ENSURE_EXCEPTION('normalized(null)');
+        ENSURE_EXCEPTION('normalized(10)');
+        ENSURE_EXCEPTION('normalized(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('distance(null,null)');
+        ENSURE_EXCEPTION('distance(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('distance(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('distance(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('distance(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('distance(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('distance(null)');
+        ENSURE_EXCEPTION('distance(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('distance(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('signedDistance(null,null)');
+        ENSURE_EXCEPTION('signedDistance(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('signedDistance(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('signedDistance(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('signedDistance(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('signedDistance(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('signedDistance(null)');
+        ENSURE_EXCEPTION('signedDistance(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('signedDistance(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('normal(null,null)');
+        ENSURE_EXCEPTION('normal(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('normal(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('normal(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('normal(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('normal(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('normal(null)');
+        ENSURE_EXCEPTION('normal(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('normal(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('orthonormal()');
+        ENSURE_EXCEPTION('orthonormal(null)');
+        ENSURE_EXCEPTION('orthonormal(10)');
+        ENSURE_EXCEPTION('orthonormal(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('cosAngle(null,null)');
+        ENSURE_EXCEPTION('cosAngle(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('cosAngle(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('cosAngle(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('cosAngle(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('cosAngle(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('cosAngle(null)');
+        ENSURE_EXCEPTION('cosAngle(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('cosAngle(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('intersection(null,null)');
+        ENSURE_EXCEPTION('intersection(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('intersection(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('intersection(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('intersection(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('intersection(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('intersection(null)');
+        ENSURE_EXCEPTION('intersection(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('intersection(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('projection(null,null)');
+        ENSURE_EXCEPTION('projection(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('projection(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('projection(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('projection(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('projection(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('projection(null)');
+        ENSURE_EXCEPTION('projection(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('projection(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('nearest(null,null)');
+        ENSURE_EXCEPTION('nearest(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('nearest(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('nearest(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('nearest(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('nearest(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('nearest(null)');
+        ENSURE_EXCEPTION('nearest(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('nearest(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('transformedNormal(null,null)');
+        ENSURE_EXCEPTION('transformedNormal(null,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('transformedNormal(undefined,new Vector3f(1,2,3))');
+        ENSURE_EXCEPTION('transformedNormal(new Vector3f(1,2,3), null)');
+        ENSURE_EXCEPTION('transformedNormal(new Vector3f(1,2,3), undefined)');
+        ENSURE_EXCEPTION('transformedNormal(new Vector3f(1,2,3), new Vector2f(0,0))');
+        ENSURE_EXCEPTION('transformedNormal(null)');
+        ENSURE_EXCEPTION('transformedNormal(new Vector2f(1,2))');
+        ENSURE_EXCEPTION('transformedNormal(new Vector2f(1,2), new Vector2f(1,2), new Vector2f(1,2))');
+        
+        ENSURE_EXCEPTION('smoothStep()');
+        ENSURE_EXCEPTION('smoothStep(null)');
+        ENSURE_EXCEPTION('smoothStep(null, null, null)');
+    };
+};
 
 function EmptyObject() {
 }
@@ -801,6 +983,7 @@ function main() {
     var myTestName = "testFixedVector.tst.js";
     var mySuite = new UnitTestSuite(myTestName);
 
+    mySuite.addTest(new JSGlobalUnitTest());
     mySuite.addTest(new FixedVectorUnitTest());
     mySuite.addTest(new FixedPointUnitTest());
     mySuite.addTest(new Matrix4fUnitTest());

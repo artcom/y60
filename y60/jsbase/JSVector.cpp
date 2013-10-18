@@ -145,7 +145,7 @@ template <template <class> class VECTOR, class NUMBER>
 bool Converter<VECTOR_NF>::convertFromVN(JSContext *cx, jsval theValue,
     VECTOR<NUMBER> & theVector)
 {
-    if (JSVAL_IS_OBJECT(theValue)) {
+    if (JSVAL_IS_OBJECT(theValue) && !JSVAL_IS_NULL(theValue)) {
         JSObject * myValObj = JSVAL_TO_OBJECT(theValue);
         if (JSVector<VECTOR<NUMBER> >::Class() != JSA_GetClass(cx, myValObj)) {
             myValObj = JSVector<VECTOR<NUMBER> >::Construct(cx, theValue);

@@ -159,7 +159,7 @@ VectorFunction(RESULT_TYPE (*theFunction)(const NATIVE_VECTORA &),
                JSContext *cx, JSObject *myObj0, jsval *rval)
 {
     // check argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSVector<NATIVE_VECTORA>::Class(),0)) {
+    if (myObj0 && !JS_InstanceOf(cx,myObj0,JSVector<NATIVE_VECTORA>::Class(),0)) {
         // try to create temporary from first argument
         jsuint myArrayLength = 0;
         if (!JS_HasArrayLength(cx,myObj0,&myArrayLength)) {
@@ -168,12 +168,12 @@ VectorFunction(RESULT_TYPE (*theFunction)(const NATIVE_VECTORA &),
         }
         if (myArrayLength == JSVector<NATIVE_VECTORA>::SIZE) {
             myObj0 = JSVector<NATIVE_VECTORA>::Construct(cx, OBJECT_TO_JSVAL(myObj0));
-            if (!myObj0) {
-                return FAILED;
-            }
         } else {
             return NOT_FOUND;
         }
+    }
+    if (!myObj0) {
+        return FAILED;
     }
     // make the actual call
     RESULT_TYPE myResult = theFunction(
@@ -190,7 +190,7 @@ VectorVectorFunction(RESULT_TYPE (*theFunction)(const NATIVE_VECTORA &,const NAT
                      JSContext *cx, JSObject *myObj0, JSObject *myObj1, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSVector<NATIVE_VECTORA>::Class(),0)) {
+    if (myObj0 && !JS_InstanceOf(cx,myObj0,JSVector<NATIVE_VECTORA>::Class(),0)) {
         // try to create temporary from first argument
         jsuint myArrayLength = 0;
         if (!JS_HasArrayLength(cx,myObj0,&myArrayLength)) {
@@ -199,20 +199,26 @@ VectorVectorFunction(RESULT_TYPE (*theFunction)(const NATIVE_VECTORA &,const NAT
         }
         if (myArrayLength == JSVector<NATIVE_VECTORA>::SIZE) {
             myObj0 = JSVector<NATIVE_VECTORA>::Construct(cx, OBJECT_TO_JSVAL(myObj0));
-            if (!myObj0) {
-                return FAILED;
-            }
         } else {
             return NOT_FOUND;
         }
     }
     // check second argument for native type
-    if (!JS_InstanceOf(cx,myObj1,JSVector<NATIVE_VECTORB>::Class(),0)) {
-        // create temporary second argument
-        myObj1 = JSVector<NATIVE_VECTORB>::Construct(cx, OBJECT_TO_JSVAL(myObj1));
-        if (!myObj1) {
-            return FAILED;
+    if (myObj1 && !JS_InstanceOf(cx,myObj1,JSVector<NATIVE_VECTORB>::Class(),0)) {
+        // try to create temporary from first argument
+        jsuint myArrayLength = 0;
+        if (!JS_HasArrayLength(cx,myObj1,&myArrayLength)) {
+            DB(AC_TRACE << "VectorVectorFunction:: second argument must be a vector or array" << endl);
+            return NOT_FOUND;
         }
+        if (myArrayLength == JSVector<NATIVE_VECTORB>::SIZE) {
+            myObj1 = JSVector<NATIVE_VECTORB>::Construct(cx, OBJECT_TO_JSVAL(myObj1));
+        } else {
+            return NOT_FOUND;
+        }
+    }
+    if (!myObj0 || !myObj1) {
+        return FAILED;
     }
     // make the actual call
     RESULT_TYPE myResult = theFunction(
@@ -230,7 +236,7 @@ NumberFunction(RESULT_TYPE (*theFunction)(const NATIVE_NUMBERA &),
                JSContext *cx, jsval theValue0, jsval *rval)
 {
     jsdouble myArg0 = -1;
-    if (JS_ValueToNumber(cx, theValue0, &myArg0) &&
+    if (!JSVAL_IS_NULL(theValue0) && JS_ValueToNumber(cx, theValue0, &myArg0) &&
         !JSDOUBLE_IS_NaN(myArg0) )
     {
         IF_NOISY(AC_TRACE << "NumberFunction: value is a number :"<<myArg0 << endl);
@@ -248,8 +254,8 @@ NumberNumberFunction(RESULT_TYPE (*theFunction)(const NATIVE_NUMBERA &,const NAT
 {
     jsdouble myArg0 = -1;
     jsdouble myArg1 = -1;
-    if (JS_ValueToNumber(cx, theValue0, &myArg0) &&
-        JS_ValueToNumber(cx, theValue1, &myArg1) &&
+    if (!JSVAL_IS_NULL(theValue0) && JS_ValueToNumber(cx, theValue0, &myArg0) &&
+        !JSVAL_IS_NULL(theValue1) && JS_ValueToNumber(cx, theValue1, &myArg1) &&
         !JSDOUBLE_IS_NaN(myArg0) &&
         !JSDOUBLE_IS_NaN(myArg1) )
     {
@@ -267,7 +273,7 @@ VectorNumberFunction(RESULT_TYPE (*theFunction)(const NATIVE_VECTORA &,NATIVE_NU
                      JSContext *cx, JSObject *myObj0, jsval theValue1, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSVector<NATIVE_VECTORA>::Class(),0)) {
+    if (myObj0 && !JS_InstanceOf(cx,myObj0,JSVector<NATIVE_VECTORA>::Class(),0)) {
         // try to create temporary from first argument
         jsuint myArrayLength = 0;
         if (!JS_HasArrayLength(cx,myObj0,&myArrayLength)) {
@@ -276,16 +282,16 @@ VectorNumberFunction(RESULT_TYPE (*theFunction)(const NATIVE_VECTORA &,NATIVE_NU
         }
         if (myArrayLength == JSVector<NATIVE_VECTORA>::SIZE) {
             myObj0 = JSVector<NATIVE_VECTORA>::Construct(cx, OBJECT_TO_JSVAL(myObj0));
-            if (!myObj0) {
-                return FAILED;
-            }
         } else {
             return NOT_FOUND;
         }
     }
+    if (!myObj0) {
+        return FAILED;
+    }
     // check second argument for number type
     jsdouble myArg1 = -1;
-    if (!JS_ValueToNumber(cx, theValue1, &myArg1) || JSDOUBLE_IS_NaN(myArg1) )
+    if (JSVAL_IS_NULL(theValue1) || !JS_ValueToNumber(cx, theValue1, &myArg1) || JSDOUBLE_IS_NaN(myArg1) )
     {
         return NOT_FOUND;
     }
@@ -304,7 +310,7 @@ VectorObjectFunction(RESULT_TYPE (*theFunction)(const NATIVE_VECTORA &,const NAT
                      JSContext *cx, JSObject *myObj0, JSObject *myObj1, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSVector<NATIVE_VECTORA>::Class(),0)) {
+    if (myObj0 && !JS_InstanceOf(cx,myObj0,JSVector<NATIVE_VECTORA>::Class(),0)) {
         // try to create temporary from first argument
         jsuint myArrayLength = 0;
         if (!JS_HasArrayLength(cx,myObj0,&myArrayLength)) {
@@ -313,15 +319,15 @@ VectorObjectFunction(RESULT_TYPE (*theFunction)(const NATIVE_VECTORA &,const NAT
         }
         if (myArrayLength == JSVector<NATIVE_VECTORA>::SIZE) {
             myObj0 = JSVector<NATIVE_VECTORA>::Construct(cx, OBJECT_TO_JSVAL(myObj0));
-            if (!myObj0) {
-                return FAILED;
-            }
         } else {
             return NOT_FOUND;
         }
     }
+    if (!myObj0) {
+        return FAILED;
+    }
     // check second argument for native type
-    if (!JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
+    if (!myObj1 || !JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
         return NOT_FOUND;
     }
     // make the actual call
@@ -339,16 +345,16 @@ ObjectVectorFunction(RESULT_TYPE (*theFunction)(const NATIVE_A &,const NATIVE_VE
                      JSContext *cx, JSObject *myObj0, JSObject *myObj1, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
+    if (!myObj0 || !JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
         return NOT_FOUND;
     }
      // check second argument for native type
-    if (!JS_InstanceOf(cx,myObj1,JSVector<NATIVE_VECTORB>::Class(),0)) {
+    if (myObj1 && !JS_InstanceOf(cx,myObj1,JSVector<NATIVE_VECTORB>::Class(),0)) {
         // create temporary second argument
         myObj1 = JSVector<NATIVE_VECTORB>::Construct(cx, OBJECT_TO_JSVAL(myObj1));
-        if (!myObj1) {
-            return FAILED;
-        }
+    }
+    if (!myObj1) {
+        return FAILED;
     }
     // make the actual call
     RESULT_TYPE myResult = theFunction(
@@ -366,7 +372,7 @@ ObjectFunction(RESULT_TYPE (*theFunction)(const NATIVE_A &),
                      JSContext *cx, JSObject *myObj0, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
+    if (!myObj0 || !JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
         return NOT_FOUND;
     }
 
@@ -384,11 +390,11 @@ ObjectObjectFunction(RESULT_TYPE (*theFunction)(const NATIVE_A &,const NATIVE_B 
                      JSContext *cx, JSObject *myObj0, JSObject *myObj1, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
+    if (!myObj0 || !JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
         return NOT_FOUND;
     }
     // check second argument for native type
-    if (!JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
+    if (!myObj1 || !JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
         return FAILED;
     }
     // make the actual call
@@ -436,7 +442,8 @@ struct Call {
 
             JSObject * myObj0 = 0;
             JSObject * myObj1 = 0;
-            if (JSVAL_IS_OBJECT(argv[0]) && JSVAL_IS_OBJECT(argv[1]) &&
+            if (JSVAL_IS_OBJECT(argv[0]) && !JSVAL_IS_NULL(argv[0]) &&
+                JSVAL_IS_OBJECT(argv[1]) && !JSVAL_IS_NULL(argv[1]) &&
                 JS_ValueToObject(cx, argv[0], &myObj0) == JS_TRUE &&
                 JS_ValueToObject(cx, argv[1], &myObj1) == JS_TRUE)
             {
@@ -485,7 +492,7 @@ struct Call {
             if (myStatus != NOT_FOUND) return myStatus;
 
             JSObject * myObj0 = 0;
-            if (JSVAL_IS_OBJECT(argv[0]) &&
+            if (JSVAL_IS_OBJECT(argv[0]) && !JSVAL_IS_NULL(argv[0]) &&
                 JS_ValueToObject(cx, argv[0], &myObj0) == JS_TRUE)
             {
                 myStatus = VectorFunction(theFunction2,cx,myObj0,rval);
@@ -591,13 +598,15 @@ bool almostEqualHelper(const VECTOR & a, const VECTOR & b) {
 
 static CallStatus
 moreAlmostEqual(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    if (argc == 2 && JSVAL_IS_OBJECT(argv[0]) && JSVAL_IS_OBJECT(argv[1])) {
+    if (argc == 2 && JSVAL_IS_OBJECT(argv[0]) && !JSVAL_IS_NULL(argv[0]) &&
+        JSVAL_IS_OBJECT(argv[1]) && !JSVAL_IS_NULL(argv[1])) {
         CallStatus myStatus;
         {
             typedef bool (*MyFunctionPtr)(const asl::Matrix4f &, const asl::Matrix4f &);
             myStatus = ObjectObjectFunction((MyFunctionPtr)&almostEqualHelper,cx,JSVAL_TO_OBJECT(argv[0]),JSVAL_TO_OBJECT(argv[1]),rval);
             if (myStatus != NOT_FOUND) return myStatus;
-        }{
+        }
+        {
             typedef bool (*MyFunctionPtr)(const asl::Quaternionf &, const asl::Quaternionf &);
             myStatus = ObjectObjectFunction((MyFunctionPtr)&almostEqualHelper,cx,JSVAL_TO_OBJECT(argv[0]),JSVAL_TO_OBJECT(argv[1]),rval);
             if (myStatus != NOT_FOUND) return myStatus;
@@ -628,9 +637,9 @@ static CallStatus
 productHelper(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     CallStatus myStatus = NOT_FOUND;
     if (argc == 2 ) {
-        if (JSVAL_IS_OBJECT(argv[0])) {
+        if (JSVAL_IS_OBJECT(argv[0]) && !JSVAL_IS_NULL(argv[0])) {
             JSObject * myObj0 = JSVAL_TO_OBJECT(argv[0]);
-            if (JSVAL_IS_OBJECT(argv[1])) {
+            if (JSVAL_IS_OBJECT(argv[1]) && !JSVAL_IS_NULL(argv[1])) {
 
                 JSObject * myObj1 = JSVAL_TO_OBJECT(argv[1]);
 
@@ -694,7 +703,8 @@ productHelper(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval
 
 static CallStatus
 distanceHelper(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
-    if (argc == 2 && JSVAL_IS_OBJECT(argv[0]) && JSVAL_IS_OBJECT(argv[1])) {
+    if (argc == 2 && JSVAL_IS_OBJECT(argv[0]) && !JSVAL_IS_NULL(argv[0]) && 
+        JSVAL_IS_OBJECT(argv[1]) && !JSVAL_IS_NULL(argv[1])) {
 
         JSObject * myObj0 = JSVAL_TO_OBJECT(argv[0]);
         JSObject * myObj1 = JSVAL_TO_OBJECT(argv[1]);
@@ -755,11 +765,11 @@ ObjectObjectResultFunction(bool (*theFunction)(const NATIVE_A &,const NATIVE_B &
                            JSContext *cx, JSObject *myObj0, JSObject *myObj1, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
+    if (!myObj0 || !JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
         return NOT_FOUND;
     }
     // check second argument for native type
-    if (!JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
+    if (!myObj1 || !JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
         return NOT_FOUND;
     }
     // make the actual call
@@ -780,11 +790,11 @@ ObjectObjectDualResultFunction(bool (*theFunction)(const NATIVE_A &,const NATIVE
                            JSContext *cx, JSObject *myObj0, JSObject *myObj1, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
+    if (!myObj0 || !JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
         return NOT_FOUND;
     }
     // check second argument for native type
-    if (!JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
+    if (!myObj1 || !JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
         return NOT_FOUND;
     }
     // make the actual call
@@ -805,11 +815,11 @@ ObjectObjectVariableResultFunction(bool (*theFunction)(const NATIVE_A &,const NA
                            JSContext *cx, JSObject *myObj0, JSObject *myObj1, jsval *rval)
 {
     // check first argument for native type
-    if (!JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
+    if (!myObj0 || !JS_InstanceOf(cx,myObj0,JSClassTraits<NATIVE_A>::Class(),0)) {
         return NOT_FOUND;
     }
     // check second argument for native type
-    if (!JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
+    if (!myObj1 || !JS_InstanceOf(cx,myObj1,JSClassTraits<NATIVE_B>::Class(),0)) {
         return NOT_FOUND;
     }
     // make the actual call
@@ -850,7 +860,7 @@ intersectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
     if (argc == 2) {
         JSObject * myObj0 = 0;
         JSObject * myObj1 = 0;
-        if (!JSVAL_IS_OBJECT(argv[0])  || !JSVAL_IS_OBJECT(argv[1])) {
+        if (!JSVAL_IS_OBJECT(argv[0]) || JSVAL_IS_NULL(argv[0]) || !JSVAL_IS_OBJECT(argv[1]) || JSVAL_IS_NULL(argv[1])) {
              JS_ReportError(cx,"intersectionDispatcher: passed 'undefined' as argument");
              return JS_FALSE;
         }
@@ -974,7 +984,7 @@ projectionDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
     if (argc == 2) {
         JSObject * myObj0 = 0;
         JSObject * myObj1 = 0;
-        if (!JSVAL_IS_OBJECT(argv[0])  || !JSVAL_IS_OBJECT(argv[1])) {
+        if (!JSVAL_IS_OBJECT(argv[0]) || JSVAL_IS_NULL(argv[0]) || !JSVAL_IS_OBJECT(argv[1]) || JSVAL_IS_NULL(argv[1])) {
              JS_ReportError(cx,"projectionDispatcher: passed 'undefined' as argument");
              return JS_FALSE;
         }
@@ -1018,7 +1028,7 @@ nearestDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
     if (argc == 2) {
         JSObject * myObj0 = 0;
         JSObject * myObj1 = 0;
-        if (!JSVAL_IS_OBJECT(argv[0])  || !JSVAL_IS_OBJECT(argv[1])) {
+        if (!JSVAL_IS_OBJECT(argv[0]) || JSVAL_IS_NULL(argv[0]) || !JSVAL_IS_OBJECT(argv[1]) || JSVAL_IS_NULL(argv[1])) {
              JS_ReportError(cx,"nearestDispatcher: passed 'undefined' as argument");
              return JS_FALSE;
         }
@@ -1086,7 +1096,7 @@ transformedNormalDispatcher(JSContext *cx, JSObject *obj, uintN argc, jsval *arg
     if (argc == 2) {
         JSObject * myObj0 = 0;
         JSObject * myObj1 = 0;
-        if (!JSVAL_IS_OBJECT(argv[0])  || !JSVAL_IS_OBJECT(argv[1])) {
+        if (!JSVAL_IS_OBJECT(argv[0]) || JSVAL_IS_NULL(argv[0]) || !JSVAL_IS_OBJECT(argv[1]) || JSVAL_IS_NULL(argv[1])) {
              JS_ReportError(cx,"transformedNormalDispatcher: passed 'undefined' as argument");
              return JS_FALSE;
         }
@@ -1144,14 +1154,19 @@ signedDistance(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rva
     DOC_BEGIN("Calculates the signed distance between a point and a plane");
     DOC_PARAM("thePoint", "", DOC_TYPE_POINT3F);
     DOC_PARAM("thePlane", "", DOC_TYPE_PLANE);
-    DOC_RVAL("The signed distance between point and plane", DOC_TYPE_MATRIX4F);
+    DOC_RVAL("The signed distance between point and plane", DOC_TYPE_FLOAT);
     DOC_END;
     if (argc == 2) {
         Point3f myPoint;
-        convertFrom(cx, argv[0], myPoint);
-
+        if (JSVAL_IS_NULL(argv[0]) || !convertFrom(cx, argv[0], myPoint)) {
+            JS_ReportError(cx, "JSGlobal::signedDistance(): Argument #1 must be a Point3f");
+            return JS_FALSE;
+        }
         Planef myPlane;
-        convertFrom(cx, argv[1], myPlane);
+        if (JSVAL_IS_NULL(argv[1]) || !convertFrom(cx, argv[1], myPlane)) {
+            JS_ReportError(cx, "JSGlobal::signedDistance(): Argument #2 must be a Plane");
+            return JS_FALSE;
+        }
 
         *rval = as_jsval(cx, asl::signedDistance(myPoint, myPlane));
         return JS_TRUE;
@@ -1176,9 +1191,18 @@ smoothStep(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 
     // UH: the JavaScript implementation used this argument order...
     float myIn, myOut, myValue;
-    convertFrom(cx, argv[0], myIn);
-    convertFrom(cx, argv[1], myOut);
-    convertFrom(cx, argv[2], myValue);
+    if (JSVAL_IS_NULL(argv[0]) || !convertFrom(cx, argv[0], myIn)) {
+        JS_ReportError(cx, "JSGlobal::smoothStep(): Argument #1 must be a float");
+        return JS_FALSE;
+    }
+    if (JSVAL_IS_NULL(argv[1]) || !convertFrom(cx, argv[1], myOut)) {
+        JS_ReportError(cx, "JSGlobal::smoothStep(): Argument #2 must be a float");
+        return JS_FALSE;
+    }
+    if (JSVAL_IS_NULL(argv[2]) || !convertFrom(cx, argv[2], myValue)) {
+        JS_ReportError(cx, "JSGlobal::smoothStep(): Argument #3 must be a float");
+        return JS_FALSE;
+    }
     // UH: the C++ implementation uses this (IMHO) more logical order...
     *rval = as_jsval(cx, asl::smoothStep(myValue, myIn, myOut));
     return JS_TRUE;
