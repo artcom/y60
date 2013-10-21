@@ -472,7 +472,7 @@ namespace y60 {
             bool isPlanar = false;
             bool needsResample = (_myResampleContext != NULL);
 #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 27, 0)
-            isPlanar = av_sample_fmt_is_planar(_myAStream->codec->sample_fmt);
+            isPlanar = (av_sample_fmt_is_planar(_myAStream->codec->sample_fmt) == 1);
             if (isPlanar) {
                 char* packedBuffer = (char *)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
                 planarToInterleaved(packedBuffer, myAlignedBuf, myNumChannels, myBytesPerSample,
@@ -942,7 +942,7 @@ namespace y60 {
 #else
             if (avcodec_open(myCodecContext, myCodec) < 0 ) {
 #endif
-                throw FFMpegDecoder2Exception(std::string("Unable to open codec " + myCodecContext->codec_id), PLUS_FILE_LINE);
+                throw FFMpegDecoder2Exception(std::string("Unable to open codec ") + asl::as_string(myCodecContext->codec_id), PLUS_FILE_LINE);
             }
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(53,8,0)
             av_dict_free(&opts);
@@ -1168,7 +1168,8 @@ namespace y60 {
 
         _myAudioSink = Pump::get().createSampleSink(theFilename);
 
-        if (myACodec->channels != Pump::get().getNumOutputChannels() || myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()) ||
+        if (myACodec->channels != static_cast<int>(Pump::get().getNumOutputChannels()) ||
+            myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()) ||
             myACodec->sample_fmt != AV_SAMPLE_FMT_S16)
         {
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)

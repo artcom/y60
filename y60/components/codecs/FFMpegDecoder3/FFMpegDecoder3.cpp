@@ -763,13 +763,13 @@ namespace y60 {
 
         _myAudioSink = Pump::get().createSampleSink(theFilename);
 
-        unsigned myChannels = (myACodec->channels > 2) ? 2 : myACodec->channels;
-        if (myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()) ||
+        if (myACodec->channels != static_cast<int>(Pump::get().getNumOutputChannels()) ||
+            myACodec->sample_rate != static_cast<int>(Pump::get().getNativeSampleRate()) ||
             myACodec->sample_fmt != AV_SAMPLE_FMT_S16)
         {
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
             _myResampleContext = av_audio_resample_init(
-                    myChannels, myChannels,
+                    Pump::get().getNumOutputChannels(), myACodec->channels,
                     Pump::get().getNativeSampleRate(), myACodec->sample_rate,
 #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 27, 0)
                     AV_SAMPLE_FMT_S16, av_get_packed_sample_fmt(myACodec->sample_fmt),
@@ -778,8 +778,8 @@ namespace y60 {
 #endif
                     16, 10, 0, 0.8);
 #else
-            _myResampleContext = audio_resample_init(myChannels,
-                    myChannels, Pump::get().getNativeSampleRate(),
+            _myResampleContext = audio_resample_init(Pump::get().getNumOutputChannels(),
+                    myACodec->channels, Pump::get().getNativeSampleRate(),
                     myACodec->sample_rate);
 #endif
         }
@@ -932,7 +932,7 @@ namespace y60 {
             bool isPlanar = false;
             bool needsResample = (_myResampleContext != NULL);
 #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 27, 0)
-            isPlanar = av_sample_fmt_is_planar(_myAStream->codec->sample_fmt);
+            isPlanar = (av_sample_fmt_is_planar(_myAStream->codec->sample_fmt) == 1);
             if (isPlanar) {
                 char* packedBuffer = (char *)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
                 planarToInterleaved(packedBuffer, myAlignedBuf, myNumChannels, myBytesPerSample,

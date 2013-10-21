@@ -191,7 +191,7 @@ void FFMpegAudioDecoder::open() {
         AC_DEBUG << "Sample rate: " << _mySampleRate << endl;
         AC_DEBUG << "Sample format: " << myCodecContext->sample_fmt << endl;
 
-        if (myCodecContext->channels != Pump::get().getNumOutputChannels() ||
+        if (_myNumChannels != Pump::get().getNumOutputChannels() ||
             _mySampleRate != Pump::get().getNativeSampleRate() ||
             myCodecContext->sample_fmt != AV_SAMPLE_FMT_S16)
         {
@@ -309,7 +309,7 @@ bool FFMpegAudioDecoder::decode() {
             bool isPlanar = false;
             bool needsResample = (_myResampleContext != NULL);
 #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 27, 0)
-            isPlanar = av_sample_fmt_is_planar(myCodec->sample_fmt);
+            isPlanar = (av_sample_fmt_is_planar(myCodec->sample_fmt) == 1);
             if (isPlanar) {
                 char* packedBuffer = (char *)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
                 planarToInterleaved(packedBuffer, myAlignedBuf, _myNumChannels, myBytesPerSample,
