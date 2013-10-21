@@ -192,20 +192,8 @@ namespace y60 {
         void convertFrame(AVFrame* theFrame, unsigned char* theBuffer);
         VideoMsgPtr createFrame(double theTimestamp);
 
-        template<typename T>
-        int downmix5p1ToStereo(T * theBuffer, int theBytesDecoded) {
-            T * myStereoPtr = theBuffer;
-            T * my5p1Ptr = theBuffer;
-            for (int i = 0; i < theBytesDecoded/3; ++i) {
-                *myStereoPtr++ = *my5p1Ptr;
-                *myStereoPtr++ = *(my5p1Ptr+2);
-                my5p1Ptr += 6;
-            }
-            return theBytesDecoded/3;
-        }
-        
-    
-
+        void planarToInterleaved(char* outputBuffer, char* inputBuffer, int numChannels,
+                                 int bytesPerSample, int numSamples);
 
         ReSampleContext * _myResampleContext;
         static asl::Block _myResampledSamples;

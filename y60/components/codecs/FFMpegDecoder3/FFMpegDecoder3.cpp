@@ -873,8 +873,8 @@ namespace y60 {
             _myAudioTimeOffset = myTime;
         }
         // we need an aligned buffer
-        int16_t * myAlignedBuf;
-        myAlignedBuf = (int16_t *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE *10 );
+        char * myAlignedBuf;
+        myAlignedBuf = (char *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE );
 
         int myBytesDecoded = 0; // decompressed sample size in bytes
 
@@ -884,9 +884,9 @@ namespace y60 {
         myTempPacket.data = thePacket.data;
         myTempPacket.size = thePacket.size;
         while (myTempPacket.size > 0) {
-            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE *10;
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE;
             int myLen = avcodec_decode_audio3(_myAStream->codec,
-                myAlignedBuf, &myBytesDecoded, &myTempPacket);
+                (int16_t*)myAlignedBuf, &myBytesDecoded, &myTempPacket);
             if (myLen < 0) {
                 AC_WARNING << "---- av_decode_audio error";
                 myTempPacket.size = 0;
@@ -900,9 +900,9 @@ namespace y60 {
         const uint8_t* myData = thePacket.data;
         int myDataLen = thePacket.size;
         while (myDataLen > 0) {
-            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE *10;
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE;
             int myLen = avcodec_decode_audio2(_myAStream->codec,
-                myAlignedBuf, &myBytesDecoded, myData, myDataLen);
+                (int16_t*)myAlignedBuf, &myBytesDecoded, myData, myDataLen);
             if (myLen < 0) {
                 AC_WARNING << "---- av_decode_audio error";
                 myDataLen = 0;
@@ -922,27 +922,34 @@ namespace y60 {
 #else
             int myBytesPerSample = av_get_bits_per_sample_format(_myAStream->codec->sample_fmt)>>3;
 #endif
-            if (myNumChannels == 6) {
-                if (myBytesPerSample == 2) {
-                    myBytesDecoded = downmix5p1ToStereo(myAlignedBuf, myBytesDecoded);
-                } else if (myBytesPerSample == 4) {
-                    myBytesDecoded = downmix5p1ToStereo(reinterpret_cast<int32_t *>(myAlignedBuf), myBytesDecoded);
-                } else {
-                    throw FFMpegDecoder3Exception(std::string("unsupported sample format for 5.1 downmix: "), PLUS_FILE_LINE);
-                }
-                myNumChannels = 2;
-            }
             int numFrames = myBytesDecoded/(myBytesPerSample*myNumChannels);
             DBA(AC_TRACE << "---- FFMpegDecoder3::addAudioPacket: Frames per buffer= " << numFrames);
-            // queue audio sample
             AudioBufferPtr myBuffer;
-            if (_myResampleContext) {
+            bool isPlanar = false;
+            bool needsResample = (_myResampleContext != NULL);
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 27, 0)
+            isPlanar = av_sample_fmt_is_planar(_myAStream->codec->sample_fmt);
+            if (isPlanar) {
+                char* packedBuffer = (char *)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+                planarToInterleaved(packedBuffer, myAlignedBuf, myNumChannels, myBytesPerSample,
+                                    _myAStream->codec->frame_size);
                 numFrames = audio_resample(_myResampleContext,
                         (int16_t*)(_myResampledSamples.begin()),
-                        myAlignedBuf, numFrames);
+                        (int16_t*)packedBuffer, numFrames);
                 myBuffer = Pump::get().createBuffer(numFrames);
-                myBuffer->convert(_myResampledSamples.begin(), SF_S16, myNumChannels);
-            } else {
+                myBuffer->convert(_myResampledSamples.begin(), SF_S16, 2);
+                av_free(packedBuffer);
+                needsResample = false;
+            }
+#endif
+            // queue audio sample
+            if (needsResample) {
+                numFrames = audio_resample(_myResampleContext,
+                        (int16_t*)(_myResampledSamples.begin()),
+                        (int16_t*)myAlignedBuf, numFrames);
+                myBuffer = Pump::get().createBuffer(numFrames);
+                myBuffer->convert(_myResampledSamples.begin(), SF_S16, 2);
+            } else if (!isPlanar){
                 myBuffer = Pump::get().createBuffer(numFrames);
                 myBuffer->convert(myAlignedBuf, SF_S16, myNumChannels);
             }
@@ -951,6 +958,23 @@ namespace y60 {
         } // while
 
         av_free( myAlignedBuf );
+    }
+
+    void FFMpegDecoder3::planarToInterleaved(char* outputBuffer, char* inputBuffer, int numChannels,
+            int bytesPerSample, int numSamples)
+    {
+        int i, j;
+        char * planes[8] = {};
+        for (i=0; i<numChannels; i++) {
+            planes[i] = inputBuffer + i*(numSamples*bytesPerSample);
+        }
+        for (i=0; i<numSamples; i++) {
+            for (j=0; j<numChannels; j++) {
+                memcpy(outputBuffer, planes[j], bytesPerSample);
+                outputBuffer += bytesPerSample;
+                planes[j] += bytesPerSample;
+            }
+        }
     }
 
     ////////////////////////////////////////////////////////////////
