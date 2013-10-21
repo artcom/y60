@@ -225,7 +225,6 @@ void FFMpegAudioDecoder::close() {
             myCodecContext = _myFormatContext->streams[_myStreamIndex]->codec;
         }
         if (_mySampleRate && _myNumChannels) {
-            
             avcodec_close(myCodecContext);
         }
         if (_myFormatContext) {
@@ -256,7 +255,6 @@ bool FFMpegAudioDecoder::decode() {
         // we need an aligned buffer
         char * myAlignedBuf;
         myAlignedBuf = (char *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE );
-
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
         AVPacket myTempPacket;
