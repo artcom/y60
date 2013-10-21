@@ -198,7 +198,7 @@ namespace y60 {
         ReSampleContext * _myResampleContext;
         static asl::Block _myResampledSamples;
 
-        // only initialized in main thread, then read from in both 
+        // only initialized in main thread, then read from in both
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
         PixelFormat
 #else

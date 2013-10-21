@@ -181,9 +181,9 @@ namespace y60 {
             throw FFMpegDecoder2Exception(std::string("Unable to find stream info: ")
                     + theFilename, PLUS_FILE_LINE);
         }
-        
+
         _myDemux = asl::Ptr<Demux>(new Demux(_myFormatContext));
-        
+
         openStreams(theFilename);
 
         if (_myVStream) {
@@ -215,7 +215,7 @@ namespace y60 {
         // reload video properties after first decode
         getVideoProperties(theFilename);
     }
-    
+
     void FFMpegDecoder2::startOverAgain() {
         AC_DEBUG <<"FFMpegDecoder2::startOverAgain";
 
@@ -896,7 +896,7 @@ namespace y60 {
 
     void
     FFMpegDecoder2::openStreams(const std::string & theFilename) {
-        
+
         unsigned myAudioStreamIndex = 0;
         _myAllAudioStreamIndicies.clear();
         for (unsigned i = 0; i < static_cast<unsigned>(_myFormatContext->nb_streams); ++i) {
@@ -1137,9 +1137,9 @@ namespace y60 {
         if (_myVStream->sample_aspect_ratio.num) {
            myAspectRatio = av_q2d(_myVStream->sample_aspect_ratio);
         } else if (_myVStream->codec->sample_aspect_ratio.num) {
-#else            
+#else
         if (_myVStream->codec->sample_aspect_ratio.num) {
-#endif            
+#endif
            myAspectRatio = av_q2d(_myVStream->codec->sample_aspect_ratio);
         } else {
            myAspectRatio = 0;
@@ -1147,7 +1147,7 @@ namespace y60 {
         if (myAspectRatio <= 0.0) {
             myAspectRatio = 1.0;
         }
-        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
+        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height;
         myMovie->Movie::set<AspectRatioTag>((float)myAspectRatio);
 
         //_myVideoStartTimestamp = _myVStream->start_time; // we use the dts of the first decoded frame
@@ -1226,7 +1226,7 @@ namespace y60 {
     bool FFMpegDecoder2::shouldSeek(double theCurrentTime, double theDestTime) {
         double myDistance = (theDestTime-theCurrentTime)*_myFrameRate;
         bool seek = (myDistance > _myMaxCacheSize || myDistance < 0);
-        DB(AC_DEBUG << "FFMpegDecoder2::shouldSeek: '"<< (seek ? "true" : "false") << "' Dest=" 
+        DB(AC_DEBUG << "FFMpegDecoder2::shouldSeek: '"<< (seek ? "true" : "false") << "' Dest="
                     << theDestTime << ", Curr=" << theCurrentTime<<" --> distance: "<< myDistance);
         return seek;
     }

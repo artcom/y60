@@ -190,9 +190,9 @@ namespace y60 {
             throw FFMpegDecoder3Exception(std::string("Unable to find stream info: ")
                     + myFilename, PLUS_FILE_LINE);
         }
-        
+
         _myDemux = AsyncDemuxerPtr(new AsyncDemuxer(_myFormatContext));
-        
+
         openStreams();
         if (_myVStream) {
             setupVideo(myFilename);
@@ -732,9 +732,9 @@ namespace y60 {
         if (_myVStream->sample_aspect_ratio.num) {
            myAspectRatio = av_q2d(_myVStream->sample_aspect_ratio);
         } else if (_myVStream->codec->sample_aspect_ratio.num) {
-#else            
+#else
         if (_myVStream->codec->sample_aspect_ratio.num) {
-#endif            
+#endif
            myAspectRatio = av_q2d(_myVStream->codec->sample_aspect_ratio);
         } else {
            myAspectRatio = 0;
@@ -742,7 +742,7 @@ namespace y60 {
         if (myAspectRatio <= 0.0) {
             myAspectRatio = 1.0;
         }
-        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
+        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height;
         myMovie->set<AspectRatioTag>((float)myAspectRatio);
 
         //_myVideoStartTimestamp = _myVStream->start_time; // we use the dts of the first decoded frame
@@ -786,7 +786,7 @@ namespace y60 {
     bool FFMpegDecoder3::shouldSeek(double theCurrentTime, double theDestTime) {
         double myDistance = (theDestTime-theCurrentTime)*_myFrameRate;
         bool seek = !_isStreamingMedia && (myDistance > _myMaxCacheSize || myDistance < 0);
-        DB(AC_DEBUG << "FFMpegDecoder3::shouldSeek: '"<< (seek ? "true" : "false") << "' Dest=" 
+        DB(AC_DEBUG << "FFMpegDecoder3::shouldSeek: '"<< (seek ? "true" : "false") << "' Dest="
                     << theDestTime << ", Curr=" << theCurrentTime<<" --> distance: "<< myDistance);
         return seek;
     }
@@ -1206,7 +1206,7 @@ namespace y60 {
                 //    continue;
                 //}
                 bool isEOF = !readAudio();
-                if (isEOF) { 
+                if (isEOF) {
                     boost::mutex::scoped_lock lock(_myAudioMutex);
                     _myAudioIsEOF = true;
                     _myAudioCondition.wait(lock);
@@ -1233,7 +1233,7 @@ namespace y60 {
                     continue;
                 }
                 bool isEOF = !decodeFrame();
-                if (isEOF) { 
+                if (isEOF) {
                     std::vector<unsigned> myFrameSize;
                     myFrameSize.push_back(0);
                     _myMsgQueue.push_back(VideoMsgPtr(new VideoMsg(VideoMsg::MSG_EOF, 0, myFrameSize)));
