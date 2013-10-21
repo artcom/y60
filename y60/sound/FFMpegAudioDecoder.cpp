@@ -59,7 +59,7 @@ using namespace asl;
 
 namespace y60 {
 
-asl::Block FFMpegAudioDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE<< 1);
+asl::Block FFMpegAudioDecoder::_myResampledSamples(AVCODEC_MAX_AUDIO_FRAME_SIZE);
 
 FFMpegAudioDecoder::FFMpegAudioDecoder (const string& myURI)
     : _myURI (myURI),
@@ -191,17 +191,18 @@ void FFMpegAudioDecoder::open() {
         AC_DEBUG << "Sample rate: " << _mySampleRate << endl;
         AC_DEBUG << "Sample format: " << myCodecContext->sample_fmt << endl;
 
-        if (_mySampleRate != Pump::get().getNativeSampleRate() || 
-            myCodecContext->sample_fmt != AV_SAMPLE_FMT_S16) 
+        if (myCodecContext->channels != Pump::get().getNumOutputChannels() ||
+            _mySampleRate != Pump::get().getNativeSampleRate() ||
+            myCodecContext->sample_fmt != AV_SAMPLE_FMT_S16)
         {
 #if  LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,15,0)
             _myResampleContext = av_audio_resample_init(
-                    _myNumChannels, _myNumChannels,
+                    Pump::get().getNumOutputChannels(), _myNumChannels,
                     Pump::get().getNativeSampleRate(), _mySampleRate,
-                    AV_SAMPLE_FMT_S16, myCodecContext->sample_fmt,
+                    AV_SAMPLE_FMT_S16, av_get_packed_sample_fmt(myCodecContext->sample_fmt),
                     16, 10, 0, 0.8);
 #else
-            _myResampleContext = audio_resample_init(_myNumChannels, _myNumChannels,
+            _myResampleContext = audio_resample_init(Pump::get().getNumOutputChannels(), _myNumChannels,
                     Pump::get().getNativeSampleRate(), _mySampleRate);
 #endif
         }
@@ -253,8 +254,8 @@ bool FFMpegAudioDecoder::decode() {
         int myBytesDecoded = 0;
 
         // we need an aligned buffer
-        int16_t * myAlignedBuf;
-        myAlignedBuf = (int16_t *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE<<1 );
+        char * myAlignedBuf;
+        myAlignedBuf = (char *)av_malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE );
 
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,27,0)
@@ -263,9 +264,9 @@ bool FFMpegAudioDecoder::decode() {
         myTempPacket.data = myPacket.data;
         myTempPacket.size = myPacket.size;
         while (myTempPacket.size > 0) {
-            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1;
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE;
             int myLen = avcodec_decode_audio3(myCodec,
-                myAlignedBuf, &myBytesDecoded, &myTempPacket);
+                (int16_t*)myAlignedBuf, &myBytesDecoded, &myTempPacket);
             if (myLen < 0) {
                 AC_WARNING << "av_decode_audio error";
                 myTempPacket.size = 0;
@@ -279,9 +280,9 @@ bool FFMpegAudioDecoder::decode() {
         const uint8_t* myData = myPacket.data;
         int myDataLen = myPacket.size;
         while (myDataLen > 0) {
-            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE<<1;
+            myBytesDecoded = AVCODEC_MAX_AUDIO_FRAME_SIZE;
             int myLen = avcodec_decode_audio2(myCodec,
-                myAlignedBuf, &myBytesDecoded, myData, myDataLen);
+                (int16_t*)myAlignedBuf, &myBytesDecoded, myData, myDataLen);
             if (myLen < 0) {
                 AC_WARNING << "av_decode_audio error";
                 myDataLen = 0;
@@ -296,19 +297,38 @@ bool FFMpegAudioDecoder::decode() {
                 continue;
             }
 #if  LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51,4,0)
-            int numFrames = myBytesDecoded/(av_get_bytes_per_sample(myCodec->sample_fmt)*_myNumChannels);
+            int myBytesPerSample = av_get_bytes_per_sample(myCodec->sample_fmt);
 #else
-            int numFrames = myBytesDecoded/(av_get_bits_per_sample_format(myCodec->sample_fmt)/8*_myNumChannels);
+            int myBytesPerSample = av_get_bits_per_sample_format(myCodec->sample_fmt)>>3;
 #endif
+            int numFrames = myBytesDecoded/(myBytesPerSample*_myNumChannels);
             AC_TRACE << "FFMpegAudioDecoder::decode(): Frames per buffer= " << numFrames;
             AudioBufferPtr myBuffer;
-            if (_myResampleContext) {
+            bool isPlanar = false;
+            bool needsResample = (_myResampleContext != NULL);
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 27, 0)
+            isPlanar = av_sample_fmt_is_planar(myCodec->sample_fmt);
+            if (isPlanar) {
+                char* packedBuffer = (char *)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+                planarToInterleaved(packedBuffer, myAlignedBuf, _myNumChannels, myBytesPerSample,
+                                    myCodec->frame_size);
                 numFrames = audio_resample(_myResampleContext,
                         (int16_t*)(_myResampledSamples.begin()),
-                        myAlignedBuf, numFrames);
+                        (int16_t*)packedBuffer, numFrames);
                 myBuffer = Pump::get().createBuffer(numFrames);
-                myBuffer->convert(_myResampledSamples.begin(), SF_S16, _myNumChannels);
-            } else {
+                myBuffer->convert(_myResampledSamples.begin(), SF_S16, 2);
+                av_free(packedBuffer);
+                needsResample = false;
+            }
+#endif
+            // queue audio sample
+            if (needsResample) {
+                numFrames = audio_resample(_myResampleContext,
+                        (int16_t*)(_myResampledSamples.begin()),
+                        (int16_t*)myAlignedBuf, numFrames);
+                myBuffer = Pump::get().createBuffer(numFrames);
+                myBuffer->convert(_myResampledSamples.begin(), SF_S16, 2);
+            } else if (!isPlanar){
                 myBuffer = Pump::get().createBuffer(numFrames);
                 myBuffer->convert(myAlignedBuf, SF_S16, _myNumChannels);
             }
@@ -320,6 +340,23 @@ bool FFMpegAudioDecoder::decode() {
     }
     av_free_packet(&myPacket);
     return false;
+}
+
+void FFMpegAudioDecoder::planarToInterleaved(char* outputBuffer, char* inputBuffer, int numChannels,
+        int bytesPerSample, int numSamples)
+{
+    int i, j;
+    char * planes[8] = {};
+    for (i=0; i<numChannels; i++) {
+        planes[i] = inputBuffer + i*(numSamples*bytesPerSample);
+    }
+    for (i=0; i<numSamples; i++) {
+        for (j=0; j<numChannels; j++) {
+            memcpy(outputBuffer, planes[j], bytesPerSample);
+            outputBuffer += bytesPerSample;
+            planes[j] += bytesPerSample;
+        }
+    }
 }
 
 unsigned FFMpegAudioDecoder::getSampleRate() {

@@ -69,6 +69,8 @@ class Y60_SOUND_DECL FFMpegAudioDecoder: public IAudioDecoder
         FFMpegAudioDecoder (const std::string& myURI); // should only be created by the factory
         void open();
         void close();
+        void planarToInterleaved(char* outputBuffer, char* inputBuffer, int numChannels,
+                                 int bytesPerSample, int numSamples);
 
         std::string _myURI;
         AVFormatContext * _myFormatContext;
