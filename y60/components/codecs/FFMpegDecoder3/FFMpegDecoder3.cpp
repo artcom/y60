@@ -771,7 +771,11 @@ namespace y60 {
             _myResampleContext = av_audio_resample_init(
                     myChannels, myChannels,
                     Pump::get().getNativeSampleRate(), myACodec->sample_rate,
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 27, 0)
+                    AV_SAMPLE_FMT_S16, av_get_packed_sample_fmt(myACodec->sample_fmt),
+#else
                     AV_SAMPLE_FMT_S16, myACodec->sample_fmt,
+#endif
                     16, 10, 0, 0.8);
 #else
             _myResampleContext = audio_resample_init(myChannels,

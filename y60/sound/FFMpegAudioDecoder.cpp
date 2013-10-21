@@ -199,7 +199,11 @@ void FFMpegAudioDecoder::open() {
             _myResampleContext = av_audio_resample_init(
                     Pump::get().getNumOutputChannels(), _myNumChannels,
                     Pump::get().getNativeSampleRate(), _mySampleRate,
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(51, 27, 0)
                     AV_SAMPLE_FMT_S16, av_get_packed_sample_fmt(myCodecContext->sample_fmt),
+#else
+                    AV_SAMPLE_FMT_S16, myCodecContext->sample_fmt,
+#endif
                     16, 10, 0, 0.8);
 #else
             _myResampleContext = audio_resample_init(Pump::get().getNumOutputChannels(), _myNumChannels,
