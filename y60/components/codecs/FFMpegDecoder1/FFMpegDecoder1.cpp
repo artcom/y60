@@ -370,8 +370,21 @@ namespace y60 {
         _myFirstFrameDecodedFlag = false; // we use the dts of the first decoded frame
 
         // framerate
-        double myFPS;
-        myFPS = av_q2d(_myVStream->r_frame_rate);
+        double myFPS = 0.0;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 42, 0)
+        if (_myVStream->avg_frame_rate.den != 0) {
+            myFPS = av_q2d(_myVStream->avg_frame_rate);
+        } else {
+#endif
+            if (_myVStream->r_frame_rate.den != 0) {
+                myFPS = av_q2d(_myVStream->r_frame_rate);
+            } else {
+                double duration = _myVStream->duration * av_q2d(_myVStream->time_base);
+                myFPS = _myVStream->nb_frames/duration;
+            }
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 42, 0)
+        }
+#endif
         myMovie->set<FrameRateTag>(myFPS);
 
         // duration
@@ -386,13 +399,13 @@ namespace y60 {
         {
             myMovie->set<FrameCountTag>(int(_myVStream->duration * myFPS / 1000));
         } else {
-            double myDuration = 0.0;
-            if(_myFormatContext->start_time == static_cast<int64_t>(AV_NOPTS_VALUE)) {
-                myDuration = (_myFormatContext->duration )*myFPS/(double)AV_TIME_BASE;
-            } else {
-                myDuration = (_myFormatContext->duration - _myFormatContext->start_time )*myFPS/(double)AV_TIME_BASE;
+            double myFrameCount = -1;
+            if (_myVStream->duration != static_cast<int64_t>(AV_NOPTS_VALUE)) {
+                myFrameCount = _myVStream->duration * myFPS * av_q2d(_myVStream->time_base);
             }
-            myMovie->set<FrameCountTag>(int(myDuration));
+            if (myFrameCount > 0) {
+                myMovie->Movie::set<FrameCountTag>(int(asl::round(myFrameCount)));
+            }
         }
         AC_INFO << "FFMpegDecoder1::load() " << theFilename << " fps="
                 << myFPS << " framecount=" << getFrameCount();
@@ -415,9 +428,9 @@ namespace y60 {
         if (_myVStream->sample_aspect_ratio.num) {
            myAspectRatio = av_q2d(_myVStream->sample_aspect_ratio);
         } else if (_myVStream->codec->sample_aspect_ratio.num) {
-#else            
+#else
         if (_myVStream->codec->sample_aspect_ratio.num) {
-#endif            
+#endif
            myAspectRatio = av_q2d(_myVStream->codec->sample_aspect_ratio);
         } else {
            myAspectRatio = 0;
@@ -425,7 +438,7 @@ namespace y60 {
         if (myAspectRatio <= 0.0) {
             myAspectRatio = 1.0;
         }
-        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height; 
+        myAspectRatio *= (float)_myVStream->codec->width / _myVStream->codec->height;
         myMovie->set<AspectRatioTag>((float)myAspectRatio);
     }
 
@@ -580,7 +593,7 @@ namespace y60 {
                     _myFirstFrameDecodedFlag = true;
                     _myStartTimestamp = myPacket.dts;
                 }
-                
+
                 // suitable framestamp?
                 if (_myLastVideoTimestamp >= theTimestamp) {
                     DB(AC_TRACE << "found " << _myLastVideoTimestamp << " for " << theTimestamp);

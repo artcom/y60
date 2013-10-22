@@ -1100,26 +1100,35 @@ namespace y60 {
         AVCodecContext * myVCodec = _myVStream->codec;
         Movie * myMovie = getMovie();
 
-        _myFrameRate = av_q2d(_myVStream->r_frame_rate);
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 42, 0)
+        if (_myVStream->avg_frame_rate.den != 0) {
+            _myFrameRate = av_q2d(_myVStream->avg_frame_rate);
+        } else {
+#endif
+            if (_myVStream->r_frame_rate.den != 0) {
+                _myFrameRate = av_q2d(_myVStream->r_frame_rate);
+            } else {
+                double duration = _myVStream->duration * av_q2d(_myVStream->time_base);
+                _myFrameRate = _myVStream->nb_frames/duration;
+            }
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52, 42, 0)
+        }
+#endif
         myMovie->Movie::set<FrameRateTag>(_myFrameRate);
         _myVideoStreamTimeBase = 1/ av_q2d(_myVStream->time_base);
         if (myVCodec->codec_id == CODEC_ID_MPEG1VIDEO || myVCodec->codec_id == CODEC_ID_MPEG2VIDEO )
         {
             // For some codecs, the duration value is not set. For MPEG1 and MPEG2,
             // ffmpeg gives often a wrong value.
-            //unsigned myFrameCount = unsigned(_myVStream->duration*_myFrameRate/_myVideoStreamTimeBase);
+            myMovie->set<FrameCountTag>(-1);
 
         } else if (myVCodec->codec_id == CODEC_ID_WMV1 || myVCodec->codec_id == CODEC_ID_WMV2 ||
                    myVCodec->codec_id == CODEC_ID_WMV3) {
             myMovie->Movie::set<FrameCountTag>(int(_myVStream->duration * _myFrameRate / 1000));
         } else {
             double myFrameCount = -1;
-            if (_myFormatContext->duration != static_cast<int64_t>(AV_NOPTS_VALUE)) {
-                if (_myFormatContext->start_time == static_cast<int64_t>(AV_NOPTS_VALUE)) {
-                    myFrameCount = (_myFormatContext->duration )*_myFrameRate/(double)AV_TIME_BASE;
-                } else {
-                    myFrameCount = (_myFormatContext->duration - _myFormatContext->start_time )*_myFrameRate/(double)AV_TIME_BASE;
-                }
+            if (_myVStream->duration != static_cast<int64_t>(AV_NOPTS_VALUE)) {
+                myFrameCount = _myVStream->duration * _myFrameRate * av_q2d(_myVStream->time_base);
             }
             if (myFrameCount > 0) {
                 myMovie->Movie::set<FrameCountTag>(int(asl::round(myFrameCount)));
