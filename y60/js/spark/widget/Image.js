@@ -74,9 +74,9 @@ spark.Image.Constructor = function (Protected) {
         }
         _myImage = theNode;
         if (_myImage) {
-            // _myTexture.image = theNode.id;
-            // Public.width  = Protected.getNumber("width", _myImage.raster.width);
-            // Public.height = Protected.getNumber("height", _myImage.raster.height);
+            _myTexture.image = theNode.id;
+            Public.width  = Protected.getNumber("width", _myImage.raster.width);
+            Public.height = Protected.getNumber("height", _myImage.raster.height);
         } else {
             Logger.error("no image node to set");
         }
