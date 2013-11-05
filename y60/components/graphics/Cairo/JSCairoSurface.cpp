@@ -31,7 +31,6 @@
 
 #include <string>
 
-#include <y60/image/Image.h>
 
 #include <y60/jsbase/JScppUtils.h>
 #include <y60/jsbase/JSNode.h>
@@ -254,27 +253,6 @@ cairo::JSSurface::setPropertySwitch(NATIVE & theNative, unsigned long theID,
     return JS_FALSE;
 }
 
-void
-cairo::JSSurface::convertRGBAtoBGRA(ResizeableRasterPtr theOld, ResizeableRasterPtr theNew) {
-    ReadableBlock  &myOld = theOld->pixels();
-    WriteableBlock &myNew = theNew->pixels();
-
-    if(myOld.size() != myNew.size()) {
-        AC_FATAL << "Trying to convert between rasters with unequal sizes.";
-    }
-
-    const unsigned char *src = const_cast<unsigned char*>(myOld.begin());
-    unsigned char *dst = myNew.begin();
-    unsigned int l = myOld.size();
-    unsigned int i;
-    for(i = 0; i < l; i += 4) {
-        dst[i+0] = src[i+2];
-        dst[i+1] = src[i+1];
-        dst[i+2] = src[i+0];
-        dst[i+3] = src[i+3];
-    }
-}
-
 JSBool
 cairo::JSSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("");
@@ -294,40 +272,10 @@ cairo::JSSurface::Constructor(JSContext *cx, JSObject *obj, uintN argc, jsval *a
 
     if (argc == 1) {
 
-        if(convertFrom(cx, argv[0], myImageNode)) {
+        if (convertFrom(cx, argv[0], myImageNode)) {
 
-            ImagePtr myImage = myImageNode->getFacade<Image>();
-
-            int myWidth = myImage->get<ImageWidthTag>();
-            int myHeight = myImage->get<ImageHeightTag>();
-            string myPixelFormat = myImage->get<RasterPixelFormatTag>();
-
-            ResizeableRasterPtr myRaster = myImage->getRasterPtr();
-            unsigned char *myData = myRaster->pixels().begin();
-
-            int myStride;
-            cairo_format_t myFormat;
-
-            if (myPixelFormat == "BGRA") {
-                myStride = myWidth * 4;
-                myFormat = CAIRO_FORMAT_ARGB32;
-            } else if (myPixelFormat == "RGBA") {
-                AC_WARNING << "Converting raster for image " << myImage->get<NameTag>() << " to BGRA";
-                myImage->createRaster(myWidth, myHeight, 1, y60::BGRA);
-                convertRGBAtoBGRA(myRaster, myImage->getRasterPtr());
-                myRaster = myImage->getRasterPtr();
-                myData = myRaster->pixels().begin();
-                myStride = myWidth * 4;
-                myFormat = CAIRO_FORMAT_ARGB32;
-            } else {
-                AC_ERROR << "Pixel format of image " << myImage->get<NameTag>() << " not supported by JSCairo: " << myPixelFormat;
-                throw UnsupportedPixelFormat("Pixel format not supported by JSCairo: " + myPixelFormat, PLUS_FILE_LINE);
-            }
-
-            cairo_surface_t *mySurface = cairo_image_surface_create_for_data(myData, myFormat, myWidth, myHeight, myStride);
-
+            cairo_surface_t *mySurface = createFromImageNode(myImageNode);
             newNative = NATIVE::get(mySurface);
-
             cairo_surface_destroy(mySurface);
 
         } else if(convertFrom(cx, argv[0], myPath)) {

@@ -75,6 +75,9 @@ namespace curl {
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_OPENSOCKETDATA, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
+    
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_NOSIGNAL, 1);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
 
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_CLOSESOCKETFUNCTION, &Client::_closeSocket);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);

@@ -154,6 +154,7 @@ spark.Image.Constructor = function (Protected) {
     Public.realize = function () {
         var myImageSource = Protected.getString("src", "");
         var myImageSourceId = Protected.getString("srcId", "");
+        var myApplymode = Protected.getString("applymode", "modulate");
         _myASyncLoad = Protected.getBoolean("loadasync", false);
         _myUseCaching = Protected.getBoolean("useCaching", true);
 
@@ -189,6 +190,10 @@ spark.Image.Constructor = function (Protected) {
         var myMaterial = Modelling.createUnlitTexturedMaterial(window.scene,
                 _myTexture, Public.name + "-material", true);
         Base.realize(myMaterial);
+
+        Protected.material.enabled = false;
+        Protected.material.childNode("textureunits").firstChild.applymode = myApplymode;
+        Protected.material.enabled = true;    
 
         Public.width = myWidth;
         Public.height = myHeight;
