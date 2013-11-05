@@ -193,7 +193,7 @@ spark.Image.Constructor = function (Protected) {
 
         Protected.material.enabled = false;
         Protected.material.childNode("textureunits").firstChild.applymode = myApplymode;
-        Protected.material.enabled = true;    
+        Protected.material.enabled = true;
 
         Public.width = myWidth;
         Public.height = myHeight;

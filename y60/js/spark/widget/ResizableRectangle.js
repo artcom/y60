@@ -95,11 +95,11 @@ spark.ResizableRectangle.Constructor = function (Protected) {
         _myMaterial.properties.blendfunction = "[src_alpha,one_minus_src_alpha,one,one_minus_src_alpha]";
         var myTextureUnit = _myMaterial.find("./textureunits/textureunit");
         if (!_myShape) {
-            // if (myTextureUnit) {
-            //     var raster = myTextureUnit.$texture.$image.raster;
-            //     Public.width = raster.width;
-            //     Public.height = raster.height;
-            // }
+            if (myTextureUnit) {
+                var raster = myTextureUnit.$texture.$image.raster;
+                Public.width = raster.width;
+                Public.height = raster.height;
+            }
             var mySize = new Vector3f(Public.width, Public.height, 0);
             var myOrigin = Protected.getString("origin", undefined);
             if (myOrigin === "center") {
