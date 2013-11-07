@@ -157,7 +157,7 @@ setText(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
         pango_layout_get_pixel_size(layout, &width, &height);
 
         //return dimensions
-        Vector2f dimensions(width, height);
+        Vector2i dimensions(width, height);
         *rval = as_jsval(cx, dimensions);
 
         return JS_TRUE;
@@ -239,16 +239,16 @@ setIndent(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
 static JSBool
 setSpacing(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     DOC_BEGIN("Sets (additional) spacing between lines in pixel and thus the lineheight. Negative values are possible.");
-    DOC_PARAM("theSpacing", "text spacing", DOC_TYPE_FLOAT);
+    DOC_PARAM("theSpacing", "text spacing", DOC_TYPE_INTEGER);
     DOC_END;
     try {
         pango::JSLayout::OWNERPTR myOwner;
         convertFrom(cx, OBJECT_TO_JSVAL(obj), myOwner);
 
         ensureParamCount(argc, 1);
-        float spacing;
+        int spacing;
         if (!convertFrom(cx, argv[0], spacing)) {
-            JS_ReportError(cx, "JSPangoLayout::setSpacing(): argument #1 must be a float");
+            JS_ReportError(cx, "JSPangoLayout::setSpacing(): argument #1 must be an integer");
             return JS_FALSE;
         }
 
