@@ -568,10 +568,10 @@ namespace y60 {
     MaterialPropertiesFacade::updateGroup1Hash() {
         unsigned long myCRC32 = crc32(0L, Z_NULL, 0);
         const TargetBuffers & myMasks = get<TargetBuffersTag>();
-        appendCRC32(myCRC32, myMasks[RED_MASK]);
-        appendCRC32(myCRC32, myMasks[GREEN_MASK]);
-        appendCRC32(myCRC32, myMasks[BLUE_MASK]);
-        appendCRC32(myCRC32, myMasks[ALPHA_MASK]);
+        appendCRC32(myCRC32, (bool)myMasks[RED_MASK]);
+        appendCRC32(myCRC32, (bool)myMasks[GREEN_MASK]);
+        appendCRC32(myCRC32, (bool)myMasks[BLUE_MASK]);
+        appendCRC32(myCRC32, (bool)myMasks[ALPHA_MASK]);
         const VectorOfBlendFunction & myBlendFunction = get<BlendFunctionTag>();
         if(myBlendFunction.size() >= 2) {
             appendCRC32(myCRC32, myBlendFunction[0]);
