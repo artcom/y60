@@ -70,7 +70,7 @@ namespace y60 {
 #endif
 
             virtual unsigned applyTexture(TexturePtr & theTexture) { return 0; }
-            virtual void updateTextureParams(TexturePtr & theTexture) {}
+            virtual void updateTextureParams(const TexturePtr & theTexture) {}
 
             VertexDataFactory1f & getVertexDataFactory1f() { return _myVertexDataFactory1f; }
             VertexDataFactory2f & getVertexDataFactory2f() { return _myVertexDataFactory2f; }
