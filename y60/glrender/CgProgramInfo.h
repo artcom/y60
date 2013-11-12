@@ -229,7 +229,6 @@ namespace y60 {
                 private:
                     GLenum _myTextureUnit;
                     bool   _myInUseFlag;
-                    bool   _myCheckUsageFlag;
             };
             typedef std::vector<CgTextureParam> CgTextureParamVector;
 
