@@ -147,7 +147,7 @@ spark.applyStyleDefaults = function(theStyle) {
     !theStyle.getAttribute("hinting")    ? theStyle.hinting    = spark.AUTOHINTING  : null;
 
     !theStyle.getAttribute("indentation") ? theStyle.indentation = 0 : null;
-    !theStyle.getAttribute("textColor")   ? theStyle.textColor   = "000000" : null;
+    !theStyle.getAttribute("textColor")   ? theStyle.textColor   = "FFFFFF" : null;
 };
 
 spark.isFontStyleNode = function(theNode) {
