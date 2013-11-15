@@ -67,8 +67,6 @@ protected:
 
 private:
 
-    int _mySourcePort;
-
     std::vector<ASSOscReceiverPtr> _myReceivers;
 };
 

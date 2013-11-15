@@ -72,7 +72,6 @@ class UDPTransport : public TransportLayer {
     unsigned _myGridWidth;
     unsigned _myGridHeight;
     unsigned _myGridSpacing;
-    unsigned char _myDimFactor;
 
     std::vector<unsigned char> _myStatusLine;
     std::vector<unsigned char> _myGridValues;
