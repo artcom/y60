@@ -300,6 +300,7 @@ namespace y60 {
     const char * const CAPTURE_NORM_ATTRIB         = "norm";
     const char * const CAPTURE_DEVICE_ATTRIB       = "device";
     const char * const CAPTURE_TIMECODE_ATTRIB     = "timecode";
+    const char * const CAPTURE_FEATURES_ATTRIB      = "features";
 
     const char * const GEOMETRY_COLOR_ATTRIB        = "color";
     const char * const GEOMETRY_LINE_WIDTH_ATTRIB   = "linewidth";

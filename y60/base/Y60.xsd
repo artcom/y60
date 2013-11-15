@@ -3276,6 +3276,11 @@ Possible values are:
                             <xs:documentation>Device ID to capture from. Default is 0 (the first one available).</xs:documentation>
                         </xs:annotation>
                     </xs:attribute>
+                    <xs:attribute name="features" type="xs:string">
+                        <xs:annotation>
+                            <xs:documentation> camera features</xs:documentation>
+                        </xs:annotation>
+                    </xs:attribute>
                     <xs:attribute name="norm" type="xs:string">
                         <xs:annotation>
                             <xs:documentation>Norm to capture in. Usually PAL. Ignored for non-capable devices.</xs:documentation>

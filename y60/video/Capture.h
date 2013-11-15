@@ -57,6 +57,7 @@ namespace y60 {
     DEFINE_ATTRIBUTE_TAG(NormTag,      std::string, CAPTURE_NORM_ATTRIB,       "PAL", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(TimeCodeTag,  std::string, CAPTURE_TIMECODE_ATTRIB,   "", Y60_VIDEO_DECL);
     DEFINE_ATTRIBUTE_TAG(DeviceTag,    unsigned,    CAPTURE_DEVICE_ATTRIB, 0, Y60_VIDEO_DECL);
+    DEFINE_ATTRIBUTE_TAG(CameraFeaturesTag,   std::string, CAPTURE_FEATURES_ATTRIB, "", Y60_VIDEO_DECL);
 
     class Y60_VIDEO_DECL CaptureDevice;
 
@@ -74,6 +75,7 @@ namespace y60 {
     class Y60_VIDEO_DECL Capture : public Image,
         public DeviceTag::Plug,
         public NormTag::Plug,
+        public CameraFeaturesTag::Plug,
         public FrameRateTag::Plug,
         public PlayModeTag::Plug,
         public TimeCodeTag::Plug
@@ -102,6 +104,8 @@ namespace y60 {
          *         parameters changed.
          */
         virtual bool reloadRequired() const;
+        virtual void registerDependenciesRegistrators();
+        void setFeatures();
 
         MoviePlayMode getPlayMode() const {
             return _myPlayMode;

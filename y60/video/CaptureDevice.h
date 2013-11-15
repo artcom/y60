@@ -82,6 +82,7 @@ namespace y60 {
         virtual void readFrame(dom::ResizeableRasterPtr theTargetRaster) = 0;
         virtual bool getEOF() { return false; };
         virtual void load(const std::string & theFilename) = 0;
+        virtual void setFeatures(const std::string & theFeatures) {};
 
         /**
         * @return new instance of the concrete CaptureDevice.
@@ -90,7 +91,6 @@ namespace y60 {
             return asl::Ptr<CaptureDevice>();
         }
 
-        void parseOptions(const std::string & theURL);
 #if 0
         virtual std::string canDecode(const std::string & theUrl, asl::Ptr<asl::ReadableStreamHandle> theStream = asl::Ptr<asl::ReadableStreamHandle>(0)) {
             AC_ERROR << asl::StackTrace();
@@ -139,17 +139,7 @@ namespace y60 {
         unsigned getDevice() const {
             return _myParent->get<DeviceTag>();
         }
-        template <class T>
-        bool getOption(const std::string & theOption, T & theValue) {
-            std::map<std::string, std::string>::iterator it = _myOptions.find(theOption);
-            if (it == _myOptions.end()) {
-                return false;
-            }
-            theValue = asl::as<T>(it->second);
-            return true;
-        };
     private:
-        std::map<std::string, std::string> _myOptions;
         Capture *   _myParent;
     };
 

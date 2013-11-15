@@ -45,16 +45,31 @@ namespace y60 {
         : Image(theNode),
         DeviceTag::Plug(theNode),
         NormTag::Plug(theNode),
+        CameraFeaturesTag::Plug(theNode),
         FrameRateTag::Plug(theNode),
         PlayModeTag::Plug(theNode),
         TimeCodeTag::Plug(theNode),
-         _myDevice(),
+        _myDevice(),
         _myPlayMode(PLAY_MODE_STOP)
     {
         AC_TRACE << "Capture::Capture " << theNode;
     }
 
     Capture::~Capture() {
+    }
+
+    void
+    Capture::registerDependenciesRegistrators() {
+        Image::registerDependenciesRegistrators();
+        AC_DEBUG << "Capture::registerDependenciesRegistrators '" << get<NameTag>();
+        CameraFeaturesTag::Plug::getValuePtr()->setImmediateCallBack(dynamic_cast_Ptr<Capture>(getSelf()), &Capture::setFeatures);
+    }
+
+    void Capture::setFeatures() {
+        const std::string & features = get<CameraFeaturesTag>();
+        if (_myDevice) {
+            _myDevice->setFeatures(features);
+        }
     }
 
     void Capture::stop() {
