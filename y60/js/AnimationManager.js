@@ -49,7 +49,7 @@ Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer
         return _myName;
     };
     obj.pause = function() {
-        _myPauseFlag = !_myPauseFlag;
+        _myPauseFlag = !_myPauseFlag; 
     };
     obj.stop = function() {
         _myAnimationNode.enabled = false;
@@ -86,6 +86,9 @@ Animation.prototype.Constructor = function(obj, theAnimationName, theSceneViewer
     obj.isRunning = function() {
         var myCurrentTime = _mySceneViewer.getCurrentTime();
         return _myAnimationNode.enabled && myCurrentTime >= _myAnimationNode.begin  &&  myCurrentTime <= _myAnimationNode.begin + _myAnimationNode.duration;
+    };
+    obj.reset = function() {
+        obj.start(604800,1); // offset on week into the future. this resets the animation toe the first frame.  
     };
 };
 
