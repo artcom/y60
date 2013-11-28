@@ -81,6 +81,8 @@ namespace curl {
             std::vector<char>   _myErrorBuffer;
             asl::Ptr<asl::Block> _privateResponseBuffer; // filled in io_service thread, emptied in JS thread
             asl::ReadWriteLock _lockResponseBuffer; // lock for _privateResponseBuffer;
+            std::map<std::string, std::string> _privateResponseHeaders; // filled in io_service thread, read in JS thread
+            mutable asl::ReadWriteLock _lockResponseHeaders; // lock for _privateResponseHeaders;
             asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread.
             bool _continueFlag;
             struct curl_slist *_reqHeaders;
@@ -95,6 +97,8 @@ namespace curl {
             void performAsync();
             void onDone(CURLcode result);
             void onProgress();
+            bool getResponseHeader(const std::string & theHeader, std::string & theValue) const;
+            std::string getResponseHeader(const std::string & theHeader) const;
             std::string getResponseString() const;
             asl::Ptr<asl::Block> getResponseBlock() const;
             void abort() { _continueFlag = false; };
@@ -141,6 +145,16 @@ namespace curl {
                 AC_DEBUG << "calling writefunction for " << self;
                 if (self) {
                     return self->writeFunction(ptr, size*nmemb);
+                } else {
+                    return 0;
+                }
+            };
+
+            size_t headerFunction(const char *ptr, size_t size);
+            static size_t _headerFunction(char *ptr, size_t size, size_t nmemb, Client *self) {
+                AC_DEBUG << "calling headerfunction for " << self;
+                if (self) {
+                    return self->headerFunction(ptr, size*nmemb);
                 } else {
                     return 0;
                 }

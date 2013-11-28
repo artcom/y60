@@ -65,6 +65,28 @@ abort(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
     return JS_TRUE;
 }
 
+static JSBool
+getResponseHeader(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval) {
+    DOC_BEGIN("Returns a single response header");
+    DOC_PARAM("the header requested", "", DOC_TYPE_STRING);
+    DOC_RVAL("the header value", DOC_TYPE_STRING);
+    DOC_END;
+    try {
+        ensureParamCount(argc, 1);
+        std::string myHeaderName;
+        std::string myHeaderValue;
+        convertFrom(cx, argv[0], myHeaderName);
+        JSHttpClient::OWNERPTR nativePtr = JSClassTraits<JSHttpClient::NATIVE>::getNativeOwner(cx,obj);
+        if (nativePtr->getResponseHeader(myHeaderName, myHeaderValue)) {
+            *rval = as_jsval(cx, myHeaderValue);
+        } else {
+            *rval = JSVAL_NULL;
+        }
+        return JS_TRUE;
+    } HANDLE_CPP_EXCEPTION;
+    return JS_TRUE;
+}
+
 
 JSHttpClient::~JSHttpClient() {
 }
@@ -76,6 +98,7 @@ JSHttpClient::Functions() {
         // name                  native                   nargs
         {"toString",             toString,                0},
         {"abort",                abort,                   0},
+        {"getResponseHeader",    getResponseHeader,       1},
         {0}
     };
     return myFunctions;

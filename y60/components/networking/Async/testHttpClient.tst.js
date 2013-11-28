@@ -137,11 +137,11 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 FAILURE("testBigRequest");
                 done = true;
             },
-            success: function() {
+            success: function(data, code, response) {
                 DPRINT2("received in Progress: ", received);
-                DPRINT2("last responseBlock:", this.responseBlock.size);
+                DPRINT2("last responseBlock:", response.responseBlock.size);
                 done = true;
-                if (received + this.responseBlock.size === 1024*1024*5) {
+                if (received + response.responseBlock.size === 1024*1024*5) {
                     SUCCESS("testBigRequest");
                 } else {
                     FAILURE("testBigRequest");
@@ -226,8 +226,11 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/echo",
             type: "GET",
-            success: function () {
-                obj.responseString = this.responseString;
+            verbose: true,
+            success: function (data, code, response) {
+                obj.responseString = response.responseString;
+                obj.code = code;
+                obj.content_type = response.getResponseHeader("Content-Type");
                 SUCCESS("testGetRequest");
                 done = true;
             },
@@ -246,6 +249,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             }
         }
         ENSURE_EQUAL("GET:", obj.responseString);
+        ENSURE_EQUAL("200", obj.code);
+        ENSURE_EQUAL("text/plain", obj.content_type);
     };
 
     function testDeleteRequest() {
@@ -255,8 +260,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/echo",
             type: "DELETE",
-            success: function () {
-                obj.responseString = this.responseString;
+            success: function (data, code, response) {
+                obj.responseString = response.responseString;
                 SUCCESS("testDeleteRequest");
                 done = true;
             },
@@ -287,8 +292,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             verbose: true,
             data: "Hello World!",
             contentType: "text/plain",
-            success: function () {
-                obj.responseString = this.responseString;
+            success: function (data, code, response) {
+                obj.responseString = response.responseString;
                 SUCCESS("testPostRequest");
                 done = true;
             },
@@ -319,8 +324,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             data: "Hello World!",
             verbose: true,
             contentType: "text/plain",
-            success: function () {
-                obj.responseString = this.responseString;
+            success: function (data, code, response) {
+                obj.responseString = response.responseString;
                 SUCCESS("testPutRequest");
                 done = true;
             },
@@ -348,8 +353,8 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/echo",
             type: "HEAD",
-            success: function () {
-                obj.responseString = this.responseString;
+            success: function (data, code, response) {
+                obj.responseString = response.responseString;
                 SUCCESS("testHeadRequest");
                 done = true;
             },

@@ -71,6 +71,11 @@ namespace curl {
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_WRITEDATA, this);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_HEADERFUNCTION, &Client::_headerFunction);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_WRITEHEADER, this);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_OPENSOCKETFUNCTION, &Client::_openSocket);
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
         myStatus = curl_easy_setopt(_curlHandle, CURLOPT_OPENSOCKETDATA, this);
@@ -208,6 +213,17 @@ namespace curl {
         }
     };
 
+    bool 
+    Client::getResponseHeader(const std::string & theHeader, std::string & theValue) const {
+        ScopeLocker L(_lockResponseHeaders, false);
+        std::map<std::string, std::string>::const_iterator it = _privateResponseHeaders.find(theHeader);
+        if (it != _privateResponseHeaders.end()) {
+            theValue = it->second;
+            return true;
+        }
+        return false;
+    };
+
     std::string
     Client::getResponseString() const {
         return std::string(_myResponseBlock->strbegin(), _myResponseBlock->strend());
@@ -232,7 +248,7 @@ namespace curl {
             AC_TRACE << "calling onProgress for " << this;
             jsval argv[1], rval;
             argv[0] = as_jsval(_jsContext, _myResponseBlock);
-            JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, "progress", 1, argv, &rval);
+            JSBool ok = JSA_CallFunctionName(_jsContext, _jsOptsObject, _jsOptsObject, "progress", 1, argv, &rval);
             if (ok) {
                 if (!convertFrom(_jsContext, rval, _continueFlag)) {
                     AC_ERROR << "HttpClient: progress callback returned a bad result (not a bool)" << std::endl;
@@ -254,9 +270,15 @@ namespace curl {
         AC_DEBUG << "error string:" << std::string(asl::begin_ptr(_myErrorBuffer));
         if (result == CURLE_OK) {
             if (hasCallback("success")) {
-                AC_DEBUG << "calling success";
-                jsval argv[1], rval;
-                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "success", 0, argv, &rval);
+                long HttpStatus;
+                curl_easy_getinfo(_curlHandle,CURLINFO_RESPONSE_CODE, &HttpStatus); 
+                AC_DEBUG << "calling success after receiving " << HttpStatus;
+
+                jsval argv[3], rval;
+                argv[0] = as_jsval(_jsContext, _myResponseBlock);
+                argv[1] = as_jsval(_jsContext, as_string(HttpStatus));
+                argv[2] = OBJECT_TO_JSVAL(_jsWrapper);
+                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, _jsOptsObject, "success", 3, argv, &rval);
                 AC_DEBUG << "called success";
             };
         } else {
@@ -265,7 +287,7 @@ namespace curl {
                 jsval argv[2], rval;
                 argv[0] = as_jsval(_jsContext, result);
                 argv[1] = as_jsval(_jsContext, std::string(asl::begin_ptr(_myErrorBuffer)));
-                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsWrapper, _jsOptsObject, "error", 2, argv, &rval);
+                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, _jsOptsObject, "error", 2, argv, &rval);
             };
         }
         AC_DEBUG << "freeing root for " << debugIdentifier;
@@ -303,6 +325,25 @@ namespace curl {
         // NOTE: this will be called from one of io_service's threads
         ScopeLocker L(_lockResponseBuffer, true);
         _privateResponseBuffer->append(ptr, size);
+        return _continueFlag ? size : 0;
+    };
+
+    size_t 
+    Client::headerFunction(const char *ptr, size_t size) {
+        std::string headerLine(ptr, size);
+        std::string header;
+        std::string value;
+
+        std::string::size_type p = headerLine.find(":");
+        if ( p != std::string::npos ) {
+            header = trim(headerLine.substr(0, p));
+            value = trim(headerLine.substr(p+1, std::string::npos), " \n\r");
+            AC_TRACE << "adding '" << header << "' with '" << value << "'";
+        }
+
+        // NOTE: this will be called from one of io_service's threads
+        ScopeLocker L(_lockResponseHeaders, true);
+        _privateResponseHeaders.insert(make_pair(header, value));
         return _continueFlag ? size : 0;
     };
 
