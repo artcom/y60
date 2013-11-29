@@ -226,11 +226,10 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/echo",
             type: "GET",
-            verbose: true,
+            verbose: false,
             success: function (data, code, response) {
                 obj.responseString = response.responseString;
                 obj.code = code;
-                obj.content_type = response.getResponseHeader("Content-Type");
                 SUCCESS("testGetRequest");
                 done = true;
             },
@@ -250,7 +249,38 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         }
         ENSURE_EQUAL("GET:", obj.responseString);
         ENSURE_EQUAL("200", obj.code);
-        ENSURE_EQUAL("text/plain", obj.content_type);
+    };
+    
+    function testHeaders() {
+        var done = false;
+
+        Logger.info("creating client");
+        var myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/headers",
+            type: "GET",
+            verbose: true,
+            success: function (data, code, response) {
+                obj.code = code;
+                obj.custom_header = response.getResponseHeader("X-Custom-Header");
+                SUCCESS("testHeaders");
+                done = true;
+            },
+            error: function () {
+                FAILURE("testHeaders");
+                done = true;
+            }
+        });
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+        ENSURE_EQUAL("201", obj.code);
+        ENSURE_EQUAL("Custom-Value", obj.custom_header);
     };
 
     function testDeleteRequest() {
@@ -415,6 +445,9 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             big: function(theMethod, theBody) {
                 return new Array(1024*1024+1).join("Fubar"); // 100 MB
                  },
+            headers: function(theMethod, theBody) {
+                return [201, { "X-Custom-Header":"Custom-Value" }, "custom headers received"]; 
+                 },
             echo: function(theMethod, theBody) {
                 return theMethod+":"+theBody;
                  }
@@ -424,8 +457,10 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         obj.myServer.registerCallback("/foo", myServer, myServer.foo);
         obj.myServer.registerCallback("/big", myServer, myServer.big);
         obj.myServer.registerCallback("/echo", myServer, myServer.echo);
+        obj.myServer.registerCallback("/headers", myServer, myServer.headers);
 
         testFireAndForget();
+        testHeaders();
         testGetRequest();
         testDeleteRequest();
         testHeadRequest();

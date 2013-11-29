@@ -108,14 +108,8 @@ namespace http {
                     if (JS_IsArrayObject(theCallback.context, myJsObject)) {
                         jsval curElement;
                         
-                        // Body
-                        JS_GetElement(theCallback.context, myJsObject, 0, &curElement);
-                        if (!JSVAL_IS_VOID(curElement)) {
-                            jslib::convertFrom(theCallback.context, curElement, theReply.content);
-                        }
-                        
                         // status
-                        JS_GetElement(theCallback.context, myJsObject, 1, &curElement);
+                        JS_GetElement(theCallback.context, myJsObject, 0, &curElement);
                         if (!JSVAL_IS_VOID(curElement)) {
                             int myStatusCode;
                             jslib::convertFrom(theCallback.context, curElement, myStatusCode);
@@ -125,7 +119,7 @@ namespace http {
                         }
                         
                         // headers
-                        JS_GetElement(theCallback.context, myJsObject, 2, &curElement);
+                        JS_GetElement(theCallback.context, myJsObject, 1, &curElement);
                         if (JSVAL_IS_OBJECT(curElement)) {
                             JSObject *headers = JSVAL_TO_OBJECT(curElement);
                             JSIdArray *props = JS_Enumerate(theCallback.context, headers);
@@ -157,6 +151,12 @@ namespace http {
                                 theReply.headers.insert(make_pair(header_name, header_value));
                             }
                         }
+                        // Body
+                        JS_GetElement(theCallback.context, myJsObject, 2, &curElement);
+                        if (!JSVAL_IS_VOID(curElement)) {
+                            jslib::convertFrom(theCallback.context, curElement, theReply.content);
+                        }
+                        
                         return;
                     }
                 }
