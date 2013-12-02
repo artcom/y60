@@ -295,6 +295,8 @@ boost::tribool request_parser::consume(request& req, char input)
     if (input == '\n') {
         if (!extractContentLength(req)) {
             return true;
+        } else if (content_length_ == 0) {
+            return true;
         } else {
             state_ = body;
             return boost::indeterminate;

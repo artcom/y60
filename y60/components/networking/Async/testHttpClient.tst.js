@@ -312,6 +312,36 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         ENSURE_EQUAL("DELETE:", obj.responseString);
     };
 
+    function testPostEmptyRequest() {
+        var done = false;
+
+        Logger.info("creating client");
+        var myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/echo",
+            type: "POST",
+            verbose: true,
+            success: function (data, code, response) {
+                obj.responseString = response.responseString;
+                SUCCESS("testPostRequest");
+                done = true;
+            },
+            error: function () {
+                FAILURE("testPostRequest");
+                done = true;
+            }
+        });
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+        ENSURE_EQUAL("POST:", obj.responseString);
+    };
+
     function testPostRequest() {
         var done = false;
 
@@ -459,6 +489,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         obj.myServer.registerCallback("/echo", myServer, myServer.echo);
         obj.myServer.registerCallback("/headers", myServer, myServer.headers);
 
+        testPostEmptyRequest();
         testFireAndForget();
         testHeaders();
         testGetRequest();

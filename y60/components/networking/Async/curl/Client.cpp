@@ -178,8 +178,8 @@ namespace curl {
         std::string nativeValue;
 
         JS_GetProperty(_jsContext, _jsOptsObject, "data", &propValue);
+        _requestBody = Ptr<Block>(new Block());
         if (!JSVAL_IS_VOID(propValue) && jslib::convertFrom(_jsContext, propValue, nativeValue)) {
-            _requestBody = Ptr<Block>(new Block());
             _requestBody->resize(nativeValue.size());
             std::copy(nativeValue.begin(), nativeValue.end(), _requestBody->begin());
         }
