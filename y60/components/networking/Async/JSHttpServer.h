@@ -36,7 +36,7 @@
 
 #include "HttpServer.h"
 
-class JSHttpServer : public jslib::JSWrapper<y60::async::http::Server, asl::Ptr<y60::async::http::Server> , jslib::StaticAccessProtocol> {
+class Y60_NETASYNC_DECL JSHttpServer : public jslib::JSWrapper<y60::async::http::Server, asl::Ptr<y60::async::http::Server> , jslib::StaticAccessProtocol> {
         JSHttpServer() {}
     public:
         typedef y60::async::http::Server NATIVE;
@@ -87,13 +87,13 @@ template <>
 struct JSClassTraits<JSHttpServer::NATIVE>
     : public JSClassTraitsWrapper<JSHttpServer::NATIVE , JSHttpServer> {};
 
-} // namespace jslib
 
 // bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::NATIVE & theNative);
-bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::OWNERPTR & theNativePtr);
+Y60_NETASYNC_DECL bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::OWNERPTR & theNativePtr);
 
-jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner);
-jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner, JSHttpServer::NATIVE * theSerial);
+Y60_NETASYNC_DECL jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner);
+Y60_NETASYNC_DECL jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner, JSHttpServer::NATIVE * theSerial);
 
+} // namespace jslib
 #endif
 

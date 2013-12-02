@@ -29,7 +29,7 @@ struct request
   std::string uri;
   int http_version_major;
   int http_version_minor;
-  std::vector<header> headers;
+  Headers headers;
   std::string body;
   boost::shared_ptr<connection> conn;
 };

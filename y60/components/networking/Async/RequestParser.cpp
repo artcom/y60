@@ -216,8 +216,7 @@ boost::tribool request_parser::consume(request& req, char input)
     }
     else
     {
-      req.headers.push_back(header("", ""));
-      req.headers.back().name.push_back(input);
+      cur_header_name = input;
       state_ = header_name;
       return boost::indeterminate;
     }
@@ -238,7 +237,8 @@ boost::tribool request_parser::consume(request& req, char input)
     else
     {
       state_ = header_value;
-      req.headers.back().value.push_back(input);
+      std::pair<Headers::iterator,bool> result = req.headers.insert(make_pair(cur_header_name, std::string(1, input)));
+      cur_header = result.first;
       return boost::indeterminate;
     }
   case header_name:
@@ -253,13 +253,15 @@ boost::tribool request_parser::consume(request& req, char input)
     }
     else
     {
-      req.headers.back().name.push_back(input);
+      cur_header_name.push_back(input);
       return boost::indeterminate;
     }
   case space_before_header_value:
     if (input == ' ')
     {
       state_ = header_value;
+      std::pair<Headers::iterator,bool> result = req.headers.insert(make_pair(cur_header_name, ""));
+      cur_header = result.first;
       return boost::indeterminate;
     }
     else
@@ -278,7 +280,7 @@ boost::tribool request_parser::consume(request& req, char input)
     }
     else
     {
-      req.headers.back().value.push_back(input);
+      cur_header->second.push_back(input);
       return boost::indeterminate;
     }
   case expecting_newline_2:
@@ -325,11 +327,11 @@ boost::tribool request_parser::consume(request& req, char input)
 }
 
 bool request_parser::extractContentLength(const request& req) {
-    std::vector<header>::const_iterator it = req.headers.begin();
+    Headers::const_iterator it = req.headers.begin();
     while (it != req.headers.end()) {
-        if ((*it).name == "Content-Length") {
+        if ((*it).first == "Content-Length") {
             std::istringstream iss;
-            iss.str((*it).value);
+            iss.str((*it).second);
             if (iss >> content_length_) {
                 return true;
             }

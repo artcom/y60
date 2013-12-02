@@ -36,6 +36,7 @@
 #define _ac_y60_async_http_client_h
 
 #include "../y60_netasync_settings.h" 
+#include "../HttpHeader.h"
 
 #include "SocketAdapter.h"
 
@@ -46,8 +47,6 @@
 #include <netsrc/spidermonkey/jsapi.h>
 
 #include <y60/jsbase/JSWrapper.h>
-
-#include <map>
 
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
@@ -81,7 +80,7 @@ namespace curl {
             std::vector<char>   _myErrorBuffer;
             asl::Ptr<asl::Block> _privateResponseBuffer; // filled in io_service thread, emptied in JS thread
             asl::ReadWriteLock _lockResponseBuffer; // lock for _privateResponseBuffer;
-            std::map<std::string, std::string> _privateResponseHeaders; // filled in io_service thread, read in JS thread
+            Headers _privateResponseHeaders; // filled in io_service thread, read in JS thread
             mutable asl::ReadWriteLock _lockResponseHeaders; // lock for _privateResponseHeaders;
             asl::Ptr<asl::Block> _myResponseBlock; // used only in JS thread.
             bool _continueFlag;

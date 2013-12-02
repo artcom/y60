@@ -14,6 +14,8 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
 
+#include "HttpHeader.h"
+
 namespace y60 {
 namespace async {
 namespace http {
@@ -95,6 +97,8 @@ private:
   } state_;
 
   unsigned content_length_;
+  std::string cur_header_name;
+  Headers::iterator cur_header;
 
 };
 

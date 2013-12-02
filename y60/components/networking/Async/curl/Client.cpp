@@ -216,7 +216,7 @@ namespace curl {
     bool 
     Client::getResponseHeader(const std::string & theHeader, std::string & theValue) const {
         ScopeLocker L(_lockResponseHeaders, false);
-        std::map<std::string, std::string>::const_iterator it = _privateResponseHeaders.find(theHeader);
+        Headers::const_iterator it = _privateResponseHeaders.find(theHeader);
         if (it != _privateResponseHeaders.end()) {
             theValue = it->second;
             return true;

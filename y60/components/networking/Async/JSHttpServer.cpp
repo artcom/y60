@@ -250,6 +250,7 @@ JSHttpServer::initClass(JSContext *cx, JSObject *theGlobalObject) {
     DOC_MODULE_CREATE("HttpServer", JSHttpServer);
     return myClass;
 }
+namespace jslib {
 
 bool convertFrom(JSContext *cx, jsval theValue, JSHttpServer::OWNERPTR & theNativePtr) {
     if (JSVAL_IS_OBJECT(theValue)) {
@@ -273,4 +274,5 @@ jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner) {
 jsval as_jsval(JSContext *cx, JSHttpServer::OWNERPTR theOwner, JSHttpServer::NATIVE * theSerial) {
     JSObject * myObject = JSHttpServer::Construct(cx, theOwner, theSerial);
     return OBJECT_TO_JSVAL(myObject);
+}
 }

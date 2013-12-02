@@ -11,24 +11,24 @@
 #ifndef HTTP_SERVER_HEADER_HPP
 #define HTTP_SERVER_HEADER_HPP
 
+#include "y60_netasync_settings.h" 
+
+#include <y60/jsbase/JSWrapper.h>
 #include <string>
+#include <map>
 
 namespace y60 {
 namespace async {
 namespace http {
 
-struct header
-{
-    header(const std::string &theName, const std::string &theValue):
-        name(theName), value(theValue) {}
-  std::string name;
-  std::string value;
-};
-
-
+    class Headers : public std::map<std::string, std::string> {};
 
 } // namespace http
 } // namespace async
 } // namespace y60
+
+namespace jslib {
+    Y60_NETASYNC_DECL jsval as_jsval(JSContext *cx, const y60::async::http::Headers theValue);
+} // namespace jslib
 
 #endif // HTTP_SERVER_HEADER_HPP
