@@ -36,7 +36,7 @@
 
 #include "HttpServer.h"
 
-class Y60_NETASYNC_DECL JSHttpServer : public jslib::JSWrapper<y60::async::http::Server, asl::Ptr<y60::async::http::Server> , jslib::StaticAccessProtocol> {
+class JSHttpServer : public jslib::JSWrapper<y60::async::http::Server, asl::Ptr<y60::async::http::Server> , jslib::StaticAccessProtocol> {
         JSHttpServer() {}
     public:
         typedef y60::async::http::Server NATIVE;

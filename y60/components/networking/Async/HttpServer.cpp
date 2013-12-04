@@ -102,13 +102,23 @@ namespace http {
                 theReply.status = reply::no_content;
                 return;
             }
+            // changed to adhere to industry standard:
+            // the callback must return either:
+            //   body
+            //   [statuscode, body]
+            //   [statucode, headers, body]
+            //
+            //   where body is a string, statuscode an integer and headers a hash.
             if (JSVAL_IS_OBJECT(rval)) {
                 JSObject * myJsObject;
+                jsuint arrayLength;
                 if(JS_ValueToObject(theCallback.context, rval, &myJsObject)) {
-                    if (JS_IsArrayObject(theCallback.context, myJsObject)) {
+                    if (JS_IsArrayObject(theCallback.context, myJsObject) &&
+                        JS_GetArrayLength(theCallback.context, myJsObject, &arrayLength)) 
+                    {
                         jsval curElement;
                         
-                        // status
+                        // first element: status
                         JS_GetElement(theCallback.context, myJsObject, 0, &curElement);
                         if (!JSVAL_IS_VOID(curElement)) {
                             int myStatusCode;
@@ -118,41 +128,43 @@ namespace http {
                             theReply.status = reply::ok;
                         }
                         
-                        // headers
-                        JS_GetElement(theCallback.context, myJsObject, 1, &curElement);
-                        if (JSVAL_IS_OBJECT(curElement)) {
-                            JSObject *headers = JSVAL_TO_OBJECT(curElement);
-                            JSIdArray *props = JS_Enumerate(theCallback.context, headers);
-                            for (int i = 0; props && i < props->length; ++i) {
-                                jsid propid = props->vector[i];
-                                jsval propname;
-                                if (!JS_IdToValue(theCallback.context, propid, &propname)) {
-                                    AC_WARNING << "Weird case";
-                                    continue;
+                        // 2nd element (if array has three elements) headers
+                        if (arrayLength == 3) {
+                            JS_GetElement(theCallback.context, myJsObject, 1, &curElement);
+                            if (JSVAL_IS_OBJECT(curElement)) {
+                                JSObject *headers = JSVAL_TO_OBJECT(curElement);
+                                JSIdArray *props = JS_Enumerate(theCallback.context, headers);
+                                for (int i = 0; props && i < props->length; ++i) {
+                                    jsid propid = props->vector[i];
+                                    jsval propname;
+                                    if (!JS_IdToValue(theCallback.context, propid, &propname)) {
+                                        AC_WARNING << "Weird case";
+                                        continue;
+                                    }
+
+                                    std::string header_name;
+                                    if (!jslib::convertFrom(theCallback.context, propname, header_name)) {
+                                        JS_ReportError(theCallback.context, 
+                                                "Server::handleRequest: header_name is not a string!");
+                                    }
+
+                                    jsval propval;
+                                    if (!JS_GetProperty(theCallback.context, headers, header_name.c_str(), &propval)) {
+                                        AC_WARNING << "Weird case";
+                                        continue;
+                                    }
+
+                                    std::string header_value;
+                                    if (!jslib::convertFrom(theCallback.context, propval, header_value)) {
+                                        JS_ReportError(theCallback.context, 
+                                                "Server::handleRequest: header_value is not a a string!");
+                                    }
+                                    theReply.headers.insert(make_pair(header_name, header_value));
                                 }
-                                
-                                std::string header_name;
-                                if (!jslib::convertFrom(theCallback.context, propname, header_name)) {
-                                    JS_ReportError(theCallback.context, 
-                                             "Server::handleRequest: header_name is not a string!");
-                                }
-                                
-                                jsval propval;
-                                if (!JS_GetProperty(theCallback.context, headers, header_name.c_str(), &propval)) {
-                                    AC_WARNING << "Weird case";
-                                    continue;
-                                }
-                                
-                                std::string header_value;
-                                if (!jslib::convertFrom(theCallback.context, propval, header_value)) {
-                                    JS_ReportError(theCallback.context, 
-                                             "Server::handleRequest: header_value is not a a string!");
-                                }
-                                theReply.headers.insert(make_pair(header_name, header_value));
                             }
                         }
-                        // Body
-                        JS_GetElement(theCallback.context, myJsObject, 2, &curElement);
+                        // last element: Body
+                        JS_GetElement(theCallback.context, myJsObject, arrayLength-1, &curElement);
                         if (!JSVAL_IS_VOID(curElement)) {
                             jslib::convertFrom(theCallback.context, curElement, theReply.content);
                         }

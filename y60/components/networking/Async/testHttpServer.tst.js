@@ -61,12 +61,10 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
                 return thePath;
             },
             detailed_response : function (theMethod, theBody, thePath) {
-                return ["Hello", "202", {
-                    "X-PRODUCED-BY" : "Y60"
-                }];
+                return [202, { "X-PRODUCED-BY" : "Y60" }, "Hello"];
             },
             detailed_response_2 : function (theMethod, theBody, thePath) {
-                    return ["I am Content", "201"];
+                    return [201, "I am Content"];
             },
             detailed_response_3 : function (theMethod, theBody, thePath) {
                     return [];
@@ -96,7 +94,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         myRequest.onDone = function () {
             obj.testResponse = this;
             ENSURE("obj.testResponse.responseCode == '201'");
-            ENSURE("obj.testResponse.responseString == 'I am Content'");
+            ENSURE_EQUAL('I am Content', obj.testResponse.responseString);
             ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
             ENSURE("obj.testResponse.getResponseHeader('Content-Length') == obj.testResponse.responseString.length");
         };
@@ -112,11 +110,11 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
         myRequest = new Request("http://localhost:4042/foo");
         myRequest.onError = function () {
             obj.testResponse = this;
-            ENSURE("obj.testResponse.responseCode == '202'");
+            ENSURE_EQUAL("202", obj.testResponse.responseCode);
             ENSURE("obj.testResponse.getResponseHeader('Content-Type') == 'text/plain'");
             ENSURE("obj.testResponse.getResponseHeader('X-PRODUCED-BY') == 'Y60'");
         };
-        myRequest.verbose = true;
+        // myRequest.verbose = true;
         myRequest.get();
         
         myRequestManager.performRequest(myRequest);
@@ -167,7 +165,7 @@ HttpServerUnitTest.prototype.Constructor = function (obj, theName) {
                     obj.testResponse = this;
                     ENSURE("obj.testResponse.responseString == '/"+p+"'");
                 };
-                myRequest.verbose = true;
+                // myRequest.verbose = true;
             })();
             myRequest.get();
             myRequestManager.performRequest(myRequest);
