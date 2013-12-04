@@ -83,6 +83,7 @@ class JSHttpServer : public jslib::JSWrapper<y60::async::http::Server, asl::Ptr<
 };
 
 namespace jslib {
+
 template <>
 struct JSClassTraits<JSHttpServer::NATIVE>
     : public JSClassTraitsWrapper<JSHttpServer::NATIVE , JSHttpServer> {};

@@ -16,8 +16,22 @@ Reply.cpp
 RequestParser.cpp
 )
 
-# no public headers
 set(HEADERS
+Connection.h
+HttpServer.h
+curl/Client.h
+JSHttpClient.h
+JSHttpServer.h
+JSWebSocketClient.h
+NetAsync.cpp
+curl/SocketAdapter.h
+curl/MultiAdapter.h
+websocket/Message.h
+websocket/Client.h
+websocket/Manager.h
+MimeTypes.h
+Reply.h
+RequestParser.h
 )
 
 find_package(OpenSSL)

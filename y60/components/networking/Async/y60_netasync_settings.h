@@ -15,7 +15,7 @@
 #   endif
 #endif
 
-#ifdef HttpServer
+#ifdef NetAsync_EXPORTS
 #   define Y60_NETASYNC_DECL AC_DLL_EXPORT
 #else
 #   define Y60_NETASYNC_DECL AC_DLL_IMPORT
