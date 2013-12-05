@@ -18,6 +18,11 @@ else (NOT Y60_WITH_TRACEMONKEY)
 endif (NOT Y60_WITH_TRACEMONKEY)
 
 # external dependencies
+
+# boost 
+set(BOOST_MIN_VERSION "1.48.0")
+find_package(Boost ${BOOST_MIN_VERSION} REQUIRED)
+
 list(APPEND REQ_PACKAGES SDL GLEW NvidiaCg OpenEXR GLIB2)
 list(APPEND OPT_PACKAGES Maya)
 
