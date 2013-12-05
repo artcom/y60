@@ -102,6 +102,12 @@ namespace y60 {
             _myParent = theParent;
         }
 
+        const std::string getName() const {
+            return _myParent->get<NameTag>();
+        }
+        unsigned getDevice() const {
+            return _myParent->get<DeviceTag>();
+        }
         unsigned getFrameWidth() const {
             return _myParent->get<ImageWidthTag>();
         }
@@ -110,6 +116,9 @@ namespace y60 {
         }
         double getFrameRate() const {
             return _myParent->get<FrameRateTag>();
+        }
+        MoviePlayMode getPlayMode() const {
+            return _myParent->getPlayMode();
         }
         void setFrameWidth(unsigned theFrameWidth) {
             _myParent->set<ImageWidthTag>(theFrameWidth);
@@ -136,9 +145,6 @@ namespace y60 {
             _myParent->set<TimeCodeTag>(theTimeCode);
         }
 
-        unsigned getDevice() const {
-            return _myParent->get<DeviceTag>();
-        }
     private:
         Capture *   _myParent;
     };
