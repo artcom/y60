@@ -32,6 +32,7 @@ spark.OffscreenStage.Constructor = function (Protected) {
     _.setupStageEnvironment = function () {
         // setup world
         Public.world = Node.createElement("world");
+        Public.world.name = Public.name + "_world";
         // TODO find a way to NOT use window without using postRealize
         window.scene.worlds.appendChild(Public.world);
         
