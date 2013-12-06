@@ -227,9 +227,9 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             url: "http://127.0.0.1:3003/echo",
             type: "GET",
             verbose: false,
-            success: function (data, code, response) {
+            success: function (data, statusText, response) {
                 obj.responseString = response.responseString;
-                obj.code = code;
+                obj.code = response.status;
                 SUCCESS("testGetRequest");
                 done = true;
             },
@@ -248,7 +248,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             }
         }
         ENSURE_EQUAL("GET:", obj.responseString);
-        ENSURE_EQUAL("200", obj.code);
+        ENSURE_EQUAL(200, obj.code);
     };
     
     function testHeaders() {
@@ -260,7 +260,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             type: "GET",
             verbose: true,
             success: function (data, code, response) {
-                obj.code = code;
+                obj.code = response.status;
                 obj.custom_header = response.getResponseHeader("X-Custom-Header");
                 SUCCESS("testHeaders");
                 done = true;
@@ -279,7 +279,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-        ENSURE_EQUAL("201", obj.code);
+        ENSURE_EQUAL(201, obj.code);
         ENSURE_EQUAL("Custom-Value", obj.custom_header);
     };
 

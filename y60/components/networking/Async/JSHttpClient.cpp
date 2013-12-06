@@ -107,6 +107,7 @@ JSHttpClient::Functions() {
 JSPropertySpec *
 JSHttpClient::Properties() {
     static JSPropertySpec myProperties[] = {
+        {"status", PROP_status, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"responseString", PROP_responseString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"responseBlock", PROP_responseBlock, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
@@ -147,6 +148,9 @@ JSHttpClient::getPropertySwitch(unsigned long theID, JSContext *cx, JSObject *ob
                 return JS_TRUE;
             case PROP_responseBlock:
                 *vp = as_jsval(cx, getNative().getResponseBlock());
+                return JS_TRUE;
+            case PROP_status:
+                *vp = as_jsval(cx, getNative().getStatus());
                 return JS_TRUE;
             default:
                 JS_ReportError(cx,"JSRequestWrapper::getProperty: index %d out of range", theID);

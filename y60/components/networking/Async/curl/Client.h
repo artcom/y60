@@ -99,6 +99,7 @@ namespace curl {
             bool getResponseHeader(const std::string & theHeader, std::string & theValue) const;
             std::string getResponseHeader(const std::string & theHeader) const;
             std::string getResponseString() const;
+            long getStatus() const;
             asl::Ptr<asl::Block> getResponseBlock() const;
             void abort() { _continueFlag = false; };
             std::string debugIdentifier;

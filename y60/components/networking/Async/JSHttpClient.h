@@ -59,6 +59,7 @@ class JSHttpClient : public jslib::JSWrapper<y60::async::http::curl::Client, boo
         enum PropertyNumbers {
             PROP_responseString = -100,
             PROP_responseBlock,
+            PROP_status,
             PROP_END
         };
 

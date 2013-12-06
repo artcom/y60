@@ -233,6 +233,14 @@ namespace curl {
     Client::getResponseBlock() const {
         return _myResponseBlock;
     };
+
+    long 
+    Client::getStatus() const {
+        long HttpStatus;
+        curl_easy_getinfo(_curlHandle,CURLINFO_RESPONSE_CODE, &HttpStatus); 
+        return HttpStatus;
+    };
+
     void 
     Client::onProgress() {
         bool newDataReceived = false;
@@ -270,13 +278,9 @@ namespace curl {
         AC_DEBUG << "error string:" << std::string(asl::begin_ptr(_myErrorBuffer));
         if (result == CURLE_OK) {
             if (hasCallback("success")) {
-                long HttpStatus;
-                curl_easy_getinfo(_curlHandle,CURLINFO_RESPONSE_CODE, &HttpStatus); 
-                AC_DEBUG << "calling success after receiving " << HttpStatus;
-
                 jsval argv[3], rval;
                 argv[0] = as_jsval(_jsContext, _myResponseBlock);
-                argv[1] = as_jsval(_jsContext, as_string(HttpStatus));
+                argv[1] = as_jsval(_jsContext, "success");
                 argv[2] = OBJECT_TO_JSVAL(_jsWrapper);
                 /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, _jsOptsObject, "success", 3, argv, &rval);
                 AC_DEBUG << "called success";
