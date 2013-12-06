@@ -178,8 +178,7 @@ Client::Client(JSContext * cx, JSObject * theOpts, boost::asio::io_service & io)
                 boost::bind(&Client::onHeadersRead, shared_from_this(),
                 boost::asio::placeholders::error));
         } else {
-             AC_ERROR << error.message();
-             // TODO: call onError
+            failTheWebSocketConnection(1006, error.message().c_str());
         }
     }
 
