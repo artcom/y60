@@ -99,7 +99,7 @@ WebSocketUnitTest.prototype.Constructor = function (obj, theName) {
 
     obj.run = function () {
         testConnectionRefused();
-        testEcho();
+        // testEcho();
         gc();
     };
 
