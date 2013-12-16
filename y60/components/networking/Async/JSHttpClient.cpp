@@ -108,6 +108,7 @@ JSPropertySpec *
 JSHttpClient::Properties() {
     static JSPropertySpec myProperties[] = {
         {"status", PROP_status, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
+        {"responseText", PROP_responseString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"responseString", PROP_responseString, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {"responseBlock", PROP_responseBlock, JSPROP_READONLY|JSPROP_ENUMERATE|JSPROP_PERMANENT|JSPROP_SHARED},
         {0}
