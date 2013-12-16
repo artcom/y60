@@ -164,6 +164,9 @@ namespace y60 {
         }
         _myDevice->load(theUrl);
 
+        // set initial camera features
+        setFeatures();
+
         /*
          * UH: theUrl is mangled by the PackageManager and is not necessarily the same as the ImageSourceTag
          * this leads to multiple load() calls by the TextureManager since reloadRequired checks
