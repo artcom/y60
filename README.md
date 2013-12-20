@@ -118,15 +118,14 @@ We have Homebrew [Homebrew] support. This makes installing on Mac OS X easier th
 
 - Homebrew Installation: [Homebrew Installation]
 
-#### Now pull the ART+COM homebrew fork:
+#### Add the artcom tap for y60 and related projects (https://github.com/artcom/homebrew-y60):
 
-    brew update
-    cd $(brew --repository)
-    git pull git@github.com:artcom/homebrew.git
+    brew tap artcom/y60
 
-#### Now simply install y60:
+#### Install watchdog:
 
-    brew install y60
+    brew install watchdog
+
 #### You can also install the repository head:
     brew install --HEAD y60
 
