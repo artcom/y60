@@ -7,6 +7,7 @@
 // or copied or duplicated in any form, in whole or in part, without the
 // specific, prior written permission of ART+COM AG Berlin.
 //=============================================================================
+use("JSON.js");
 
 spark.CachedRectangle = spark.ComponentClass("CachedRectangle");
 spark.CachedRectangle.Constructor = function (Protected) {
