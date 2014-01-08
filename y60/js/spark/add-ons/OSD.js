@@ -245,16 +245,16 @@ spark.OSD.Constructor = function (Protected) {
 
     Public.addTab = function (theName, theOptions) {
         theOptions = theOptions || {};
+        if (theName in _myTabs) {
+            Logger.info("tab with name '" + theName + "' already registered");
+            return;
+        }
         var myLabel = ("label" in theOptions) ? theOptions.label : theName;
         var myTransform = {name:theName};
         if (!_myNoGUIFlag) {
             myTransform = new Node("<Transform x='20' y='-70' z='1' name='" + theName + "' visible='false'/>").firstChild;
             myTransform = spark.loadDocument(myTransform, Public);
             Public.world.appendChild(myTransform.sceneNode);
-        }
-        if (theName in _myTabs) {
-            dumpstack();
-            Logger.warning("tab name '" + theName + "' already registered");
         }
         var myX = 20;
         for (tab in _myTabs) {
@@ -322,6 +322,10 @@ spark.OSD.Constructor = function (Protected) {
             }
             myTab = _myTabs[_myDefaultTab];
         }
+        if (theName in myTab.groups) {
+            Logger.info("the group with name '" + theName + "' already registered");
+            return;
+        }
         var myTransform = {name:theName};
         if(!_myNoGUIFlag) {
             myTransform = new Node("<Transform z='1' y='-25' name='" + theName + "' visible='true'/>").firstChild;
@@ -376,9 +380,15 @@ spark.OSD.Constructor = function (Protected) {
         }
         var settingskey = myLabel;
         var myKey = myTab.name + "#" + (myGroup ? myGroup.name + "#" : "") + settingskey;
+        if (myKey in _mySliders) {
+            _mySliders[myKey].objects.push(theObject);
+            setProperty(_mySliders[myKey], Number(_mySliders[myKey].value));
+            return;
+        }
         _mySliders[myKey] = {};
+        _mySliders[myKey].value = 0;
         _mySliders[myKey].range = range;
-        _mySliders[myKey].object = theObject;
+        _mySliders[myKey].objects = [theObject];
         _mySliders[myKey].property = theProperty;
         _mySliders[myKey].setter = setter;
         _mySliders[myKey].tab = myTab;
@@ -390,7 +400,7 @@ spark.OSD.Constructor = function (Protected) {
         _mySliders[myKey].updateValueText = function(theValue) {
             this.slider.value_text.text = theValue;
         };
-        var myValue  = ("start_value" in theOptions) ? theOptions.start_value : _mySliders[myKey].range[0];
+        var myValue  = ("start_value" in theOptions && (theOptions.start_value !== null)) ? theOptions.start_value : _mySliders[myKey].range[0];
         if (_mySettings) {
             var myProperty;
             if (myGroup) {
@@ -497,12 +507,14 @@ spark.OSD.Constructor = function (Protected) {
         theSliderInfo.value = theValue;
         var mySlider = theSliderInfo.slider;
         mySlider.setRelativeCursorPosition(theSliderInfo.getRelative(theValue));
-        if (theSliderInfo.setter) {
-            theSliderInfo.setter(theSliderInfo.object, theSliderInfo.property, theValue);
-        } else if (theSliderInfo.property) {
-            theSliderInfo.object[theSliderInfo.property] = theValue;
-        } else  {
-            theSliderInfo.object = theValue;
+        for (var i = 0; i < theSliderInfo.objects.length; ++i) {
+            if (theSliderInfo.setter) {
+                theSliderInfo.setter(theSliderInfo.objects[i], theSliderInfo.property, theValue);
+            } else if (theSliderInfo.property) {
+                theSliderInfo.objects[i][theSliderInfo.property] = theValue;
+            } else  {
+                theSliderInfo.objects[i] = theValue;
+            }
         }
         theSliderInfo.updateValueText(theValue);
         updateSettings(theSliderInfo, theValue);
