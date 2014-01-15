@@ -1,0 +1,70 @@
+#!/usr/bin/ruby
+require 'logger'
+require 'pathname'
+require 'date'
+
+log = Logger.new "#{File.dirname __FILE__}/log/publish.log"
+log.level = Logger::INFO
+log.info '==== deploy'
+PackageExtensions = ['tar.gz', 'tar.bz2', 'deb', 'rpm', 'zip', 'exe', 'dmg']
+RemoteHost = "artifacts"
+remote_dir  = "pro60"
+RemoteUser = 'artifacts'
+
+revision = ARGV.shift
+revision = revision[0..8]
+date = ARGV.shift
+date = DateTime.parse(date)
+date = date.strftime("%Y%m%d")
+package_dir = ARGV.shift
+
+nightly = false
+ARGV.each do |arg| 
+  if arg == '--nightly'
+    nightly = true
+    remote_dir = "#{remote_dir}/nightlies"
+  end
+  if arg == '--release'
+    remote_dir = "#{remote_dir}/releases"
+  end
+end
+
+log.info "rev: #{revision} time: #{date} package_dir: #{package_dir}"
+find_args = ""
+PackageExtensions.each do |extension|
+  find_args << " -o " unless find_args.empty?
+  find_args << "-name '*.#{extension}'"
+end
+
+all_packages = []
+all_targets = []
+packages = `find #{package_dir} -type f \\( #{find_args} \\)`
+packages.each do |package|
+  target = File.basename(package)
+  target_array = target.split("-")
+  # add date and scm revision to nightly packages
+  if nightly
+    target = ""
+    l = target_array.length
+    target_array.each_with_index do |t, index|
+      target = "#{target}#{t}"
+      if index < (l -1)
+        target = "#{target}-"
+      end
+      if index == 1
+        target = "#{target}#{date}-#{revision}-"
+      end
+    end
+  end
+
+  log.info " target: #{target}"
+  all_packages << package
+  all_targets << target
+end
+
+all_packages.each_index do |i|
+  copy_command = "scp #{all_packages[i]} #{RemoteUser}@#{RemoteHost}:#{remote_dir}/#{all_targets[i]}".gsub(/\n/, "")
+  log.info "cmd: #{copy_command}"
+  system(copy_command);
+end
+
