@@ -228,7 +228,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             type: "GET",
             verbose: false,
             success: function (data, statusText, response) {
-                obj.responseString = response.responseString;
+                obj.responseText = response.responseText;
                 obj.code = response.status;
                 SUCCESS("testGetRequest");
                 done = true;
@@ -247,7 +247,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-        ENSURE_EQUAL("GET:", obj.responseString);
+        ENSURE_EQUAL("GET:", obj.responseText);
         ENSURE_EQUAL(200, obj.code);
     };
     
@@ -291,7 +291,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             url: "http://127.0.0.1:3003/echo",
             type: "DELETE",
             success: function (data, code, response) {
-                obj.responseString = response.responseString;
+                obj.responseText = response.responseText;
                 SUCCESS("testDeleteRequest");
                 done = true;
             },
@@ -309,7 +309,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-        ENSURE_EQUAL("DELETE:", obj.responseString);
+        ENSURE_EQUAL("DELETE:", obj.responseText);
     };
 
     function testPostEmptyRequest() {
@@ -321,7 +321,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             type: "POST",
             verbose: true,
             success: function (data, code, response) {
-                obj.responseString = response.responseString;
+                obj.responseText = response.responseText;
                 SUCCESS("testPostRequest");
                 done = true;
             },
@@ -339,7 +339,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-        ENSURE_EQUAL("POST:", obj.responseString);
+        ENSURE_EQUAL("POST:", obj.responseText);
     };
 
     function testPostRequest() {
@@ -353,7 +353,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             data: "Hello World!",
             contentType: "text/plain",
             success: function (data, code, response) {
-                obj.responseString = response.responseString;
+                obj.responseText = response.responseText;
                 SUCCESS("testPostRequest");
                 done = true;
             },
@@ -371,7 +371,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-        ENSURE_EQUAL("POST:Hello World!", obj.responseString);
+        ENSURE_EQUAL("POST:Hello World!", obj.responseText);
     };
 
     function testPutRequest() {
@@ -385,7 +385,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             verbose: true,
             contentType: "text/plain",
             success: function (data, code, response) {
-                obj.responseString = response.responseString;
+                obj.responseText = response.responseText;
                 SUCCESS("testPutRequest");
                 done = true;
             },
@@ -403,7 +403,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-        ENSURE_EQUAL("PUT:Hello World!", obj.responseString);
+        ENSURE_EQUAL("PUT:Hello World!", obj.responseText);
     };
 
     function testHeadRequest() {
@@ -414,7 +414,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             url: "http://127.0.0.1:3003/echo",
             type: "HEAD",
             success: function (data, code, response) {
-                obj.responseString = response.responseString;
+                obj.responseText = response.responseText;
                 SUCCESS("testHeadRequest");
                 done = true;
             },
@@ -432,7 +432,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
                 break;
             }
         }
-        ENSURE_EQUAL("", obj.responseString);
+        ENSURE_EQUAL("", obj.responseText);
     };
 
     function testSmallRequests() {
