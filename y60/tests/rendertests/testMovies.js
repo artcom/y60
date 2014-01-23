@@ -89,15 +89,9 @@ try {
     
     Base.onPreRender = ourShow.onPreRender;
     ourShow.onPreRender = function() { 
-        printScreenText();
+        // printScreenText(); differences in font rendering make this flaky
         Base.onPreRender();
     }
-
-    /* Base.onPostRender = ourShow.onPostRender;
-    ourShow.onPostRender = function() { 
-        printScreenText();
-        Base.onPostRender();
-    } */
 
     function printScreenText() {
         var myPos = 42;
@@ -106,7 +100,7 @@ try {
             var myTextColor = new Vector4f(0,1,1,1);            
             myRenderer.renderText([10, myPos], _myTests[i], new Node("<style textColor='" + myTextColor + "'/>").childNode(0),
                                   "Screen15");
-            var myTextColor = new Vector4f(1,1,1,1);            
+            myTextColor = new Vector4f(1,1,1,1);            
             myPos += 20;
             for (var j = 0; j < ourMovieSources.length; ++j) {
                 var myMovie = ourMovies[i * ourMovieSources.length + j];
