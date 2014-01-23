@@ -3,8 +3,8 @@ set(CG_TESTS
 cubemap
 depthtest
 emissive
-gelenk_ani
-glowcube
+# gelenk_ani - doesn't work on HD4000 (build server) due to missing shader profile
+# glowcube - doesn't work on HD4000 (build server) due to missing shader profile
 lambert_blinn_phong
 material_test
 multiLightEnvmap
@@ -28,7 +28,7 @@ copyBufferToImage
 cube
 cube_ortho
 cubemap
-curve
+# curve - fails on HD4000 (build server)
 depthtest
 envmap
 fogtest
