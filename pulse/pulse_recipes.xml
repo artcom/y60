@@ -41,6 +41,12 @@
                 <process processor="${ctest.pp}"/>
             
             <dir-artifact name="test output" base="${build.dir}/${ctest.log.dir}"/>
+            <dir-artifact name="rendertests.spark" base="${build.dir}/y60/js/spark/tests/TestImages" type="image/png">
+              <include pattern="*.png"/>
+            </dir-artifact>
+            <dir-artifact name="rendertests.y60" base="${build.dir}/y60/tests/rendertests/TestImages" type="image/png">
+              <include pattern="*.png"/>
+            </dir-artifact>
         </executable>
     </macro>
 
