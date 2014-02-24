@@ -45,6 +45,9 @@ extern "C" {
 #ifndef AV_VERSION_INT
 #define AV_VERSION_INT(a,b,c) (a<<16 | b<<8 | c)
 #endif
+#ifndef AVCODEC_MAX_AUDIO_FRAME_SIZE
+#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
+#endif
 #if LIBAVCODEC_VERSION_MAJOR < 54
 #define AV_SAMPLE_FMT_S16 SAMPLE_FMT_S16
 #endif
