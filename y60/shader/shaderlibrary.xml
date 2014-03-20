@@ -1,5 +1,30 @@
 <?xml version="1.0"?>
 <shaders>
+ <shader id="2passBlur" name="2passBlur" cost="10">
+        <supports>
+            <feature class="textures" values="[`paint`]"/>
+            <feature class="texcoord" values="[`uv_map`]"/>
+            <feature class="lighting" values="[`unlit`]"/>
+            <feature class="effect"   values="[`2passBlur`]"/>
+        </supports>
+        <vertexshader profiles="[`arbfp1`,`vp40`,`gp4vp`]" files="[`blur2pass.cg`]" entryfunctions="[`mainVertex`]">
+            <properties/>
+            <vertexparameters>
+                <vector4f name="position"/>
+                <vector2f name="texcoord0"/>
+            </vertexparameters>
+        </vertexshader>
+        <fragmentshader profiles="[`arbvp1`,`fp40`,`gp4fp`]" files="[`blur2pass.cg`]" entryfunctions="[`mainFragment`]">
+            <properties>
+                <vector4f name="surfacecolor">[1.0,1.0,1.0,1.0]</vector4f>
+                <sampler2d name="tex0">0</sampler2d>
+                <float name="width">10</float>  
+                <float name="height">10</float>  
+                <float name="blur">0</float>  
+                <int name="blurpass">0</int>  
+           </properties>
+        </fragmentshader>
+    </shader>        
     <shader id="s0" name="phongBump" cost="100">
         <supports>
             <feature class="lighting" values="[`phong`]"/>

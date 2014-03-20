@@ -1,0 +1,72 @@
+//=============================================================================
+// Copyright (C) 2003 ART+COM AG Berlin
+//
+// These coded instructions, statements, and computer programs contain
+// unpublished proprietary information of ART+COM AG Berlin, and
+// are copy protected by law. They may not be disclosed to third parties
+// or copied or duplicated in any form, in whole or in part, without the
+// specific, prior written permission of ART+COM AG Berlin.
+//=============================================================================
+
+float gauss(float x) {
+    return 0.39894*exp(-0.5*pow(x, 1.0)); 
+}
+
+float4 apply2PassGauss(sampler2D theTexSampler, float2 theTexCoord, int theBlurPass, float theSize, float pixW, float pixH) {
+    float myWeight = 0.0;
+    float4 myReturn = float4(0.0);
+    
+    if (theBlurPass == 0) {
+        for (float i=-theSize; i<theSize; i++) 
+        {
+            float myCenterDistance = length(float2(i, 0));         
+            float myStrength = gauss((myCenterDistance/(theSize/1.75)));
+            myWeight += myStrength;
+            
+            float4 myBlurTexel = myStrength * tex2D(theTexSampler, theTexCoord + float2(i*pixW, 0));
+            myReturn += myBlurTexel;
+        }        
+    } else {
+        for (float j=-theSize; j<theSize; j++)
+        { 
+            float myCenterDistance = length(float2(0, j));         
+            float myStrength = gauss((myCenterDistance/(theSize/1.75)));
+            myWeight += myStrength;
+            
+            float4 myBlurTexel = myStrength * tex2D(theTexSampler, theTexCoord + float2(0, j*pixH));
+            myReturn += myBlurTexel;
+        }        
+    }
+    myReturn *= 1.0/myWeight;
+    return myReturn;
+}
+
+void mainVertex(float4 thePosition  : POSITION,
+                     float4 theTexCoord0 : TEXCOORD0,
+                     uniform float4x4 GL_MODELVIEW_PROJECTION,
+                     uniform float4x4 GL_TEXTURE,
+                     out float4 oPosition : POSITION,
+                     out float2 oTexCoord : TEXCOORD0)
+
+{
+    oPosition  = mul(GL_MODELVIEW_PROJECTION, thePosition);
+    oTexCoord = mul(GL_TEXTURE, theTexCoord0).xy;
+}
+
+uniform int blurpass;
+uniform float width;
+uniform float height;
+uniform float blur;
+uniform sampler2D tex0;
+uniform float4 surfacecolor;
+
+void mainFragment(in float4 iPosition : POSITION,
+                  in float2 iTexCoord : TEXCOORD0,
+                  out float4 oColor : COLOR0)
+{    
+    if (blur == 0.0) {
+        oColor = tex2D(tex0, float2(iTexCoord.xy));
+    } else {
+        oColor = apply2PassGauss(tex0, iTexCoord.xy, blurpass, blur, width, height);
+    }
+}
