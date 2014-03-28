@@ -190,10 +190,13 @@ spark.Canvas.Constructor = function (Protected) {
     Public.realize = function () {
         var myWorldId, myCanvasId;
         var myMultiSampling     = Protected.getNumber("multisamples", 0);
+        var myAutoNearFarFlag   = Protected.getBoolean("autoNearFar", true);
         var myBackgroundColor   = null;
         var myWidth             = Protected.getNumber("width", Public.root.width);
         var myHeight            = Protected.getNumber("height", Public.root.height);
         
+        Public.setAutoNearFarPlane(myAutoNearFarFlag);
+
         _myRenderArea = new OffscreenRenderArea();
         _myRenderArea.renderingCaps = Public.getDefaultRenderingCapabilites() | Renderer.FRAMEBUFFER_SUPPORT;
         _myRenderArea.multisamples = myMultiSampling;
@@ -321,6 +324,7 @@ spark.Canvas.Constructor = function (Protected) {
             var myHandle = _bindings[spark.Canvas.BINDING_SLOT.POST_VIEWPORT][handleId];
             myHandle.cb(theViewport);
         }
+
         Base.onPostViewport(theViewport);
     };
     
