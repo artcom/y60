@@ -409,7 +409,7 @@ spark.OSD.Constructor = function (Protected) {
                 myProperty = _mySettings[myTab.name][settingskey];
             }
             if (myProperty) {
-                myValue = parseFloat(myProperty);
+                myValue = ("start_value" in theOptions && (theOptions.start_value !== null)) ? theOptions.start_value : parseFloat(myProperty);
             } else {
                 appendPropertyToSettings(myTab, myGroup, settingskey, myValue.toFixed(precision));
             }

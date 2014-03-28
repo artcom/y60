@@ -185,6 +185,12 @@ function clamp(theValue, theMin, theMax) {
     return theValue;
 }
 
+function linearMap(theValue, theMin, theMax, theTargetMin, theTargetMax) {
+    var myNormedValue = theValue / (theMax - theMin);
+    var myMappedValue = theTargetMin + ((theTargetMax - theTargetMin) * myNormedValue)
+    return myMappedValue;
+}
+
 function tanh(x) {
     var myExp = Math.exp(x);
     var myNegExp = Math.exp(-x);
