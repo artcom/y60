@@ -1,6 +1,7 @@
 set(SOURCES
 Connection.cpp
 HttpServer.cpp
+HttpHeader.cpp
 curl/Client.cpp
 JSHttpClient.cpp
 JSHttpServer.cpp

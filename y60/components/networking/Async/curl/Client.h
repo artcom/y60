@@ -86,6 +86,8 @@ namespace curl {
             bool _continueFlag;
             struct curl_slist *_reqHeaders;
             asl::Ptr<asl::Block> _requestBody;
+            //static const std::string multiple_header_whitelist_array[];
+            //static std::set<std::string> multiple_header_whitelist_set;
         public:
             /// creates a new HttpClient
             Client(JSContext * cx, JSObject * theOpts);
@@ -126,6 +128,8 @@ namespace curl {
             };
         private:
             Client();
+        
+            long getResponseCode();
 
             void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere); 
             bool hasCallback(const char * theName);

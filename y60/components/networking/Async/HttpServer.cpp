@@ -89,14 +89,15 @@ namespace http {
     {
         std::string myResponseString;
         try {
-            jsval argv[3], rval;
+            jsval argv[4], rval;
 
             argv[0] = jslib::as_jsval(theCallback.context, theRequest.method);
             argv[1] = jslib::as_jsval(theCallback.context, theRequest.body);
             argv[2] = jslib::as_jsval(theCallback.context, theRequest.uri ); 
+            argv[3] = jslib::as_jsval(theCallback.context, theRequest.headers ); 
 
             jslib::JSA_CallFunctionValue(theCallback.context, theCallback.object, theCallback.functionValue, 
-                                         3, argv, &rval);
+                                         4, argv, &rval);
             
             if (JSVAL_IS_VOID(rval)) {
                 theReply.status = reply::no_content;

@@ -137,11 +137,18 @@ namespace curl {
             if (!JSVAL_IS_VOID(propValue) && jslib::convertFrom(_jsContext, propValue, nativeValue)) {
                 _reqHeaders = curl_slist_append(_reqHeaders, std::string("Content-Type: "+nativeValue).c_str());
             }
+
+            JS_GetProperty(_jsContext, _jsOptsObject, "accept", &propValue);
+            if (!JSVAL_IS_VOID(propValue) && jslib::convertFrom(_jsContext, propValue, nativeValue)) {
+                _reqHeaders = curl_slist_append(_reqHeaders, std::string("Accept: "+nativeValue).c_str());
+            }
         }
         
         setCurlOption<long>(_jsOptsObject, "connecttimeout", CURLOPT_CONNECTTIMEOUT, 0);
+        setCurlOption<std::string>(_jsOptsObject, "cookie", CURLOPT_COOKIE,0);
+        
+        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_HTTPHEADER, _reqHeaders);
 
-        myStatus = curl_easy_setopt(_curlHandle, CURLOPT_HTTPHEADER, _reqHeaders); 
         checkCurlStatus(myStatus, PLUS_FILE_LINE);
 
         if(!JS_AddNamedRoot(_jsContext, &_jsOptsObject, debugIdentifier.c_str())) {
@@ -150,10 +157,19 @@ namespace curl {
     
     }
 
+    long
+    Client::getResponseCode() {
+        long myResponseCode = 0;
+        CURLcode myStatus = curl_easy_getinfo(_curlHandle, CURLINFO_HTTP_CODE, &myResponseCode);
+        checkCurlStatus(myStatus, PLUS_FILE_LINE);
+        return myResponseCode;
+    }
+
     void 
     Client::performSync() {
         CURLcode myStatus = curl_easy_perform(_curlHandle);
         onDone(myStatus);
+
     }
 
     void
@@ -216,6 +232,7 @@ namespace curl {
     bool 
     Client::getResponseHeader(const std::string & theHeader, std::string & theValue) const {
         ScopeLocker L(_lockResponseHeaders, false);
+
         Headers::const_iterator it = _privateResponseHeaders.find(theHeader);
         if (it != _privateResponseHeaders.end()) {
             theValue = it->second;
@@ -274,9 +291,11 @@ namespace curl {
             _privateResponseBuffer->resize(0);
         }
 
-        AC_DEBUG << "onDone. CURLcode is " << result << " for " << this;
-        AC_DEBUG << "error string:" << std::string(asl::begin_ptr(_myErrorBuffer));
-        if (result == CURLE_OK) {
+        AC_INFO << "onDone. CURLcode is " << result << " for " << this;
+        AC_INFO << "error string:" << std::string(asl::begin_ptr(_myErrorBuffer));
+
+        long myResponseCode = getResponseCode();
+        if (myResponseCode / 100 == 2) {
             if (hasCallback("success")) {
                 jsval argv[3], rval;
                 argv[0] = as_jsval(_jsContext, _myResponseBlock);
@@ -288,10 +307,11 @@ namespace curl {
         } else {
             if (hasCallback("error")) {
                 AC_DEBUG << "calling error";
-                jsval argv[2], rval;
-                argv[0] = as_jsval(_jsContext, result);
+                jsval argv[3], rval;
+                argv[0] = as_jsval(_jsContext, myResponseCode);
                 argv[1] = as_jsval(_jsContext, std::string(asl::begin_ptr(_myErrorBuffer)));
-                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, _jsOptsObject, "error", 2, argv, &rval);
+                argv[2] = OBJECT_TO_JSVAL(_jsWrapper);
+                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, _jsOptsObject, "error", 3, argv, &rval);
             };
         }
         AC_DEBUG << "freeing root for " << debugIdentifier;
@@ -332,6 +352,10 @@ namespace curl {
         return _continueFlag ? size : 0;
     };
 
+    static const std::string multiple_header_whitelist[] = { "Set-Cookie" };
+    static const std::set<std::string> multiple_header_whitelist_set(multiple_header_whitelist, multiple_header_whitelist + 
+                                                                     sizeof(multiple_header_whitelist)/sizeof(*multiple_header_whitelist));
+
     size_t 
     Client::headerFunction(const char *ptr, size_t size) {
         std::string headerLine(ptr, size);
@@ -342,12 +366,17 @@ namespace curl {
         if ( p != std::string::npos ) {
             header = trim(headerLine.substr(0, p));
             value = trim(headerLine.substr(p+1, std::string::npos), " \n\r");
-            AC_TRACE << "adding '" << header << "' with '" << value << "'";
         }
-
+        
         // NOTE: this will be called from one of io_service's threads
         ScopeLocker L(_lockResponseHeaders, true);
-        _privateResponseHeaders.insert(make_pair(header, value));
+        Headers::const_iterator it = _privateResponseHeaders.find(header);
+        bool myHeaderIsOnWhitelistFlag = multiple_header_whitelist_set.find(header) != multiple_header_whitelist_set.end();
+        if (myHeaderIsOnWhitelistFlag && it != _privateResponseHeaders.end()) {
+            _privateResponseHeaders[header] = it->second + ", " + value;
+        } else {
+            _privateResponseHeaders.insert(make_pair(header, value));            
+        }
         return _continueFlag ? size : 0;
     };
 

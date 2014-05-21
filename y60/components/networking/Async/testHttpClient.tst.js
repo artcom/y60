@@ -258,7 +258,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/headers",
             type: "GET",
-            verbose: true,
+            verbose: false,
             success: function (data, code, response) {
                 obj.code = response.status;
                 obj.custom_header = response.getResponseHeader("X-Custom-Header");
@@ -319,7 +319,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/echo",
             type: "POST",
-            verbose: true,
+            verbose: false,
             success: function (data, code, response) {
                 obj.responseText = response.responseText;
                 SUCCESS("testPostRequest");
@@ -349,12 +349,46 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         var myClient = new Async.HttpClient({
             url: "http://127.0.0.1:3003/echo",
             type: "POST",
+            verbose: false,
+            data: "Hello World!",
+            contentType: "text/plain",
+            success: function (data, code, response) {
+                obj.responseText = response.responseText;
+                SUCCESS("testPostRequest");
+                done = true;
+            },
+            error: function () {
+                FAILURE("testPostRequest");
+                done = true;
+            }
+        });
+
+        while (true) {
+            Async.onFrame();
+            gc();
+            msleep(1);
+            if (done) {
+                break;
+            }
+        }
+        ENSURE_EQUAL("POST:Hello World!", obj.responseText);
+    };
+
+    function testCookieRequest() {
+        var done = false;
+
+        Logger.info("creating client");
+        var myClient = new Async.HttpClient({
+            url: "http://127.0.0.1:3003/echo",
+            type: "POST",
+            cookie: "testCookie",
             verbose: true,
             data: "Hello World!",
             contentType: "text/plain",
             success: function (data, code, response) {
                 obj.responseText = response.responseText;
                 SUCCESS("testPostRequest");
+                ENSURE_EQUAL("testCookie", response.getResponseHeader("Cookie"));
                 done = true;
             },
             error: function () {
@@ -382,7 +416,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             url: "http://127.0.0.1:3003/echo",
             type: "PUT",
             data: "Hello World!",
-            verbose: true,
+            verbose: false,
             contentType: "text/plain",
             success: function (data, code, response) {
                 obj.responseText = response.responseText;
@@ -478,9 +512,13 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
             headers: function(theMethod, theBody) {
                 return [201, { "X-Custom-Header":"Custom-Value" }, "custom headers received"]; 
                  },
-            echo: function(theMethod, theBody) {
-                return theMethod+":"+theBody;
-                 }
+            echo: function(theMethod, theBody, theURI, theRequestHeaders) {
+                var myResponseHeaders = {};
+                if ("Cookie" in theRequestHeaders) {
+                    myResponseHeaders["Cookie"] = theRequestHeaders["Cookie"] ;
+                }
+                return [200, myResponseHeaders, theMethod+":"+theBody];
+            }
 
         };
         obj.myServer.start("0.0.0.0", "3003");
@@ -503,6 +541,7 @@ HttpClientUnitTest.prototype.Constructor = function (obj, theName) {
         testBigRequest();
         testRequestProgressError();
         testRequestAbort();
+        testCookieRequest();
 
         obj.myServer = null;
         gc();
