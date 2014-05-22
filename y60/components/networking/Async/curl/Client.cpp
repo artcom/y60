@@ -138,7 +138,7 @@ namespace curl {
                 _reqHeaders = curl_slist_append(_reqHeaders, std::string("Content-Type: "+nativeValue).c_str());
             }
 
-            JS_GetProperty(_jsContext, _jsOptsObject, "accept", &propValue);
+            JS_GetProperty(_jsContext, _jsOptsObject, "dataType", &propValue);
             if (!JSVAL_IS_VOID(propValue) && jslib::convertFrom(_jsContext, propValue, nativeValue)) {
                 _reqHeaders = curl_slist_append(_reqHeaders, std::string("Accept: "+nativeValue).c_str());
             }
@@ -155,14 +155,6 @@ namespace curl {
             AC_WARNING << "failed to root request object!";
         }
     
-    }
-
-    long
-    Client::getResponseCode() {
-        long myResponseCode = 0;
-        CURLcode myStatus = curl_easy_getinfo(_curlHandle, CURLINFO_HTTP_CODE, &myResponseCode);
-        checkCurlStatus(myStatus, PLUS_FILE_LINE);
-        return myResponseCode;
     }
 
     void 
@@ -291,12 +283,11 @@ namespace curl {
             _privateResponseBuffer->resize(0);
         }
 
-        AC_INFO << "onDone. CURLcode is " << result << " for " << this;
-        AC_INFO << "error string:" << std::string(asl::begin_ptr(_myErrorBuffer));
+        AC_DEBUG << "onDone. CURLcode is " << result << " for " << this;
+        AC_DEBUG << "error string:" << std::string(asl::begin_ptr(_myErrorBuffer));
 
-        long myResponseCode = getResponseCode();
-        if (myResponseCode / 100 == 2) {
-            if (hasCallback("success")) {
+        if (result == CURLE_OK) {
+           if (hasCallback("success")) {
                 jsval argv[3], rval;
                 argv[0] = as_jsval(_jsContext, _myResponseBlock);
                 argv[1] = as_jsval(_jsContext, "success");
@@ -307,11 +298,10 @@ namespace curl {
         } else {
             if (hasCallback("error")) {
                 AC_DEBUG << "calling error";
-                jsval argv[3], rval;
-                argv[0] = as_jsval(_jsContext, myResponseCode);
+                jsval argv[2], rval;
+                argv[0] = as_jsval(_jsContext, result);
                 argv[1] = as_jsval(_jsContext, std::string(asl::begin_ptr(_myErrorBuffer)));
-                argv[2] = OBJECT_TO_JSVAL(_jsWrapper);
-                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, _jsOptsObject, "error", 3, argv, &rval);
+                /*JSBool ok =*/ JSA_CallFunctionName(_jsContext, _jsOptsObject, _jsOptsObject, "error", 2, argv, &rval);
             };
         }
         AC_DEBUG << "freeing root for " << debugIdentifier;

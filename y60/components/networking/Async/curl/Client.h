@@ -129,8 +129,6 @@ namespace curl {
         private:
             Client();
         
-            long getResponseCode();
-
             void checkCurlStatus(CURLcode theStatusCode, const std::string & theWhere); 
             bool hasCallback(const char * theName);
             void prepareRequestBody();
