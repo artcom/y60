@@ -81,10 +81,11 @@ namespace y60 {
         float myPlaySpeed = _myMovie->get<PlaySpeedTag>();
         if (_myLastSystemTime >= 0) {
             _myMovieTime += (theSystemTime - _myLastSystemTime) * myPlaySpeed;
+            // disabled this code, cause looping movie playback failed with new ffmpeg: the enforced wraparound here is not needed anymore(vs, 2014)
             // if difference between last system time and current system time is bigger than movie duration
-            if (getFrameCount() != -1 && _myMovieTime * getFrameRate() > getFrameCount()) {
+            /*if (getFrameCount() != -1 && _myMovieTime * getFrameRate() > getFrameCount()) {
                 _myMovieTime = getFrameCount() / getFrameRate();
-            }
+            }*/
             // Calculate the wraparaound for reverse playback
             if (_myMovieTime < 0) {
                 unsigned myFrameCount = getFrameCount();
