@@ -52,32 +52,7 @@ function removeOverlay(theOverlayNode) {
     if ("material" in theOverlayNode && theOverlayNode.material) {
         var myMaterialNode = theOverlayNode.getElementById(theOverlayNode.material);
         if (myMaterialNode) {
-
-            // Remove texture,image
-            var myTextureUnits = myMaterialNode.find("textureunits");
-            if (myTextureUnits) {
-                for (var i = 0; i < myTextureUnits.childNodesLength(); ++i) {
-                    var myTextureUnit = myTextureUnits.childNode(i);
-                    var myTexture = myTextureUnits.getElementById(myTextureUnit.texture);
-                    if (window.scene.textures.findAll("texture[@image='"+ myTexture.image+ "']").length === 1) {
-                        // our texture is the only one referencing this image, safe to remove
-                        var myImage = myTexture.getElementById(myTexture.image);
-                        myImage.parentNode.removeChild(myImage);
-                    } else {
-                        Logger.warning("More than one texture references image id=" + myTexture.image);
-                    }
-
-                    if (window.scene.materials.findAll(".//textureunit[@texture='"+ myTexture.id+ "']").length === 1) {
-                        // our textureunit is the only one referencing this texture, safe to remove
-                        myTexture.parentNode.removeChild(myTexture);
-                    } else {
-                        Logger.warning("More than one textureunit references texture id=" + myTexture.id);
-                    }
-                }
-            }
-
-            // Remove material node
-            myMaterialNode.parentNode.removeChild(myMaterialNode);
+            removeMatImgMovFromScene(myMaterialNode);
         } else {
             Logger.warning("Could not remove material node " + theOverlayNode.material);
         }

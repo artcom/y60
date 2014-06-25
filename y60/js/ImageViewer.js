@@ -102,6 +102,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
         } else {
             window.canvas.backgroundcolor = [0.5,0.5,0.5,1];
         }
+            window.backgroundColor = [0.0, 0.0, 0.0];
         //window.fixedFrameTime = 1/60;
         //window.swapInterval    = 0;
 
@@ -650,7 +651,7 @@ ImageViewerApp.prototype.Constructor = function(self, theArguments) {
             _myMovieNode.decoderhint = theDecoderHint;
             _myMovieNode.audio_stream = 0;
             //_myMovieNode.maxcachesize = 32;
-            _myMovieNode.targetpixelformat = "YUV420";//"YUV444";//"YUV444";//"YUVA420";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA";//"RGBA8";
+            _myMovieNode.targetpixelformat = "RGBA8";//RGBA8"; //YUV420";//"YUV444";//"YUV444";//"YUVA420";//"YUV420";//"ALPHA";//"LUMINANCE8";//"RGB" // "ALPHA";//"RGBA8";
         }
 
         if (_myFullSizeMode) {

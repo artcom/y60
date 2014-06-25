@@ -319,7 +319,9 @@ namespace inet {
 
     string
     Request::urlDecode(const std::string & theUrl) {
-        return string(curl_unescape(theUrl.c_str(), 0));
+        string myTmp(theUrl);
+        findAndReplace(myTmp, "+", "%20");
+        return string(curl_unescape(myTmp.c_str(), 0));
     }
     
     struct WriteString {

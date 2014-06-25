@@ -1310,3 +1310,34 @@ utils.rgbFromHSV = function(h, s, v){
     } 
     return new Vector3f(r, g, b);
 }
+
+function removeMatImgMovFromScene(theMaterial) {
+    if (theMaterial) {
+        // Remove texture,image
+        var myTextureUnits = theMaterial.find("textureunits");
+        if (myTextureUnits) {
+            for (var i = 0; i < myTextureUnits.childNodesLength(); ++i) {
+                var myTextureUnit = myTextureUnits.childNode(i);
+                var myTexture = myTextureUnits.getElementById(myTextureUnit.texture);
+                if (window.scene.textures.findAll("texture[@image='"+ myTexture.image+ "']").length === 1) {
+                    // our texture is the only one referencing this image, safe to remove
+                    var myImage = myTexture.getElementById(myTexture.image);
+                    print("**** remove image: " + myImage.name, myImage.id)
+                    myImage.parentNode.removeChild(myImage);
+                } else {
+                    Logger.warning("More than one texture references image id=" + myTexture.image);
+                }
+
+                if (window.scene.materials.findAll(".//textureunit[@texture='"+ myTexture.id+ "']").length === 1) {
+                    // our textureunit is the only one referencing this texture, safe to remove
+                    print("**** remove texture: " + myTexture.id)
+                    myTexture.parentNode.removeChild(myTexture);
+                } else {
+                    Logger.warning("More than one textureunit references texture id=" + myTexture.id);
+                }
+            }
+        }
+        // Remove material node
+        theMaterial.parentNode.removeChild(theMaterial);
+    } 
+}
