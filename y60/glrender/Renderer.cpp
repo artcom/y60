@@ -181,7 +181,6 @@ namespace y60 {
     Renderer::switchMaterial(const Viewport & theViewport,
                              const MaterialBase & theMaterial,
                              bool isOverlay) {
-//AC_PRINT << theMaterial.get<NameTag>();
         if (_myPreviousMaterial == &theMaterial) {
             return false;
         } else if (_myPreviousMaterial == 0) {
@@ -1329,7 +1328,6 @@ namespace y60 {
     // called once per Canvas per Frame
     void
     Renderer::render(ViewportPtr theViewport) {
-//AC_PRINT << "---------";
 
         AC_TRACE << "Rendering:" << theViewport->getNode();
         MAKE_GL_SCOPE_TIMER(render);
@@ -1368,7 +1366,6 @@ namespace y60 {
 
             myWorld = myCamera->getWorld();
             WorldPtr myWorldFacade = myWorld->getFacade<World>();
-
             if (theViewport->get<ViewportCullingTag>()) {
                 if (theViewport->get<ViewportDebugCullingTag>()) {
                     renderFrustum( myCameraNode );

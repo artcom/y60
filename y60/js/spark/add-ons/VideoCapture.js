@@ -76,4 +76,22 @@ spark.VideoCapture.Constructor = function (Protected) {
     Public.postRealize = function () {
         Base.postRealize();
     };
+    Public.play = function() {
+        if(_myCaptureNode.nodeName === "capture") {
+            _myCaptureNode.playmode = "play";
+        }
+    };
+
+    Public.stop = function() {
+        if(_myMovie.nodeName === "capture") {
+            _myCaptureNode.playmode = "stop";
+        }
+    };
+
+    Public.pause = function() {
+        if(_myCaptureNode.nodeName === "capture") {
+            _myCaptureNode.playmode = "pause";
+        }
+    };
+
 };
