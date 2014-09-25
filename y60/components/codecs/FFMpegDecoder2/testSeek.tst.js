@@ -44,7 +44,7 @@ function SeekTest(theArguments) {
         //"xvid_160x120_25_10_audio.avi",
         //"xvid_160x120_25_10_audio.mov",
         //"xvid_160x120_25_10_noaudio.mov",
-        "mpeg1_160x120_25_10_audio.mpg",
+        //"mpeg1_160x120_25_10_audio.mpg",
         "mpeg2_160x120_25_10_audio.mpg",
         "mpeg2intra_160x120_25_10_audio.mpg"
     ];
