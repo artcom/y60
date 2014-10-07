@@ -18,7 +18,11 @@ spark.VideoCapture.Constructor = function (Protected) {
     var _myAVTCameraFlag = 0;
     var _myFramerate     = 30;
     var _myBitsPerPixel  = 24;
-    
+    var _myGain = -1;
+    var _myPacketSize = -1;
+    var _myExposure = -1;
+    var _myWBFlag = 0;
+    var _myPacketSize = 0;
     /////////////////////
     // Private Methods //
     /////////////////////
@@ -29,7 +33,7 @@ spark.VideoCapture.Constructor = function (Protected) {
         _myCaptureNode.name = "CaptureNode";
         _myCaptureNode.id = createUniqueId();
         _myCaptureNode.playmode = "play";
-        _myCaptureNode.src = _myCaptureType + "://ip=" + _myIp + ";input=1device=" + _myDeviceId + "avtcamera=" + _myAVTCameraFlag + "width=" + theWidth + "height=" + theHeight + "deinterlace=0fps=" + _myFramerate + "bpp=" + _myBitsPerPixel;
+        _myCaptureNode.src = _myCaptureType + "://ip=" + _myIp + ";input=1device=" + _myDeviceId + "avtcamera=" + _myAVTCameraFlag + "width=" + theWidth + "height=" + theHeight + "deinterlace=0fps=" + _myFramerate + "bpp=" + _myBitsPerPixel + "gain=" + _myGain +"exposure=" + _myExposure + "wbflag=" + _myWBFlag + "packetsize=" + _myPacketSize;
         Logger.info("Create Capture node with src: " + _myCaptureNode.src);
         if (_myCaptureNode) {
             window.scene.loadCaptureFrame(_myCaptureNode);
@@ -56,6 +60,10 @@ spark.VideoCapture.Constructor = function (Protected) {
         _myCaptureType  = Protected.getString("type", "dshow");
         _myFramerate    = Protected.getNumber("fps", 30);
         _myBitsPerPixel = Protected.getNumber("bpp", 24);
+        _myGain         = Protected.getNumber("gain", -1);
+        _myExposure     = Protected.getNumber("exposure", -1);
+        _myWBFlag       = Protected.getNumber("wbflag", 0);
+        _myPacketSize   = Protected.getNumber("packetsize", 0);
         
         if (operatingSystem() === "WIN32") {
             if (_myCaptureType === "dshow") {
@@ -66,6 +74,9 @@ spark.VideoCapture.Constructor = function (Protected) {
                 plug("AlliedEthernetCameraCapture");
                 _myIp = Protected.getString("ip");
             }
+        } 
+        if (_myCaptureType === "vimba") {
+            _myDeviceId = Protected.getString("device", "0");
         }
         
         createNewCaptureNode(Protected.getNumber("capturewidth",  800),
@@ -83,7 +94,7 @@ spark.VideoCapture.Constructor = function (Protected) {
     };
 
     Public.stop = function() {
-        if(_myMovie.nodeName === "capture") {
+        if(_myCaptureNode.nodeName === "capture") {
             _myCaptureNode.playmode = "stop";
         }
     };
@@ -93,5 +104,8 @@ spark.VideoCapture.Constructor = function (Protected) {
             _myCaptureNode.playmode = "pause";
         }
     };
+    Public.__defineGetter__("capturenode", function () {
+        return _myCaptureNode;
+    });
 
 };
