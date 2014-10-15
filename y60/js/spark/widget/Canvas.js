@@ -194,7 +194,6 @@ spark.Canvas.Constructor = function (Protected) {
         var myBackgroundColor   = null;
         var myWidth             = Protected.getNumber("width", Public.root.width);
         var myHeight            = Protected.getNumber("height", Public.root.height);
-        
         Public.setAutoNearFarPlane(myAutoNearFarFlag);
 
         _myRenderArea = new OffscreenRenderArea();

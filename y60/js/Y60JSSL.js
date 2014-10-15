@@ -548,6 +548,13 @@ function padStringFront(theString, thePaddingChar, theLength) {
     if (typeof(theString) !== "string") {
         theString = String(theString);
     }
+    if (typeof(thePaddingChar) !== "string") {
+        thePaddingChar = String(thePaddingChar);
+    }
+    // this check avoids a endless while loop condition below
+    if (thePaddingChar.length == 0) {
+        thePaddingChar = "0";
+    }
     while (theString.length < theLength) {
         theString = thePaddingChar + theString;
     }
@@ -558,6 +565,13 @@ function padStringBack(theString, thePaddingChar, theLength) {
     if (typeof(theString) !== "string") {
         //print("converting from " + typeof(theString));
         theString = String(theString);
+    }
+    if (typeof(thePaddingChar) !== "string") {
+        thePaddingChar = String(thePaddingChar);
+    }
+    // this check avoids a endless while loop condition below
+    if (thePaddingChar.length == 0) {
+        thePaddingChar = "0";
     }
     while (theString.length < theLength) {
         theString = theString + thePaddingChar;

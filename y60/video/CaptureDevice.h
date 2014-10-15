@@ -144,6 +144,9 @@ namespace y60 {
         void setTimeCode(const std::string & theTimeCode) {
             _myParent->set<TimeCodeTag>(theTimeCode);
         }
+        const Capture * getCapture() const{
+            return _myParent;
+        }
 
     private:
         Capture *   _myParent;
