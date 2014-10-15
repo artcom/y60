@@ -36,7 +36,7 @@
 //
 //=============================================================================
 
-#ifndef _Y60_INPUT_TOCUHEVENT_INCLUDED_
+#ifndef _Y60_INPUT_TOUCHEVENT_INCLUDED_
 #define _Y60_INPUT_TOUCHEVENT_INCLUDED_
 
 #include "y60_input_settings.h"
