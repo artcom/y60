@@ -37,6 +37,7 @@
 #include <asl/base/UnitTest.h>
 #include <asl/net/net.h>
 #include <asl/base/file_functions.h>
+#include <asl/base/os_functions.h>
 #include <iostream>
 #include <sstream>
 
@@ -120,7 +121,7 @@ class RequestTest : public UnitTest {
         RequestTest() : UnitTest("RequestTest") {};
 
         void run() {
-            const int PORT = 2346;
+            const asl::Unsigned16 PORT = asl::getenv<asl::Unsigned16>("TEST_PORT", 2346);
 
             ConduitAcceptor<TCPPolicy> myTestAcceptor(TCPPolicy::Endpoint("localhost",PORT), TestServer::create);
             myTestAcceptor.start();
