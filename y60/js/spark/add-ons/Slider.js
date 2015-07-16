@@ -22,7 +22,9 @@ spark.Slider.Constructor = function (Protected) {
     var _sticky             = null;
     var _snappy             = null;
     var _precision          = 10;
-                            
+    var _useRasterOnSlide   = null;                            
+    var _snapOnRelease      = null;
+
     var _myEventTarget      = null;
                             
     var _myCursorOrigin     = null;
@@ -61,12 +63,12 @@ spark.Slider.Constructor = function (Protected) {
         theEvent.dampenedPos = myDampenedPos;
     }
 
-    function ensurePrecision() {
+    function ensurePrecision(enforceRaster) {
         if (!_verticalLock && _mySliderBackground.height !== _myActiveCursor.height) {
             _myActiveCursor.y = getRelativeY() * (_mySliderBackground.height - _myActiveCursor.height);
         }
         if (!_horizontalLock && _mySliderBackground.width !== _myActiveCursor.width) {
-            _myActiveCursor.x = getRelativeX() * (_mySliderBackground.width - _myActiveCursor.width);
+            _myActiveCursor.x = getRelativeX(enforceRaster) * (_mySliderBackground.width - _myActiveCursor.width);
         }
     }
     
@@ -86,7 +88,7 @@ spark.Slider.Constructor = function (Protected) {
         }
     }
 
-    function getRelativeX() {
+    function getRelativeX(enforceRaster) {
         if (_horizontalLock) {
             return 0;
         }
@@ -99,7 +101,12 @@ spark.Slider.Constructor = function (Protected) {
             if (myOldRasterIndex != _rasterIndex && _rasterSnapCb) {
                 _rasterSnapCb();
             }
-            return _relativeRasterPositions[_rasterIndex];
+            var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
+            if (!_useRasterOnSlide && (enforceRaster == undefined || !enforceRaster)) {
+                return (_relativeRasterPositions[_relativeRasterPositions.length-1] - _relativeRasterPositions[0]) * myRelativeX;
+            } else {
+                return _relativeRasterPositions[_rasterIndex];
+            }
         } else {
             var myRelativeX = _myActiveCursor.x / (_mySliderBackground.width - _myActiveCursor.width);
             return (_precision === 0) ? myRelativeX : myRelativeX.toFixed(_precision);
@@ -237,6 +244,8 @@ spark.Slider.Constructor = function (Protected) {
         _centered       = Protected.getBoolean("centered", true);
         _sticky         = Protected.getBoolean("sticky", true);
         _snappy         = Protected.getBoolean("snappy", true);
+        _snapOnRelease  = Protected.getBoolean("snapOnRelease", false);
+        _useRasterOnSlide = Protected.getBoolean("useRasterOnSlide", true);
         _precision      = Protected.getNumber("precision", _precision);
         Public.addEventListener(spark.CursorEvent.APPEAR_ENTER, Public.onSlideStart, true);
         Public.addEventListener(spark.CursorEvent.MOVE, Public.onSlide, true);
@@ -325,6 +334,9 @@ spark.Slider.Constructor = function (Protected) {
         if(theEvent.cursor.id in _myPosHistory) {
             Public.onSlide(theEvent);
             delete _myPosHistory[theEvent.cursor.id];
+            if (_snapOnRelease) {
+               ensurePrecision(_snapOnRelease); 
+            }
             _myIdleCursor.position = _myActiveCursor.position;
             _myIdleCursor.visible   = true;
             _myActiveCursor.visible = false;
