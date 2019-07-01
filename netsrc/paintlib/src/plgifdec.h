@@ -25,7 +25,8 @@
     ((GIFLIB_MAJOR == 4 && GIFLIB_MINOR >= 2) || GIFLIB_MAJOR > 4)
 
 void PrintGifError(void);
-
+#else
+#define HAS_PRINTGIFERROR
 #endif
 
 //! Compuserve gif file decoder using libungif to do the actual work. The
@@ -52,6 +53,7 @@ public:
   virtual void Close ();
 
 private:
+  void PrintError();
   void * m_pGifFile;
 
 };

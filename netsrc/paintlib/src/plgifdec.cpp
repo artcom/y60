@@ -33,17 +33,20 @@ extern "C"
 
 /* GIFLIB_MAJOR is only defined in libgif >= 4.1.6 */ 
 /* libgif 4.2.0 has retired PrintGifError() and added GifErrorString() */
-#if defined(GIFLIB_MAJOR) && defined(GIFLIB_MINOR) && \
-    ((GIFLIB_MAJOR == 4 && GIFLIB_MINOR >= 2) || GIFLIB_MAJOR > 4)
+#ifndef HAS_PRINTGIFERROR
 
 void
-PrintGifError(void) {
+PrintGifError(GifFileType * pGifFile) {
+#if GIFLIB_MAJOR >= 5
+    const char *Err = (const char*) GifErrorString(pGifFile->Error);
+#else
     char *Err = GifErrorString();
+#endif
 
     if (Err != NULL) {
         fprintf(stderr, "\nGIF-LIB error: %s.\n", Err);
     } else {
-        fprintf(stderr, "\nGIF-LIB undefined error %d.\n", GifError());
+        fprintf(stderr, "\nGIF-LIB undefined error.\n");
     }
 }
 
@@ -81,10 +84,23 @@ int GIF_Read_Data(GifFileType* pGifFile, GifByteType* pByteType, int length)
   return length;
 }
 
+inline void PLGIFDecoder::PrintError () {
+#ifndef HAS_PRINTGIFERROR
+  PrintGifError((GifFileType *)m_pGifFile);
+#else
+  PrintGifError();
+#endif
+}
+
 void PLGIFDecoder::Open (PLDataSource * pDataSrc)
 {
   PLASSERT (m_pGifFile == 0);
+#if defined(GIFLIB_MAJOR) && GIFLIB_MAJOR >= 5
+  int nError;
+  GifFileType * pGifFile= DGifOpen( (void*)pDataSrc, GIF_Read_Data, &nError);
+#else
   GifFileType * pGifFile= DGifOpen( (void*)pDataSrc, GIF_Read_Data);
+#endif
   m_pGifFile = (void*)pGifFile;
   SetBmpInfo (PLPoint (pGifFile->SWidth, pGifFile->SHeight), PLPoint (0,0), PLPixelFormat::I8);
 }
@@ -118,7 +134,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
   {
     if (DGifGetRecordType(pGifFile, &RecordType) == GIF_ERROR)
     {
-      PrintGifError();
+      PrintError();
       PLASSERT (false);
     }
 
@@ -127,7 +143,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
       case IMAGE_DESC_RECORD_TYPE:
         if (DGifGetImageDesc(pGifFile) == GIF_ERROR)
         {
-          PrintGifError();
+          PrintError();
           PLASSERT (false);
         }
         Row = pGifFile->Image.Top; /* Image Position relative to Screen. */
@@ -151,7 +167,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
 //              GifQprintf("\b\b\b\b%-4d", Count++);
               if (DGifGetLine(pGifFile, &pLineArray[j][Col], Width) == GIF_ERROR)
               {
-                PrintGifError();
+                PrintError();
                 PLASSERT (false);
               }
             }
@@ -163,7 +179,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
 //            GifQprintf("\b\b\b\b%-4d", i);
             if (DGifGetLine(pGifFile, &pLineArray[Row++][Col], Width) == GIF_ERROR)
             {
-              PrintGifError();
+              PrintError();
               PLASSERT (false);
             }
           }
@@ -174,7 +190,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
         // Check for transparency, skip any other extension records.
         if (DGifGetExtension(pGifFile, &ExtCode, &Extension) == GIF_ERROR)
         {
-          PrintGifError();
+          PrintError();
           PLASSERT (false);
         }
         if(Extension == NULL)
@@ -191,7 +207,7 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
           }
           if (DGifGetExtensionNext(pGifFile, &Extension) == GIF_ERROR)
           {
-            PrintGifError();
+            PrintError();
             PLASSERT (false);
           }
         } while(Extension != NULL);
@@ -222,7 +238,12 @@ void PLGIFDecoder::GetImage (PLBmpBase & Bmp)
 
 void PLGIFDecoder::Close ()
 {
+#if defined(GIFLIB_MAJOR) && GIFLIB_MAJOR >= 5
+  int nError;
+  DGifCloseFile((GifFileType*)m_pGifFile, &nError);
+#else
   DGifCloseFile((GifFileType*)m_pGifFile);
+#endif
   m_pGifFile = 0;
   PLPicDecoder::Close();
 }
