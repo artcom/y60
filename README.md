@@ -4,7 +4,7 @@ Y60 itself is implemented in C++ for the Windows, Linux and Mac OS X platforms. 
 
 It is open-source licensed under GPL and available for windows, linux and mac-osx.
 
-# Prerequisits
+# Prerequisites
 - CMake: download and install the latest installer from: [cmake]
 - Cg Toolkit: get the latest installer from [NVIDIA Cg Toolkit] or install it with your favorite package manager on your OS
 - y60 relies heavily on ASL the ART+COM Standard Library and AcMake, so you need to install or build those too. Instructions can be found in the readme at [ASL] and [AcMake]
@@ -78,7 +78,7 @@ Build with nmake via shell:
 These instructions should work on Ubuntu >=8.04 and Debian (>=lenny) RedHat/CentOS >= 6 on either x86 or X86_64 systems. The Dependent library names may vary on those target systems
 
 #### Install dependencies
-     sudo apt-get install build-essential autoconf2.13 libboost-dev libboost-system-dev libboost-thread-dev libsdl1.2-dev libglib2.0-dev libavcodec-dev libavformat-dev libswscale-dev libglew1.5-dev libcurl4-openssl-dev libopenexr-dev libjpeg62-dev libtiff4-dev libpng12-dev libungif4-dev libasound2-dev libfreetype6-dev libcrypto++-dev
+     sudo apt-get install git cmake nvidia-cg-dev build-essential autoconf2.13 libboost-dev libboost-system-dev libboost-thread-dev libsdl1.2-dev libglib2.0-dev libavcodec-dev libavformat-dev libswscale-dev libglew1.5-dev libcurl4-openssl-dev libssl-dev libopenexr-dev libtiff5-dev libpng12-dev libgif-dev libasound2-dev libfreetype6-dev libcrypto++-dev
 
 #### If you want to use the gtk binding, also known as G60, you also need:
      sudo apt-get install libgtkmm-2.4-dev libgtkglext1-dev libglademm-2.4-dev
