@@ -21,15 +21,9 @@
 #include "plexcept.h"
 #include "plexif.h"
 
-#include "jmemsrc.h"
 
-// This is for RGB_RED, RGB_GREEN, RGB_BLUE, RGB_PIXELSIZE
-#ifdef EXTERN
-    // avoid redefinition warning in jpeglib.h
-    #undef EXTERN
-#endif
-#define JPEG_INTERNALS
-#include <jmorecfg.h>
+
+#include "jmemsrc.h"
 
 #include <cstring> // memcpy() & co.
 #include <algorithm> // min/max
@@ -102,7 +96,7 @@ void PLJPEGDecoder::Open (PLDataSource * pDataSrc)
     jpeg_save_markers(&cinfo, JPEG_APP0 + 1, 0xFFFF);   
 //      jpeg_save_markers(&cinfo, JPEG_COM, 0xFFFF);     // also comment even though not really EXIF
 
-    jpeg_read_header (&cinfo, true);
+    jpeg_read_header (&cinfo, TRUE);
 	try{
 		m_pExifData->ReadData(&cinfo);
 	} catch (const PLTextException & e) {
@@ -161,7 +155,7 @@ void PLJPEGDecoder::GetImage (PLBmpBase & Bmp)
   {
     if (m_bFast)
     {
-      cinfo.do_fancy_upsampling = false;
+      cinfo.do_fancy_upsampling = FALSE;
     }
 
     // Choose floating point DCT method.

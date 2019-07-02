@@ -28,6 +28,12 @@
 
 extern "C"
 {
+// This is for RGB_RED, RGB_GREEN, RGB_BLUE, RGB_PIXELSIZE
+#ifdef EXTERN
+    // avoid redefinition warning in jpeglib.h
+    #undef EXTERN
+#endif
+#define JPEG_INTERNAL_OPTIONS
 #include "jpeglib.h"
 }
 

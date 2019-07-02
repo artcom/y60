@@ -24,19 +24,14 @@
 #endif
 extern "C"
 {
+// This is for RGB_RED, RGB_GREEN, RGB_BLUE, RGB_PIXELSIZE
+#define JPEG_INTERNAL_OPTIONS
 #include "jpeglib.h"
 }
 
 #include "plexcept.h"
 #include "jmemdest.h"
 
-// This is for RGB_RED, RGB_GREEN, RGB_BLUE, RGB_PIXELSIZE
-#ifdef EXTERN
-    // avoid redefinition warning in jpeglib.h
-    #undef EXTERN
-#endif
-#define JPEG_INTERNALS
-#include <jmorecfg.h>
 
 #include <cstring>
 #include <stdio.h>
@@ -129,8 +124,8 @@ void PLJPEGEncoder::DoEncode
 
     // set up user settings
     if (iQuality_)
-        jpeg_set_quality(m_pcinfo, iQuality_, true);
-    m_pcinfo->optimize_coding = bOptimizeCoding_;
+        jpeg_set_quality(m_pcinfo, iQuality_, TRUE);
+    m_pcinfo->optimize_coding = (bOptimizeCoding_) ? TRUE : FALSE;
     m_pcinfo->smoothing_factor = iSmoothingFactor_;
     // density will be in DPI
     if (uiDensityX_ || uiDensityY_)
@@ -140,7 +135,7 @@ void PLJPEGEncoder::DoEncode
         m_pcinfo->Y_density = static_cast<UINT16>(uiDensityY_);
     }
 
-    jpeg_start_compress (m_pcinfo, true);
+    jpeg_start_compress (m_pcinfo, TRUE);
     // if exif data available then write it must be after jpeg_start_compress
     if (m_pExifData)
     {
