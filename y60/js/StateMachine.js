@@ -45,7 +45,7 @@ var SM = (function () {
         self.__defineGetter__('id', function () {
             return _id;
         });
-        self.toString = function toString() {
+        self.toString = function () {
             return _id;
         };
         self._enter = function (thePreviousState, theData) {
@@ -75,7 +75,7 @@ var SM = (function () {
         self.handleEvent = function () {
             _subMachine.handleEvent.apply(_subMachine, arguments);
         };
-        self.toString = function toString() {
+        self.toString = function () {
             return self.id + "/(" + _subMachine + ")";
         };
         self.__defineGetter__("subMachine", function () {
@@ -97,7 +97,7 @@ var SM = (function () {
 
         var _subMachines = theStatemachines || [];
 
-        self.toString = function toString() {
+        self.toString = function () {
             return self.id + "/(" + _subMachines.join('|') + ")";
         };
 
@@ -160,7 +160,7 @@ var SM = (function () {
             self.states[_myPreparedArguments[i].id] = _myPreparedArguments[i];
         }
 
-        self.toString = function toString() {
+        self.toString = function () {
             if (_currentState in self.states) {
                 return self.states[_currentState].toString();
             } else {
